@@ -47,7 +47,7 @@ const MasonryGrid = () => {
           {item.type === 'vimeo' ? (
             <div className="video-container">
               <iframe
-                src={`https://player.vimeo.com/video/${item.videoId}?h=1ff8d3f9a0&autoplay=0&loop=1&muted=1`}
+                src={`https://player.vimeo.com/video/${item.videoId}?h=1ff8d3f9a0&autoplay=1&loop=1&muted=1`}
                 width="100%"
                 height="100%"
                 frameBorder="0"

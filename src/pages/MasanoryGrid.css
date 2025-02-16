@@ -11,7 +11,7 @@
     display: flex;
     flex-direction: column;
     border-radius: 15px;
-    padding: 0px;
+    padding: 0;  /* remove space around the video*/
     box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
     transition: transform 0.3s ease;
     overflow: hidden;
@@ -46,14 +46,4 @@
     height: 100%;
     border: none;
     border-radius: 10px;
-  }
-  @media (max-width: 600px) {
-    .masonry-grid {
-      grid-template-columns: 1fr;
-    }
-    
-    .masonry-item {
-      grid-column-end: span 1 !important;
-      grid-row-end: span 1 !important;
-    }
   }
