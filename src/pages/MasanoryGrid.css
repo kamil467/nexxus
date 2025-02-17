@@ -27,18 +27,16 @@
     }
 
     h3 {
-        font-size: 1.2rem; /* Smaller font size for headings */
-      }
-    
-      p {
-        font-size: 0.9rem; /* Smaller font size for paragraphs */
-      }
-    
-      .card-media {
-        height: auto; /* Allow media to scale naturally */
-      }
-
-    
+      font-size: 1.2rem;
+    }
+  
+    p {
+      font-size: 0.9rem;
+    }
+  
+    .card-media {
+      height: auto;
+    }
   }
 
   @media (max-width: 480px) {
@@ -51,15 +49,35 @@
 
     .masonry-item {
       width: 100% !important;
-      height: auto !important;
-      min-height: 250px !important;
+      height: 500px !important;
       grid-column: unset !important;
       grid-row: unset !important;
     }
 
-    .masonry-item[style*="grid-column-end"],
-    .masonry-item[style*="grid-row-end"] {
-      height: 400px !important;
+    .masonry-item .card-content {
+      height: 100% !important;
+      width: 100% !important;
+    }
+
+    .masonry-item .video-container {
+      position: absolute !important;
+      width: 100% !important;
+      height: 100% !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+    }
+
+    .masonry-item .video-container iframe {
+      position: absolute !important;
+      width: 100% !important;
+      height: 100% !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      object-fit: cover !important;
     }
   }
   
@@ -106,6 +124,7 @@
     width: 100%;
     height: 100%;
     position: relative;
+    overflow: hidden;
   }
   
   .video-container iframe {
