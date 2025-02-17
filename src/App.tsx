@@ -7,11 +7,13 @@ import Contact from './pages/Contact';
 import Footer from './components/Footer';
 import Test from './pages/Test';
 import WorkDetails from './pages/WorkDetails';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
+      <ScrollToTop />
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
