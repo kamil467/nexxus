@@ -26,8 +26,8 @@ const MasonryGrid = () => {
     { id: 20, cols: 2, rows: 2, background: '#fff' , type:'vimeo', videoId:'1057280811' , hId:'17964124a8' },
     { id: 21, cols: 1, rows: 2, background: '#fff' , type:'image', image:'https://images.unsplash.com/photo-1738273473785-99c1fc498c14?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw0MzJ8fHxlbnwwfHx8fHw%3D'},
     { id: 22, cols: 1, rows: 3, background: '#fff', type:'image', image:'https://images.unsplash.com/photo-1736173155834-6cd98d8dc9fe?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwyMDV8fHxlbnwwfHx8fHw%3D' },
-    { id: 23, cols: 1, rows: 3, background: '#fff' },
-    { id: 24, cols: 1, rows: 3, background: '#fff' },
+    { id: 23, cols: 1, rows: 3, background: '#fff', type:'image' , image:'https://plus.unsplash.com/premium_photo-1738091397333-48f0e514b467?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+    { id: 24, cols: 1, rows: 3, background: '#fff', type:'image' , image:'https://images.unsplash.com/photo-1738162571972-d8337de941e7?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
     { id: 25, cols: 2, rows: 2, background: '#fff' , type:'vimeo', videoId: '1057278002' , hId:'64b3293a30' }
   ];
 
@@ -47,7 +47,7 @@ const MasonryGrid = () => {
           {item.type === 'vimeo' ? (
             <div className="video-container">
               <iframe
-                src={`https://player.vimeo.com/video/${item.videoId}?h=${item.hId}&autoplay=1&loop=1&muted=1`}
+                src={`https://player.vimeo.com/video/${item.videoId}?h=${item.hId}&autoplay=1&loop=1&muted=1&background=1`}
                 width="100%"
                 height="100%"
                 frameBorder="0"
