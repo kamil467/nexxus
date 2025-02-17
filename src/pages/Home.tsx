@@ -1,41 +1,64 @@
 import React from 'react';
-import { ArrowDown, Play } from 'lucide-react';
+import { ArrowDown } from 'lucide-react';
 import Test from './Test';
 
 const Home = () => {
+  const scrollToWork = () => {
+    const workSection = document.getElementById('work');
+    workSection?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50">
       {/* Hero Section */}
-      <div className="container mx-auto px-4 pt-20 pb-48">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-1 items-center">
-          <div className="space-y-6">
-            <h1 className="text-5xl font-light leading-tight">
-              Crafting the future,<br />One pixel at a time
-            </h1>
-            <p className="text-gray-600 max-w-md">
-              Passionate about creating meaningful digital experiences that inspire and engage. Bringing ideas to life through innovative design and development.
-            </p>
-            <ArrowDown size={32} className="text-gray-400 animate-bounce" />
-          </div>
-          <div className="relative">
-            <img 
-              src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80" 
-              alt="Building"
-              className="rounded-lg w-72 h-72 object-cover absolute top-0 right-0"
-            />
-            <img 
-              src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80" 
-              alt="Nature"
-              className="rounded-lg w-64 h-64 object-cover absolute bottom-0 left-0"
-            />
+      <section className="min-h-[85vh] flex items-center -mt-20">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-8 relative">
+              <div className="absolute -top-10 -left-10 w-32 h-32 bg-blue-50 rounded-full blur-3xl opacity-60"></div>
+              <h1 className="text-6xl font-light leading-tight relative z-10">
+                Crafting the future,<br />One pixel at a time
+              </h1>
+              <p className="text-gray-600 max-w-md text-lg">
+                Passionate about creating meaningful digital experiences that inspire and engage. Bringing ideas to life through innovative design and development.
+              </p>
+              <button 
+                onClick={scrollToWork}
+                className="flex items-center space-x-3 bg-[#A9AC87] text-white px-6 py-3 rounded-full hover:bg-[#959872] transition-all duration-300 hover:translate-y-1 group hover:shadow-lg hover:shadow-[#A9AC87]/20"
+              >
+                <span className="text-lg font-medium">View Our Work</span>
+                <ArrowDown 
+                  size={28} 
+                  className="animate-bounce group-hover:animate-none group-hover:translate-y-1 transition-all duration-300 group-hover:scale-110" 
+                />
+              </button>
+            </div>
+            <div className="relative h-[450px] mt-10 lg:mt-0">
+              <div className="absolute top-0 right-0 w-80 h-80 rounded-full overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-500 hover:shadow-blue-100/50">
+                <img 
+                  src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80" 
+                  alt="Building"
+                  className="w-full h-full object-cover scale-110 hover:scale-125 transition-transform duration-700"
+                />
+              </div>
+              <div className="absolute bottom-0 left-0 w-72 h-72 rounded-full overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-500 hover:shadow-blue-100/50">
+                <img 
+                  src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80" 
+                  alt="Nature"
+                  className="w-full h-full object-cover scale-110 hover:scale-125 transition-transform duration-700"
+                />
+              </div>
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full bg-blue-100 opacity-20 blur-3xl"></div>
+              <div className="absolute bottom-10 right-10 w-32 h-32 rounded-full bg-blue-50 opacity-30 blur-2xl"></div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-    <section id="work">
-      <Test />
-    </section>
-
+      {/* Work Section */}
+      <section id="work" className="min-h-screen py-20">
+        <Test />
+      </section>
     </div>
   );
 }
