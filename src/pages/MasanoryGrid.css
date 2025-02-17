@@ -25,6 +25,20 @@
     .masonry-item[style*="grid-row-end: span 3"] {
       grid-row-end: span 2 !important;
     }
+
+    h3 {
+        font-size: 1.2rem; /* Smaller font size for headings */
+      }
+    
+      p {
+        font-size: 0.9rem; /* Smaller font size for paragraphs */
+      }
+    
+      .card-media {
+        height: auto; /* Allow media to scale naturally */
+      }
+
+    
   }
 
   @media (max-width: 480px) {
