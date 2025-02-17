@@ -58,7 +58,7 @@ const projects: Project[] = [
   }
 ];
 
-const Work = () => {
+const WorkDetails = () => {
   const [expandedProject, setExpandedProject] = useState<number | null>(null);
   const [showInfo, setShowInfo] = useState(false);
 
@@ -167,4 +167,4 @@ const Work = () => {
   );
 };
 
-export default Work;
+export default WorkDetails;
