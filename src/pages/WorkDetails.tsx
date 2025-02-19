@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Plus, Minus, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import workItems from '../components/workitems';
 
+{/*
 interface Project {
   id: number;
   title: string;
@@ -57,19 +59,25 @@ const projects: Project[] = [
     ]
   }
 ];
+*/}
 
 const WorkDetails = () => {
-  const [expandedProject, setExpandedProject] = useState<number | null>(null);
-  const [showInfo, setShowInfo] = useState(false);
 
-  const currentProject = projects.find(p => p.id === expandedProject);
+  // const [expandedProject, setExpandedProject] = useState<number | null>(null);
+ //  const [showInfo, setShowInfo] = useState(false);
 
-  if (expandedProject !== null && currentProject) {
+  //const currentProject = projects.find(p => p.id === expandedProject);
+  const { slug } = useParams<{ slug: string }>();
+
+  console.log("The slug is ", slug);
+   const currentProject = workItems.find(p => p.slug === slug);
+    console.log(currentProject);
+  if (currentProject) {
     return (
       <div className="min-h-screen">
         <div className="px-8 py-6 flex items-center justify-between">
           <button
-            onClick={() => setExpandedProject(null)}
+           
             className="flex items-center text-gray-600 hover:text-gray-900"
           >
             <ArrowLeft className="mr-2" size={20} />
@@ -78,14 +86,14 @@ const WorkDetails = () => {
           <div className="flex items-center space-x-4">
             <h1 className="text-xl font-light">{currentProject.title}</h1>
             <span className="text-gray-400">—</span>
-            <span className="text-gray-600">{currentProject.client}</span>
+            <span className="text-gray-600">{currentProject.description}</span>
           </div>
           <button
-            onClick={() => setShowInfo(!showInfo)}
+            // onClick={() => setShowInfo(!showInfo)}
             className="flex items-center text-gray-600 hover:text-gray-900"
           >
             Info
-            {showInfo ? <Minus className="ml-2" size={20} /> : <Plus className="ml-2" size={20} />}
+            {/* {showInfo ? <Minus className="ml-2" size={20} /> : <Plus className="ml-2" size={20} />} */}
           </button>
         </div>
 
@@ -102,33 +110,45 @@ const WorkDetails = () => {
           </div>
         </div>
 
-        {showInfo && (
+        {/* {showInfo && (
           <div className="container mx-auto px-8 py-12 grid grid-cols-3 gap-16">
             <div>
               <h3 className="text-sm text-gray-400 mb-2">Overview</h3>
-              <p className="text-gray-800">{currentProject.overview}</p>
+              <p className="text-gray-800">{currentProject.title}</p>
             </div>
             <div>
               <h3 className="text-sm text-gray-400 mb-2">Capability</h3>
-              <p className="text-gray-800">{currentProject.capability}</p>
+              <p className="text-gray-800">{currentProject.description}</p>
             </div>
             <div>
               <h3 className="text-sm text-gray-400 mb-2">Team</h3>
-              <p className="text-gray-800">{currentProject.team}</p>
+              <p className="text-gray-800">{currentProject.description}</p>
             </div>
           </div>
-        )}
+        )} */}
 
         <div className="container mx-auto px-8 py-12">
           <h3 className="text-xl font-light mb-8">Related Work</h3>
           <div className="grid grid-cols-3 gap-8">
-            {currentProject.relatedImages.map((image, index) => (
+            {currentProject.relatedItems.map((item, index) => (
               <div key={index} className="aspect-video overflow-hidden rounded-lg">
-                <img
-                  src={image}
-                  alt={`Related work ${index + 1}`}
-                  className="w-full h-full object-cover"
-                />
+                {item.type === 'image' ? (
+                  <img
+                    src={item.src}
+                    alt={`Related work ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : item.type === 'video' ? (
+                  <iframe
+                    src={`https://player.vimeo.com/video/${item.videoId}`}
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    allow="autoplay; fullscreen"
+                    allowFullScreen
+                    title={`Related video ${index + 1}`}
+                  ></iframe>
+                ) : null}
               </div>
             ))}
           </div>
@@ -136,35 +156,6 @@ const WorkDetails = () => {
       </div>
     );
   }
-
-  return (
-    <div className="container mx-auto px-8 py-12">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {projects.map(project => (
-          <div 
-            key={project.id}
-            className="cursor-pointer group"
-            onClick={() => setExpandedProject(project.id)}
-          >
-            <div className="relative overflow-hidden rounded-lg">
-              <img 
-                src={project.image} 
-                alt={project.title}
-                className="w-full aspect-video object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <Plus className="text-white" size={32} />
-              </div>
-            </div>
-            <div className="mt-4">
-              <h3 className="text-lg font-light">{project.title}</h3>
-              <p className="text-gray-600">{project.client}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 };
 
 export default WorkDetails;
