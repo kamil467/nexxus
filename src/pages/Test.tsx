@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './MasanoryGrid.css';
 
 const MasonryGrid = () => {
+  const [loadedItems, setLoadedItems] = useState<{ [key: number]: boolean }>({});
+
+  const handleItemLoad = (id: number) => {
+    setLoadedItems(prev => ({ ...prev, [id]: true }));
+  };
+
   const ArrowIcon = () => (
     <svg 
       className="arrow-icon" 
@@ -58,7 +64,13 @@ const MasonryGrid = () => {
             gridRowEnd: `span ${item.rows}`,
           }}
         >
-          <div className="card-content">
+          <div className={`card-content ${loadedItems[item.id] ? 'loaded' : ''}`}>
+            {!loadedItems[item.id] && (
+              <>
+                <div className="loading-skeleton"></div>
+                <div className="loading-progress"></div>
+              </>
+            )}
             {item.type === 'vimeo' ? (
               <div className="video-container">
                 <iframe
@@ -70,13 +82,15 @@ const MasonryGrid = () => {
                   allowFullScreen
                   style={{ borderRadius: '10px' }}
                   title={`Vimeo Video ${item.videoId}`}
+                  onLoad={() => handleItemLoad(item.id)}
                 ></iframe>
               </div>
             ) : (
               <img 
                 src={item.image} 
                 alt={`Card ${item.id}`} 
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                onLoad={() => handleItemLoad(item.id)}
               />
             )}
             <div className="card-overlay">
