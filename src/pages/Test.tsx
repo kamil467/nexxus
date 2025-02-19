@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './MasanoryGrid.css';
+import workItems from '../components/workitems';
 
 const MasonryGrid = () => {
   const [loadedItems, setLoadedItems] = useState<{ [key: number]: boolean }>({});
@@ -24,7 +25,7 @@ const MasonryGrid = () => {
       <polyline points="12 5 19 12 12 19"></polyline>
     </svg>
   );
-
+{/*
   const items = [
     { id: 1, cols: 1, rows: 1, type: 'image', image: 'https://images.unsplash.com/photo-1734784548166-a1ffe07dd7cd?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxODJ8fHxlbnwwfHx8fHw%3D', title: 'Urban Architecture', description: 'Modern architectural design showcasing the beauty of urban landscapes.' },
     { id: 2, cols: 2, rows: 2, type: 'image', image: 'https://plus.unsplash.com/premium_photo-1739091068170-5486fbb36cff?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxMjV8fHxlbnwwfHx8fHw%3D', title: "Nature's Canvas", description: 'Capturing the raw beauty of natural landscapes in their purest form.' },
@@ -52,10 +53,10 @@ const MasonryGrid = () => {
     { id: 24, cols: 1, rows: 3, type: 'image', image: 'https://images.unsplash.com/photo-1738162571972-d8337de941e7?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', title: 'Coastal Cliffs', description: 'A breathtaking and awe-inspiring atmosphere, perfect for nature lovers.' },
     { id: 25, cols: 2, rows: 2, type: 'vimeo', videoId: '1057278002', hId: '64b3293a30', title: 'Creative Expression', description: 'An artistic exploration of movement and visual storytelling.' }
   ];
-
+*/}
   return (
     <div className="masonry-grid">
-      {items.map((item) => (
+      {workItems.map((item) => (
         <div
           key={item.id}
           className="masonry-item"
@@ -96,7 +97,7 @@ const MasonryGrid = () => {
             <div className="card-overlay">
               <h3>{item.title}</h3>
               <p>{item.description}</p>
-              <a href="#" className="card-action">
+              <a href={`/work/${item.slug}`} className="card-action">
                 View Project <ArrowIcon />
               </a>
             </div>
