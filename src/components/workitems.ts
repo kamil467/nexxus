@@ -10,7 +10,7 @@ const workItems = [
         description: 'Modern architectural design showcasing the beauty of urban landscapes.',
         relatedItems: [
             { type: 'image', src: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=60' },
-            { type: 'video', videoId: '123456' }
+            { type: 'video', videoId: '1058323026', hId: 'b97a3cc228' }
         ]
     },
     {
@@ -47,7 +47,7 @@ const workItems = [
         slug: 'rustic-charm',
         description: 'A cozy retreat that embodies the warmth of rural living.',
         relatedItems: [
-            { type: 'video', videoId: '654321' }
+            { type: 'video', videoId: '654321', hId: '654321' }
         ]
     },
     {
