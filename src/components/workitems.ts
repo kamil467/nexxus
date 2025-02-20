@@ -10,7 +10,8 @@ const workItems = [
         description: 'Modern architectural design showcasing the beauty of urban landscapes.',
         relatedItems: [
             { type: 'image', src: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=60' },
-            { type: 'video', videoId: '1058323026', hId: 'b97a3cc228' }
+            { type: 'video', videoId: '1058323026', hId: 'b97a3cc228' },
+            {type: 'video', videoId: '1058621851', hId: '3caccb6ab6'}
         ]
     },
     {
@@ -23,7 +24,12 @@ const workItems = [
         slug: 'natures-canvas',
         description: 'Capturing the raw beauty of natural landscapes in their purest form.',
         relatedItems: [
-            { type: 'image', src: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&auto=format&fit=crop&q=60' }
+            { type: 'image', src: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&auto=format&fit=crop&q=60' },
+            {type: 'video', videoId: '1058621851', hId: '3caccb6ab6'}
+
+       
+
+
         ]
     },
     {
@@ -35,7 +41,10 @@ const workItems = [
         title: 'Urban Oasis',
         slug: 'urban-oasis',
         description: 'A serene escape from the hustle and bustle of city life.',
-        relatedItems: []
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1726137569971-cdfa45c3138e?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
     },
     {
         id: 4,
@@ -47,7 +56,8 @@ const workItems = [
         slug: 'rustic-charm',
         description: 'A cozy retreat that embodies the warmth of rural living.',
         relatedItems: [
-            { type: 'video', videoId: '654321', hId: '654321' }
+            { type: 'video', videoId: '654321', hId: '654321' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1726137569971-cdfa45c3138e?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
         ]
     },
     {
@@ -59,7 +69,10 @@ const workItems = [
         title: 'Modern Minimalism',
         slug: 'modern-minimalism',
         description: 'A sleek and sophisticated design that celebrates simplicity.',
-        relatedItems: []
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
     },
     {
         id: 6,
@@ -70,7 +83,10 @@ const workItems = [
         title: 'Vibrant Culture',
         slug: 'vibrant-culture',
         description: 'A kaleidoscope of colors and textures that reflect the diversity of urban culture.',
-        relatedItems: []
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1726137569971-cdfa45c3138e?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
     },
     {
         id: 7,
@@ -81,7 +97,9 @@ const workItems = [
         title: 'Coastal Breeze',
         slug: 'coastal-breeze',
         description: 'A refreshing escape to the seaside, where the air is sweet and the views are breathtaking.',
-        relatedItems: []
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' }
+        ]
     },
     {
         id: 8,
@@ -92,7 +110,10 @@ const workItems = [
         title: 'Mountain Retreat',
         slug: 'mountain-retreat',
         description: "A secluded haven nestled in the mountains, where nature's beauty is on full display.",
-        relatedItems: []
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
     },
     {
         id: 9,
@@ -104,7 +125,10 @@ const workItems = [
         title: 'Creative Motion',
         slug: 'creative-motion',
         description: 'An artistic exploration of movement and visual storytelling.',
-        relatedItems: []
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
     },
     {
         id: 10,
@@ -115,7 +139,10 @@ const workItems = [
         title: 'Urban Jungle',
         slug: 'urban-jungle',
         description: 'A fusion of nature and architecture, where the city meets the wild.',
-        relatedItems: []
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
     },
     {
         id: 11,
@@ -126,7 +153,10 @@ const workItems = [
         title: 'Rustic Elegance',
         slug: 'rustic-elegance',
         description: 'A charming blend of traditional and modern elements, creating a warm and inviting atmosphere.',
-        relatedItems: []
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
     },
     {
         id: 12,
@@ -137,7 +167,10 @@ const workItems = [
         title: 'Cozy Corner',
         slug: 'cozy-corner',
         description: 'A snug and intimate space that invites relaxation and contemplation.',
-        relatedItems: []
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
     },
     {
         id: 13,
@@ -148,7 +181,9 @@ const workItems = [
         title: 'Sunset Serenade',
         slug: 'sunset-serenade',
         description: 'A warm and romantic atmosphere, perfect for a peaceful evening.',
-        relatedItems: []
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' }
+        ]
     },
     {
         id: 14,
@@ -159,7 +194,10 @@ const workItems = [
         title: 'Morning Dew',
         slug: 'morning-dew',
         description: 'A refreshing and revitalizing atmosphere, perfect for a new beginning.',
-        relatedItems: []
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
     },
     {
         id: 15,
@@ -170,18 +208,23 @@ const workItems = [
         title: 'Seaside Escape',
         slug: 'seaside-escape',
         description: 'A tranquil and serene atmosphere, perfect for a relaxing getaway.',
-        relatedItems: []
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' }
+        ]
     },
     {
         id: 16,
         cols: 1,
         rows: 2,
         type: 'image',
-        image: 'https://images.unsplash.com/photo-1676165852076-2e23ece9ff78?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw0MzN8fHxlbnwwfHx8fHw%3D',
+        image: 'https://images.unsplash.com/photo-1739948044190-06307aa3ab18?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw1Nnx8fGVufDB8fHx8fA%3D%3D',
         title: 'Mountain Peak',
         slug: 'mountain-peak',
         description: 'A breathtaking and awe-inspiring atmosphere, perfect for adventure seekers.',
-        relatedItems: []
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
     },
     {
         id: 17,
@@ -192,7 +235,10 @@ const workItems = [
         title: 'Urban Oasis',
         slug: 'urban-oasis',
         description: 'A peaceful and serene atmosphere, perfect for a city retreat.',
-        relatedItems: []
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
     },
     {
         id: 18,
@@ -203,7 +249,9 @@ const workItems = [
         title: "Nature's Wonders",
         slug: 'natures-wonders',
         description: 'A breathtaking and awe-inspiring atmosphere, perfect for nature lovers.',
-        relatedItems: []
+        relatedItems: [ { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
     },
     {
         id: 19,
@@ -215,7 +263,10 @@ const workItems = [
         title: 'Creative Journey',
         slug: 'creative-journey',
         description: 'An artistic exploration of movement and visual storytelling.',
-        relatedItems: []
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
     },
     {
         id: 20,
@@ -227,7 +278,10 @@ const workItems = [
         title: 'Urban Rhythms',
         slug: 'urban-rhythms',
         description: 'A dynamic and energetic atmosphere, perfect for city dwellers.',
-        relatedItems: []
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
     },
     {
         id: 21,
@@ -238,7 +292,10 @@ const workItems = [
         title: 'Coastal Walk',
         slug: 'coastal-walk',
         description: 'A peaceful and serene atmosphere, perfect for a seaside stroll.',
-        relatedItems: []
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
     },
     {
         id: 22,
@@ -249,7 +306,10 @@ const workItems = [
         title: 'Mountain Lake',
         slug: 'mountain-lake',
         description: 'A breathtaking and awe-inspiring atmosphere, perfect for nature lovers.',
-        relatedItems: []
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
     },
     {
         id: 23,
@@ -260,7 +320,9 @@ const workItems = [
         title: 'Urban Nights',
         slug: 'urban-nights',
         description: 'A dynamic and energetic atmosphere, perfect for city dwellers.',
-        relatedItems: []
+        relatedItems: [ { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
     },
     {
         id: 24,
@@ -271,7 +333,9 @@ const workItems = [
         title: 'Coastal Cliffs',
         slug: 'coastal-cliffs',
         description: 'A breathtaking and awe-inspiring atmosphere, perfect for nature lovers.',
-        relatedItems: []
+        relatedItems: [ { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
     },
     {
         id: 25,
@@ -283,7 +347,9 @@ const workItems = [
         title: 'Creative Expression',
         slug: 'creative-expression',
         description: 'An artistic exploration of movement and visual storytelling.',
-        relatedItems: []
+        relatedItems: [ { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
     }
 ];
 
