@@ -1,170 +1,132 @@
-import React, { useState } from 'react';
-import { ArrowLeft, Plus, Minus, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
-
-interface Project {
-  id: number;
-  title: string;
-  client: string;
-  image: string;
-  overview: string;
-  capability: string;
-  team: string;
-  relatedImages: string[];
-}
-
-const projects: Project[] = [
-  {
-    id: 1,
-    title: 'These Legs',
-    client: 'Audi',
-    image: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=1200&q=80',
-    overview: 'A little girl gets her and gets frustrated at the lines if its too long. We created a heartwarming campaign that captures the essence of childhood wonder and determination.',
-    capability: 'Advertising',
-    team: 'BFD',
-    relatedImages: [
-      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&q=80',
-      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=800&q=80',
-      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80'
-    ]
-  },
-  {
-    id: 2,
-    title: 'Urban Dreams',
-    client: 'Nike',
-    image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200&q=80',
-    overview: 'Exploring the intersection of urban culture and athletic performance through a series of compelling visual narratives.',
-    capability: 'Photography',
-    team: 'Creative Studio',
-    relatedImages: [
-      'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&q=80',
-      'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&q=80',
-      'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&q=80'
-    ]
-  },
-  {
-    id: 3,
-    title: 'Nature\'s Call',
-    client: 'REI',
-    image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1200&q=80',
-    overview: 'A campaign that reconnects urban dwellers with the raw beauty of nature through immersive storytelling.',
-    capability: 'Content Creation',
-    team: 'Outdoor Division',
-    relatedImages: [
-      'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&q=80',
-      'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&q=80',
-      'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&q=80'
-    ]
-  }
-];
+import { useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { ArrowLeft, Plus, X } from 'react-feather';
+import workItems from '../components/workitems';
 
 const WorkDetails = () => {
-  const [expandedProject, setExpandedProject] = useState<number | null>(null);
+  const [loadingStates, setLoadingStates] = useState<{ [key: string]: boolean }>({});
   const [showInfo, setShowInfo] = useState(false);
 
-  const currentProject = projects.find(p => p.id === expandedProject);
+  const { slug } = useParams<{ slug: string }>();
+  const currentProject = workItems.find(p => p.slug === slug);
 
-  if (expandedProject !== null && currentProject) {
+  const handleMediaLoad = (id: string) => {
+    setLoadingStates(prev => ({ ...prev, [id]: false }));
+  };
+
+  if (currentProject) {
     return (
       <div className="min-h-screen">
-        <div className="px-8 py-6 flex items-center justify-between">
-          <button
-            onClick={() => setExpandedProject(null)}
-            className="flex items-center text-gray-600 hover:text-gray-900"
-          >
-            <ArrowLeft className="mr-2" size={20} />
-            Our Work
-          </button>
-          <div className="flex items-center space-x-4">
-            <h1 className="text-xl font-light">{currentProject.title}</h1>
-            <span className="text-gray-400">—</span>
-            <span className="text-gray-600">{currentProject.client}</span>
+        {/* Header Section - Mobile Optimized */}
+        <div className="px-4 md:px-8 py-4 flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+          <div className="flex justify-between items-center">
+            <Link to="/work">
+              <button className="flex items-center text-gray-600 hover:text-[#A9AC87] transition-colors text-sm md:text-base">
+                <ArrowLeft className="mr-2" size={20} />
+                Our Work
+              </button>
+            </Link>
+            <button
+              onClick={() => setShowInfo(!showInfo)}
+              className="flex items-center text-gray-600 hover:text-[#A9AC87] transition-colors md:hidden"
+            >
+              Info
+              {showInfo ? <X className="ml-2" size={20} /> : <Plus className="ml-2" size={20} />}
+            </button>
           </div>
+          
+          <div className="flex flex-col md:flex-row md:items-center md:space-x-4">
+            <h1 className="text-lg md:text-xl font-light">{currentProject.title}</h1>
+            <span className="hidden md:inline text-gray-400">—</span>
+            <p className="text-sm md:text-base text-gray-600 mt-1 md:mt-0">{currentProject.description}</p>
+          </div>
+          
           <button
             onClick={() => setShowInfo(!showInfo)}
-            className="flex items-center text-gray-600 hover:text-gray-900"
+            className="hidden md:flex items-center text-gray-600 hover:text-[#A9AC87] transition-colors"
           >
             Info
-            {showInfo ? <Minus className="ml-2" size={20} /> : <Plus className="ml-2" size={20} />}
+            {showInfo ? <X className="ml-2" size={20} /> : <Plus className="ml-2" size={20} />}
           </button>
         </div>
 
-        <div className="relative">
-          <img
-            src={currentProject.image}
-            alt={currentProject.title}
-            className="w-full h-[70vh] object-cover"
-          />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="bg-white bg-opacity-90 rounded-full p-4">
-              <ArrowRight className="text-gray-800" size={32} />
-            </div>
-          </div>
-        </div>
+        <hr className="border-t border-gray-200" />
 
+        {/* Info Section - Mobile Optimized */}
         {showInfo && (
-          <div className="container mx-auto px-8 py-12 grid grid-cols-3 gap-16">
-            <div>
-              <h3 className="text-sm text-gray-400 mb-2">Overview</h3>
-              <p className="text-gray-800">{currentProject.overview}</p>
-            </div>
-            <div>
-              <h3 className="text-sm text-gray-400 mb-2">Capability</h3>
-              <p className="text-gray-800">{currentProject.capability}</p>
-            </div>
-            <div>
-              <h3 className="text-sm text-gray-400 mb-2">Team</h3>
-              <p className="text-gray-800">{currentProject.team}</p>
+          <div className="container mx-auto px-4 md:px-8 py-6 md:py-8 bg-gray-50">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
+              <div className="space-y-2">
+                <h3 className="text-lg md:text-xl font-light mb-2 md:mb-3 text-gray-800">Overview</h3>
+                <p className="text-sm leading-relaxed text-gray-600 font-light">
+                  {currentProject.overview || 'No overview available.'}
+                </p>
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-lg md:text-xl font-light mb-2 md:mb-3 text-gray-800">Capability</h3>
+                <p className="text-sm leading-relaxed text-gray-600 font-light">
+                  {currentProject.capability || 'No capability information available.'}
+                </p>
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-lg md:text-xl font-light mb-2 md:mb-3 text-gray-800">Team</h3>
+                <p className="text-sm leading-relaxed text-gray-600 whitespace-pre-line font-light">
+                  {currentProject.team || 'No team information available.'}
+                </p>
+              </div>
             </div>
           </div>
         )}
 
-        <div className="container mx-auto px-8 py-12">
-          <h3 className="text-xl font-light mb-8">Related Work</h3>
-          <div className="grid grid-cols-3 gap-8">
-            {currentProject.relatedImages.map((image, index) => (
-              <div key={index} className="aspect-video overflow-hidden rounded-lg">
+        {/* Media Content Section - Mobile Optimized */}
+        <div className="relative">
+          {currentProject.relatedItems.filter(item => item.type === 'video').map((item, index) => (
+            <div key={`video-${index}`}>
+              <div className="w-full bg-[#F5F5F0] py-4 md:py-8">
+                <div className="container mx-auto px-4 md:px-8 max-w-7xl relative">
+                  {loadingStates[`video-${index}`] !== false && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-[#F5F5F0]">
+                      <div className="animate-spin rounded-full h-10 w-10 md:h-12 md:w-12 border-t-2 border-b-2 border-[#A9AC87]"></div>
+                    </div>
+                  )}
+                  <iframe
+                    src={`https://player.vimeo.com/video/${item.videoId}?h=${item.hId}&autoplay=0&controls=1`}
+                    className="w-full aspect-video rounded-lg md:rounded-none"
+                    frameBorder="0"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowFullScreen
+                    title={`Related video ${index + 1}`}
+                    style={{ pointerEvents: 'auto' }}
+                    onLoad={() => handleMediaLoad(`video-${index}`)}
+                  ></iframe>
+                </div>
+              </div>
+              <hr className="my-2 md:my-4 border-t border-gray-200" />
+            </div>
+          ))}
+  
+          {currentProject.relatedItems.filter(item => item.type === 'image').map((item, index) => (
+            <div className="relative" key={`image-${index}`}>
+              {loadingStates[`image-${index}`] !== false && (
+                <div className="absolute inset-0 flex items-center justify-center bg-[#F5F5F0]">
+                  <div className="animate-spin rounded-full h-10 w-10 md:h-12 md:w-12 border-t-2 border-b-2 border-[#A9AC87]"></div>
+                </div>
+              )}
+              <div className="px-4 md:px-0">
                 <img
-                  src={image}
+                  src={item.src}
                   alt={`Related work ${index + 1}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-[50vh] md:h-[70vh] object-cover rounded-lg md:rounded-none"
+                  onLoad={() => handleMediaLoad(`image-${index}`)}
                 />
               </div>
-            ))}
-          </div>
+              <hr className="my-2 md:my-4 border-t border-gray-200" />
+            </div>
+          ))}
         </div>
       </div>
     );
   }
-
-  return (
-    <div className="container mx-auto px-8 py-12">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {projects.map(project => (
-          <div 
-            key={project.id}
-            className="cursor-pointer group"
-            onClick={() => setExpandedProject(project.id)}
-          >
-            <div className="relative overflow-hidden rounded-lg">
-              <img 
-                src={project.image} 
-                alt={project.title}
-                className="w-full aspect-video object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <Plus className="text-white" size={32} />
-              </div>
-            </div>
-            <div className="mt-4">
-              <h3 className="text-lg font-light">{project.title}</h3>
-              <p className="text-gray-600">{project.client}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 };
 
 export default WorkDetails;
