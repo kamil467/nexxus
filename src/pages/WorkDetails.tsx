@@ -63,27 +63,29 @@ const projects: Project[] = [
 
 const WorkDetails = () => {
 
-  // const [expandedProject, setExpandedProject] = useState<number | null>(null);
- //  const [showInfo, setShowInfo] = useState(false);
+  const [expandedProject, setExpandedProject] = useState<number | null>(null);
+  const [showInfo, setShowInfo] = useState(false);
+  const [loadingStates, setLoadingStates] = useState<{ [key: string]: boolean }>({});
 
-  //const currentProject = projects.find(p => p.id === expandedProject);
+  const handleMediaLoad = (id: string) => {
+    setLoadingStates(prev => ({ ...prev, [id]: false }));
+  };
+
   const { slug } = useParams<{ slug: string }>();
-
+  const currentProject = workItems.find(p => p.slug === slug);
   console.log("The slug is ", slug);
-   const currentProject = workItems.find(p => p.slug === slug);
-    console.log(currentProject);
+  console.log(currentProject);
   if (currentProject) {
     return (
       <div className="min-h-screen">
         <div className="px-8 py-6 flex items-center justify-between">
-        <Link to="/work">
-          <button
-           
-            className="flex items-center text-gray-600 hover:text-[#A9AC87]"
-          >
-            <ArrowLeft className="mr-2" size={20} />
-            Our Work
-          </button>
+          <Link to="/work">
+            <button
+              className="flex items-center text-gray-600 hover:text-[#A9AC87]"
+            >
+              <ArrowLeft className="mr-2" size={20} />
+              Our Work
+            </button>
           </Link>
           <div className="flex items-center space-x-4">
             <h1 className="text-xl font-light">{currentProject.title}</h1>
@@ -100,35 +102,45 @@ const WorkDetails = () => {
         </div>
 
         <div className="relative">
-  {/* Separate videos and images */}
-  {currentProject.relatedItems.filter(item => item.type === 'video').map((item, index) => (
-    <><div className="w-full bg-[#F5F5F0] py-8">
-      <div className="container mx-auto max-w-7xl">
-        <iframe
-          key={index}
-          src={`https://player.vimeo.com/video/${item.videoId}?h=${item.hId}&autoplay=0&controls=1`}
-          className="w-full aspect-video"
-          frameBorder="0"
-          allow="autoplay; fullscreen; picture-in-picture"
-          allowFullScreen
-          title={`Related video ${index + 1}`}
-          style={{ pointerEvents: 'auto' }}
-        ></iframe>
-      </div>
-    </div><hr className="my-4 border-t border-gray-300" /></>
-  ))}
+          {currentProject.relatedItems.filter(item => item.type === 'video').map((item, index) => (
+            <><div className="w-full bg-[#F5F5F0] py-8" key={`video-${index}`}>
+              <div className="container mx-auto max-w-7xl relative">
+                {loadingStates[`video-${index}`] !== false && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-[#F5F5F0]">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#A9AC87]"></div>
+                  </div>
+                )}
+                <iframe
+                  src={`https://player.vimeo.com/video/${item.videoId}?h=${item.hId}&autoplay=0&controls=1`}
+                  className="w-full aspect-video"
+                  frameBorder="0"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  allowFullScreen
+                  title={`Related video ${index + 1}`}
+                  style={{ pointerEvents: 'auto' }}
+                  onLoad={() => handleMediaLoad(`video-${index}`)}
+                ></iframe>
+              </div>
+            </div><hr className="my-4 border-t border-gray-300" /></>
+          ))}
   
-  {currentProject.relatedItems.filter(item => item.type === 'image').map((item, index) => (
-    <div className="relative" key={index}>
-      <img
-        src={item.src}
-        alt={`Related work ${index + 1}`}
-        className="w-full h-[70vh] object-cover"
-      />
-      <hr className="my-4 border-t border-gray-300" />
-    </div>
-  ))}
-</div>
+          {currentProject.relatedItems.filter(item => item.type === 'image').map((item, index) => (
+            <div className="relative" key={`image-${index}`}>
+              {loadingStates[`image-${index}`] !== false && (
+                <div className="absolute inset-0 flex items-center justify-center bg-[#F5F5F0]">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#A9AC87]"></div>
+                </div>
+              )}
+              <img
+                src={item.src}
+                alt={`Related work ${index + 1}`}
+                className="w-full h-[70vh] object-cover"
+                onLoad={() => handleMediaLoad(`image-${index}`)}
+              />
+              <hr className="my-4 border-t border-gray-300" />
+            </div>
+          ))}
+        </div>
 
         {/* {showInfo && (
           <div className="container mx-auto px-8 py-12 grid grid-cols-3 gap-16">
@@ -146,7 +158,7 @@ const WorkDetails = () => {
             </div>
           </div>
         )} */}
-
+{/** 
         <div className="container mx-auto px-8 py-12">
           <h3 className="text-xl font-light mb-8">Related Work</h3>
           <div className="grid grid-cols-3 gap-8">
@@ -173,6 +185,7 @@ const WorkDetails = () => {
             ))}
           </div>
         </div>
+        */}
       </div>
     );
   }
