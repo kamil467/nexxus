@@ -76,13 +76,15 @@ const WorkDetails = () => {
     return (
       <div className="min-h-screen">
         <div className="px-8 py-6 flex items-center justify-between">
+        <Link to="/work">
           <button
            
-            className="flex items-center text-gray-600 hover:text-gray-900"
+            className="flex items-center text-gray-600 hover:text-[#A9AC87]"
           >
             <ArrowLeft className="mr-2" size={20} />
             Our Work
           </button>
+          </Link>
           <div className="flex items-center space-x-4">
             <h1 className="text-xl font-light">{currentProject.title}</h1>
             <span className="text-gray-400">—</span>
@@ -98,17 +100,35 @@ const WorkDetails = () => {
         </div>
 
         <div className="relative">
-          <img
-            src={currentProject.image}
-            alt={currentProject.title}
-            className="w-full h-[70vh] object-cover"
-          />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="bg-white bg-opacity-90 rounded-full p-4">
-              <ArrowRight className="text-gray-800" size={32} />
-            </div>
-          </div>
-        </div>
+  {/* Separate videos and images */}
+  {currentProject.relatedItems.filter(item => item.type === 'video').map((item, index) => (
+    <iframe
+      key={index}
+      src={`https://player.vimeo.com/video/${item.videoId}?h=${item.hId}`}
+      width="100%"
+      height="100%"
+      frameBorder="0"
+      allow="autoplay; fullscreen"
+      allowFullScreen
+      title={`Related video ${index + 1}`}
+    ></iframe>
+  ))}
+  {/* Separator */}
+  <hr className="my-4 border-t border-gray-300" />
+  {currentProject.relatedItems.filter(item => item.type === 'image').map((item, index) => (
+    <img
+      key={index}
+      src={item.src}
+      alt={`Related work ${index + 1}`}
+      className="w-full h-[70vh] object-cover"
+    />
+  ))}
+  <div className="absolute inset-0 flex items-center justify-center">
+    <div className="bg-white bg-opacity-90 rounded-full p-4">
+      <ArrowRight className="text-gray-800" size={32} />
+    </div>
+  </div>
+</div>
 
         {/* {showInfo && (
           <div className="container mx-auto px-8 py-12 grid grid-cols-3 gap-16">
