@@ -1,4 +1,21 @@
-const workItems = [
+interface WorkItem {
+    id: number;
+    cols: number;
+    rows: number;
+    type: string;
+    image?: string;
+    videoId?: string;
+    hId?: string;
+    title: string;
+    slug: string;
+    description: string;
+    relatedItems: Array<{ type: string; src?: string; videoId?: string; hId?: string }>;
+    overview?: string;
+    capability?: string;
+    team?: string;
+}
+
+const workItems: WorkItem[] = [
     {
         id: 1,
         cols: 1,
@@ -8,10 +25,13 @@ const workItems = [
         title: 'Urban Architecture',
         slug: 'urban-architecture',
         description: 'Modern architectural design showcasing the beauty of urban landscapes.',
+        overview: 'A comprehensive exploration of urban architectural elements that define modern cityscapes. This project focuses on the intersection of functionality and aesthetic appeal in contemporary urban design.',
+        capability: 'Architectural Design, 3D Modeling, Urban Planning, Sustainable Development',
+        team: 'Lead Architect: John Smith\nProject Manager: Sarah Johnson\nDesign Team: Michael Chen, Emma Davis',
         relatedItems: [
             { type: 'image', src: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=60' },
             { type: 'video', videoId: '1058323026', hId: 'b97a3cc228' },
-            {type: 'video', videoId: '1058621851', hId: '3caccb6ab6'}
+            { type: 'video', videoId: '1058621851', hId: '3caccb6ab6' }
         ]
     },
     {
@@ -25,11 +45,7 @@ const workItems = [
         description: 'Capturing the raw beauty of natural landscapes in their purest form.',
         relatedItems: [
             { type: 'image', src: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&auto=format&fit=crop&q=60' },
-            {type: 'video', videoId: '1058621851', hId: '3caccb6ab6'}
-
-       
-
-
+            { type: 'video', videoId: '1058621851', hId: '3caccb6ab6' }
         ]
     },
     {
@@ -43,7 +59,7 @@ const workItems = [
         description: 'A serene escape from the hustle and bustle of city life.',
         relatedItems: [
             { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
-            { type: 'image', src: 'https://images.unsplash.com/photo-1726137569971-cdfa45c3138e?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+            { type: 'image', src: 'https://images.unsplash.com/photo-1726137569971-cdfa45c3138e?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
         ]
     },
     {
@@ -57,7 +73,7 @@ const workItems = [
         description: 'A cozy retreat that embodies the warmth of rural living.',
         relatedItems: [
             { type: 'video', videoId: '654321', hId: '654321' },
-            { type: 'image', src: 'https://images.unsplash.com/photo-1726137569971-cdfa45c3138e?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+            { type: 'image', src: 'https://images.unsplash.com/photo-1726137569971-cdfa45c3138e?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
         ]
     },
     {
@@ -85,7 +101,7 @@ const workItems = [
         description: 'A kaleidoscope of colors and textures that reflect the diversity of urban culture.',
         relatedItems: [
             { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
-            { type: 'image', src: 'https://images.unsplash.com/photo-1726137569971-cdfa45c3138e?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+            { type: 'image', src: 'https://images.unsplash.com/photo-1726137569971-cdfa45c3138e?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
         ]
     },
     {
@@ -249,7 +265,8 @@ const workItems = [
         title: "Nature's Wonders",
         slug: 'natures-wonders',
         description: 'A breathtaking and awe-inspiring atmosphere, perfect for nature lovers.',
-        relatedItems: [ { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
             { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
         ]
     },
@@ -320,7 +337,8 @@ const workItems = [
         title: 'Urban Nights',
         slug: 'urban-nights',
         description: 'A dynamic and energetic atmosphere, perfect for city dwellers.',
-        relatedItems: [ { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
             { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
         ]
     },
@@ -333,7 +351,8 @@ const workItems = [
         title: 'Coastal Cliffs',
         slug: 'coastal-cliffs',
         description: 'A breathtaking and awe-inspiring atmosphere, perfect for nature lovers.',
-        relatedItems: [ { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
             { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
         ]
     },
@@ -347,7 +366,8 @@ const workItems = [
         title: 'Creative Expression',
         slug: 'creative-expression',
         description: 'An artistic exploration of movement and visual storytelling.',
-        relatedItems: [ { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+        relatedItems: [
+            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
             { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
         ]
     }
