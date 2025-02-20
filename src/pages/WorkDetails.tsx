@@ -106,32 +106,28 @@ const WorkDetails = () => {
       <div className="container mx-auto max-w-7xl">
         <iframe
           key={index}
-          src={`https://player.vimeo.com/video/${item.videoId}?h=${item.hId}`}
+          src={`https://player.vimeo.com/video/${item.videoId}?h=${item.hId}&autoplay=0&controls=1`}
           className="w-full aspect-video"
           frameBorder="0"
-          allow="autoplay; fullscreen"
+          allow="autoplay; fullscreen; picture-in-picture"
           allowFullScreen
           title={`Related video ${index + 1}`}
+          style={{ pointerEvents: 'auto' }}
         ></iframe>
       </div>
     </div><hr className="my-4 border-t border-gray-300" /></>
-  ))
-  
-  }
-  {/* Separator */}
- 
-  {currentProject.relatedItems.filter(item => item.type === 'image').map((item, index) => (
-    <><img
-      key={index}
-      src={item.src}
-      alt={`Related work ${index + 1}`}
-      className="w-full h-[70vh] object-cover" /><hr className="my-4 border-t border-gray-300" /></>
   ))}
-  <div className="absolute inset-0 flex items-center justify-center">
-    <div className="bg-white bg-opacity-90 rounded-full p-4">
-      <ArrowRight className="text-gray-800" size={32} />
+  
+  {currentProject.relatedItems.filter(item => item.type === 'image').map((item, index) => (
+    <div className="relative" key={index}>
+      <img
+        src={item.src}
+        alt={`Related work ${index + 1}`}
+        className="w-full h-[70vh] object-cover"
+      />
+      <hr className="my-4 border-t border-gray-300" />
     </div>
-  </div>
+  ))}
 </div>
 
         {/* {showInfo && (
