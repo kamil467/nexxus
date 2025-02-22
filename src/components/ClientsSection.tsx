@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Users, Building2, Award, Star } from 'lucide-react';
+import { Users, Building2, Award, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Client logos data with real brand logos
 const clients = [
@@ -56,6 +56,16 @@ const stats = [
 interface ClientsSectionProps {
   className?: string;
 }
+
+const LogoCard = ({ client, className = '' }: { client: typeof clients[0], className?: string }) => (
+  <div className={`bg-gray-50 rounded-lg p-4 flex items-center justify-center hover:shadow-lg transition-all duration-300 ${className}`}>
+    <img 
+      src={client.logo} 
+      alt={client.name}
+      className="max-w-full max-h-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+    />
+  </div>
+);
 
 const CountUpAnimation = ({ end, suffix = '' }: { end: number; suffix?: string }) => {
   const [count, setCount] = useState(0);
@@ -114,8 +124,106 @@ const CountUpAnimation = ({ end, suffix = '' }: { end: number; suffix?: string }
 };
 
 const ClientsSection: React.FC<ClientsSectionProps> = ({ className = '' }) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const slideTimerRef = useRef<NodeJS.Timeout>();
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Auto-advance slides on mobile
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const startSlideTimer = () => {
+      slideTimerRef.current = setInterval(() => {
+        setCurrentSlide(prev => 
+          prev < Math.ceil(clients.length / 2) - 1 ? prev + 1 : 0
+        );
+      }, 5000); // Change slide every 5 seconds
+    };
+
+    startSlideTimer();
+
+    return () => {
+      if (slideTimerRef.current) {
+        clearInterval(slideTimerRef.current);
+      }
+    };
+  }, [isMobile]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+    // Pause auto-advance while user is interacting
+    if (slideTimerRef.current) {
+      clearInterval(slideTimerRef.current);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (!isAnimating) {
+      if (isLeftSwipe && currentSlide < Math.ceil(clients.length / 2) - 1) {
+        changeSlide(currentSlide + 1);
+      }
+      if (isRightSwipe && currentSlide > 0) {
+        changeSlide(currentSlide - 1);
+      }
+    }
+
+    setTouchStart(0);
+    setTouchEnd(0);
+
+    // Resume auto-advance after interaction
+    if (slideTimerRef.current) {
+      clearInterval(slideTimerRef.current);
+    }
+    slideTimerRef.current = setInterval(() => {
+      setCurrentSlide(prev => 
+        prev < Math.ceil(clients.length / 2) - 1 ? prev + 1 : 0
+      );
+    }, 5000);
+  };
+
+  const changeSlide = (newSlide: number) => {
+    setIsAnimating(true);
+    setCurrentSlide(newSlide);
+    setTimeout(() => setIsAnimating(false), 300); // Match transition duration
+  };
+
+  const nextSlide = () => {
+    if (!isAnimating && currentSlide < Math.ceil(clients.length / 2) - 1) {
+      changeSlide(currentSlide + 1);
+    }
+  };
+
+  const prevSlide = () => {
+    if (!isAnimating && currentSlide > 0) {
+      changeSlide(currentSlide - 1);
+    }
+  };
+
   return (
-    <section className={`py-20 bg-white ${className}`}>
+    <section className={`py-20 ${className}`}>
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -126,37 +234,80 @@ const ClientsSection: React.FC<ClientsSectionProps> = ({ className = '' }) => {
           </p>
         </div>
 
-        {/* Scrolling Logos */}
-        <div className="relative mb-20 overflow-hidden">
+        {/* Desktop Scrolling Logos */}
+        <div className="hidden md:block relative mb-20 overflow-hidden">
           <div className="flex animate-scroll">
-            {/* First set of logos */}
             <div className="flex space-x-8 items-center">
               {clients.map((client) => (
-                <div 
-                  key={client.id} 
-                  className="flex-shrink-0 w-[200px] h-20 bg-gray-50 rounded-lg flex items-center justify-center p-4 hover:shadow-lg transition-shadow duration-300"
-                >
-                  <img 
-                    src={client.logo} 
-                    alt={client.name} 
-                    className="max-w-full max-h-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
-                  />
+                <div key={client.id} className="flex-shrink-0 w-[200px] h-20">
+                  <LogoCard client={client} />
                 </div>
               ))}
             </div>
-            {/* Duplicate set for seamless scrolling */}
             <div className="flex space-x-8 items-center">
               {clients.map((client) => (
-                <div 
-                  key={`${client.id}-duplicate`} 
-                  className="flex-shrink-0 w-[200px] h-20 bg-gray-50 rounded-lg flex items-center justify-center p-4 hover:shadow-lg transition-shadow duration-300"
-                >
-                  <img 
-                    src={client.logo} 
-                    alt={client.name} 
-                    className="max-w-full max-h-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
-                  />
+                <div key={`${client.id}-duplicate`} className="flex-shrink-0 w-[200px] h-20">
+                  <LogoCard client={client} />
                 </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Carousel */}
+        <div className="md:hidden mb-20">
+          <div 
+            className="relative overflow-hidden touch-pan-y"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
+            <div 
+              className="flex transition-transform duration-300 ease-out will-change-transform"
+              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+            >
+              {Array.from({ length: Math.ceil(clients.length / 2) }).map((_, groupIndex) => (
+                <div key={groupIndex} className="flex w-full flex-shrink-0 px-4">
+                  {clients.slice(groupIndex * 2, (groupIndex * 2) + 2).map((client) => (
+                    <div key={client.id} className="w-1/2 px-2">
+                      <LogoCard client={client} className="h-24" />
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+
+            {/* Navigation Buttons */}
+            <button 
+              onClick={prevSlide}
+              className={`absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-lg transform transition-transform active:scale-95 ${
+                currentSlide === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white'
+              }`}
+              disabled={currentSlide === 0 || isAnimating}
+            >
+              <ChevronLeft size={20} className="text-gray-600" />
+            </button>
+            <button 
+              onClick={nextSlide}
+              className={`absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-lg transform transition-transform active:scale-95 ${
+                currentSlide === Math.ceil(clients.length / 2) - 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white'
+              }`}
+              disabled={currentSlide === Math.ceil(clients.length / 2) - 1 || isAnimating}
+            >
+              <ChevronRight size={20} className="text-gray-600" />
+            </button>
+
+            {/* Dots Indicator */}
+            <div className="flex justify-center mt-6 space-x-2">
+              {Array.from({ length: Math.ceil(clients.length / 2) }).map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => !isAnimating && changeSlide(index)}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    currentSlide === index ? 'bg-[#A9AC87] w-6' : 'bg-gray-300 hover:bg-gray-400'
+                  }`}
+                  disabled={isAnimating}
+                />
               ))}
             </div>
           </div>
