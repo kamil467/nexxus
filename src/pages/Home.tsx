@@ -1,6 +1,27 @@
 import React from 'react';
-import { ArrowDown } from 'lucide-react';
+import { ArrowDown, Users, Building2, Award, Star } from 'lucide-react';
 import Test from './Test';
+import ClientsSection from '../components/ClientsSection';
+
+// Dummy client logos - Replace with actual client logos
+const clients = [
+  { id: 1, name: 'Client 1', logo: 'https://placehold.co/200x80/A9AC87/white?text=Client+1' },
+  { id: 2, name: 'Client 2', logo: 'https://placehold.co/200x80/A9AC87/white?text=Client+2' },
+  { id: 3, name: 'Client 3', logo: 'https://placehold.co/200x80/A9AC87/white?text=Client+3' },
+  { id: 4, name: 'Client 4', logo: 'https://placehold.co/200x80/A9AC87/white?text=Client+4' },
+  { id: 5, name: 'Client 5', logo: 'https://placehold.co/200x80/A9AC87/white?text=Client+5' },
+  { id: 6, name: 'Client 6', logo: 'https://placehold.co/200x80/A9AC87/white?text=Client+6' },
+  { id: 7, name: 'Client 7', logo: 'https://placehold.co/200x80/A9AC87/white?text=Client+7' },
+  { id: 8, name: 'Client 8', logo: 'https://placehold.co/200x80/A9AC87/white?text=Client+8' },
+];
+
+// Statistics data
+const stats = [
+  { id: 1, title: 'Happy Clients', value: '200+', icon: Users },
+  { id: 2, title: 'Projects Completed', value: '500+', icon: Building2 },
+  { id: 3, title: 'Awards Won', value: '25+', icon: Award },
+  { id: 4, title: 'Years Experience', value: '10+', icon: Star },
+];
 
 const Home = () => {
   const scrollToWork = () => {

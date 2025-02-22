@@ -8,6 +8,7 @@ import Footer from './components/Footer';
 import Test from './pages/Test';
 import WorkDetails from './pages/WorkDetails';
 import ScrollToTop from './components/ScrollToTop';
+import './styles/animations.css';
 
 function App() {
   return (

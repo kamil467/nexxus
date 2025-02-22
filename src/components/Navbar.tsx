@@ -65,7 +65,7 @@ const Navbar = () => {
               onClick={handleLinkClick} 
               className="text-gray-600 hover:text-[#A9AC87] transition-colors"
             >
-              About
+              About Us
             </Link>
             <Link 
               to="/contact" 
@@ -110,7 +110,7 @@ const Navbar = () => {
                 onClick={handleLinkClick} 
                 className="text-lg text-gray-800 hover:text-[#A9AC87] transition-colors font-light"
               >
-                About
+                About Us
               </Link>
               <Link 
                 to="/contact" 
