@@ -12,7 +12,7 @@ const Footer = () => {
             <Link to="/" className="text-white-600 hover:text-green-900">Home</Link>
             <Link to="/work" className="text-white-600 hover:text-green-900">Work</Link>
             <Link to="/contact" className="text-white-600 hover:text-green-900">Contact</Link>
-            <Link to="/about" className="text-white-600 hover:text-green-900">About</Link>
+            <Link to="/about" className="text-white-600 hover:text-green-900">About Us</Link>
           </div>
           <p className="text-gray-500 text-sm">&copy; {new Date().getFullYear()} Nexxus. All rights reserved.</p>
         </div>
