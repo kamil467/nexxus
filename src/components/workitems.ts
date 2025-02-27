@@ -62,7 +62,7 @@ const workItems: WorkItem[] = [
         hId: '4f447e7fe9',
        // image: 'https://plus.unsplash.com/premium_photo-1739091068170-5486fbb36cff?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxMjV8fHxlbnwwfHx8fHw%3D',
         title: "Food & Restaurant",
-        slug: 'food-restaurant',
+        slug: 'food-restaurant-1',
         description: 'A vibrant hub for culinary experiences.',
         overview: 'A food and restaurant project that showcases the best in culinary artistry and culinary culture.',
         capability: 'Culinary Artistry, Culinary Culture, Culinary Education, Culinary Innovation',
