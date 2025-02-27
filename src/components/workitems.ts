@@ -16,7 +16,7 @@ interface WorkItem {
 }
 
 const workItems: WorkItem[] = [
-    {
+   /* {
         id: 1,
         cols: 1,
         rows: 1,
@@ -33,22 +33,46 @@ const workItems: WorkItem[] = [
             { type: 'video', videoId: '1058323026', hId: 'b97a3cc228' },
             { type: 'video', videoId: '1058621851', hId: '3caccb6ab6' }
         ]
-    },
+    },*/
+
     {
-        id: 2,
-        cols: 2,
-        rows: 2,
-        type: 'image',
-        image: 'https://plus.unsplash.com/premium_photo-1739091068170-5486fbb36cff?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxMjV8fHxlbnwwfHx8fHw%3D',
-        title: "Nature's Canvas",
-        slug: 'natures-canvas',
-        description: 'Capturing the raw beauty of natural landscapes in their purest form.',
+        id: 9,
+        cols: 1,
+        rows: 3,
+        type: 'vimeo',
+        videoId: '1061002506',
+        hId: 'd595762e8c',
+        title: 'Food & Restaurant',
+        slug: 'food-restaurant',
+        description: 'A culinary journey that showcases the best in food and restaurant culture.',
+        overview: '',
+        capability: '',
+        team: '',
         relatedItems: [
-            { type: 'image', src: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&auto=format&fit=crop&q=60' },
-            { type: 'video', videoId: '1058621851', hId: '3caccb6ab6' }
+            { type: 'video', videoId: '1061002506', hId: 'd595762e8c' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
         ]
     },
     {
+        id: 2,
+        cols: 3,
+        rows: 3,
+        type: 'vimeo',
+        videoId: '1061002395',
+        hId: '4f447e7fe9',
+       // image: 'https://plus.unsplash.com/premium_photo-1739091068170-5486fbb36cff?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxMjV8fHxlbnwwfHx8fHw%3D',
+        title: "Food & Restaurant",
+        slug: 'food-restaurant',
+        description: 'A vibrant hub for culinary experiences.',
+        overview: 'A food and restaurant project that showcases the best in culinary artistry and culinary culture.',
+        capability: 'Culinary Artistry, Culinary Culture, Culinary Education, Culinary Innovation',
+        team: 'Chef: John Doe\nCulinary Director: Sarah Johnson\nCulinary Team: Michael Chen, Emma Davis',
+        relatedItems: [
+            { type: 'image', src: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&auto=format&fit=crop&q=60' },
+            { type: 'video', videoId: '1061002395', hId: '4f447e7fe9' }
+        ]
+    },
+ /*   {
         id: 3,
         cols: 1,
         rows: 2,
@@ -117,50 +141,47 @@ const workItems: WorkItem[] = [
             { type: 'video', videoId: '1058623325', hId: '475b69db9b' }
         ]
     },
-    {
-        id: 8,
-        cols: 2,
-        rows: 3,
-        type: 'image',
-        image: 'https://images.unsplash.com/photo-1737646099147-f2636ed6c1b3?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwyNTd8fHxlbnwwfHx8fHw%3D',
-        title: 'Mountain Retreat',
-        slug: 'mountain-retreat',
-        description: "A secluded haven nestled in the mountains, where nature's beauty is on full display.",
-        relatedItems: [
-            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
-            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
-        ]
-    },
-    {
-        id: 9,
-        cols: 1,
-        rows: 3,
-        type: 'vimeo',
-        videoId: '1057103201',
-        hId: '1ff8d3f9a0',
-        title: 'Creative Motion',
-        slug: 'creative-motion',
-        description: 'An artistic exploration of movement and visual storytelling.',
-        relatedItems: [
-            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
-            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
-        ]
-    },
+    */
+   
     {
         id: 10,
         cols: 1,
         rows: 3,
-        type: 'image',
-        image: 'https://images.unsplash.com/photo-1586768798120-95597acaa6e3?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxOTJ8fHxlbnwwfHx8fHw%3D',
-        title: 'Urban Jungle',
-        slug: 'urban-jungle',
-        description: 'A fusion of nature and architecture, where the city meets the wild.',
+        type: 'vimeo',
+      //  image: 'https://images.unsplash.com/photo-1586768798120-95597acaa6e3?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxOTJ8fHxlbnwwfHx8fHw%3D',
+      videoId: '1061002650',
+      hId: '4875906def', 
+      title: 'Content video',
+        slug: 'content-video',
+        description: 'A video that showcases the content of your business or service.',
+        capability: 'Content Strategy, Content Creation, Content Marketing',
+        team: 'Content Manager: Sarah Johnson\nContent Editor: John Doe',
         relatedItems: [
-            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'video', videoId: '1061002650', hId: '4875906def' },
             { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
         ]
     },
     {
+        id: 8,
+        cols: 3,
+        rows: 3,
+        type: 'vimeo',
+        videoId: '1061002580',
+        hId: '1ea606b5ac',
+       // image: 'https://images.unsplash.com/photo-1737646099147-f2636ed6c1b3?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwyNTd8fHxlbnwwfHx8fHw%3D',
+        title: 'Personal Branding',
+        slug: 'personal-branding',
+        description: 'A unique and personalized brand experience that sets you apart from the crowd.',
+        capability: 'Brand Strategy, Brand Identity, Brand Management',
+        team: 'Brand Manager: Jane Smith\nBrand Strategist: Alex Johnson',
+        relatedItems: [
+            { type: 'video', videoId: '1061002580', hId: '1ea606b5ac' },
+            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ]
+    },
+
+  
+  /*  {
         id: 11,
         cols: 2,
         rows: 2,
@@ -174,20 +195,27 @@ const workItems: WorkItem[] = [
             { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
         ]
     },
+    */
     {
         id: 12,
         cols: 1,
-        rows: 2,
-        type: 'image',
-        image: 'https://images.unsplash.com/photo-1737380047092-e0cb34e12f84?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        title: 'Cozy Corner',
-        slug: 'cozy-corner',
-        description: 'A snug and intimate space that invites relaxation and contemplation.',
+        rows: 3,
+        type: 'vimeo',
+      //  image: 'https://images.unsplash.com/photo-1737380047092-e0cb34e12f84?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+       videoId: '1061002700',
+       hId: 'a4fcb113f3',  
+      title: 'Wedding & Event shoots',
+        slug: 'wedding-event-shoots',
+        description: 'Bespoke Event Experiences',
+        overview: 'Our team specializes in creating bespoke wedding and event experiences that seamlessly blend creativity with meticulous planning. We excel in venue selection, decor design, and coordination to ensure every detail is perfect.',
+        capability: 'We offer a comprehensive range of services, including event planning, design and decor, vendor management, and on-site coordination. Our goal is to create memorable experiences that reflect the unique vision of each client.',
+        team: '',
         relatedItems: [
-            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
+            { type: 'video', videoId: '1061002700', hId: 'a4fcb113f3' },
             { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
         ]
     },
+    /*
     {
         id: 13,
         cols: 2,
@@ -201,6 +229,7 @@ const workItems: WorkItem[] = [
             { type: 'video', videoId: '1058623325', hId: '475b69db9b' }
         ]
     },
+   /*
     {
         id: 14,
         cols: 1,
@@ -214,10 +243,11 @@ const workItems: WorkItem[] = [
             { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
             { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
         ]
-    },
+    },*/
+    /*
     {
         id: 15,
-        cols: 1,
+        cols: 2,
         rows: 2,
         type: 'image',
         image: 'https://images.unsplash.com/photo-1736794781970-ae55b6e3a13e?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwzODZ8fHxlbnwwfHx8fHw%3D',
@@ -290,8 +320,8 @@ const workItems: WorkItem[] = [
         cols: 2,
         rows: 2,
         type: 'vimeo',
-        videoId: '1057280811',
-        hId: '17964124a8',
+        videoId: '1060982636',
+        hId: '6b718a7c08',
         title: 'Urban Rhythms',
         slug: 'urban-rhythms',
         description: 'A dynamic and energetic atmosphere, perfect for city dwellers.',
@@ -371,6 +401,7 @@ const workItems: WorkItem[] = [
             { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
         ]
     }
+        */
 ];
 
 export default workItems;
