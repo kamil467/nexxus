@@ -1,10 +1,116 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './MasanoryGrid.css';
-import workItems from '../components/workitems';
 import ClientsSection from '../components/ClientsSection';
+import { API_CONFIG, getApiHeaders } from '../config/api';
+
+interface WorkItemFormat {
+  name: string;
+  hash: string;
+  ext: string;
+  mime: string;
+  path: null;
+  width: number;
+  height: number;
+  size: number;
+  sizeInBytes: number;
+  url: string;
+}
+
+interface WorkItemMedia {
+  id: number;
+  documentId: string;
+  name: string;
+  alternativeText: string;
+  caption: string;
+  width: number;
+  height: number;
+  formats: {
+    thumbnail: WorkItemFormat;
+    medium: WorkItemFormat;
+    small: WorkItemFormat;
+    large?: WorkItemFormat;
+  };
+  hash: string;
+  ext: string;
+  mime: string;
+  size: number;
+  url: string;
+  previewUrl: null;
+  provider: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface WorkItem {
+  id: number;
+  documentId: string;
+  RowNumber: number;
+  ColNumber: number;
+  Title: string;
+  Descriptions: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+  CardType: 'Image' | 'Video';
+  slug: string;
+  Overview: string;
+  Capabilities: string;
+  ProjectTeam: string;
+  MainCardMedia: WorkItemMedia;
+  RelatedItems: WorkItemMedia[];
+}
+
+interface ApiResponse {
+  data: WorkItem[];
+  meta: {
+    pagination: {
+      page: number;
+      pageSize: number;
+      pageCount: number;
+      total: number;
+    };
+  };
+}
 
 const MasonryGrid = () => {
   const [loadedItems, setLoadedItems] = useState<{ [key: number]: boolean }>({});
+  const [workItems, setWorkItems] = useState<WorkItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchWorkItems = async () => {
+      try {
+        if (!API_CONFIG.API_TOKEN) {
+          throw new Error('API token is not configured');
+        }
+
+        const response = await fetch(
+          `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.WORK_CARDS}?populate=*`, 
+          {
+            headers: getApiHeaders(),
+          }
+        );
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error('Authentication failed. Please check your API token.');
+          }
+          throw new Error(`Failed to fetch work items: ${response.statusText}`);
+        }
+
+        const data: ApiResponse = await response.json();
+        setWorkItems(data.data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred while fetching work items');
+        console.error('Error fetching work items:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchWorkItems();
+  }, []);
 
   const handleItemLoad = (id: number) => {
     setLoadedItems(prev => ({ ...prev, [id]: true }));
@@ -27,6 +133,24 @@ const MasonryGrid = () => {
     </svg>
   );
 
+  if (isLoading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading work items...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error-container">
+        <p>Error: {error}</p>
+        <button onClick={() => window.location.reload()}>Retry</button>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="masonry-grid">
@@ -35,8 +159,8 @@ const MasonryGrid = () => {
             key={item.id}
             className="masonry-item"
             style={{
-              gridColumnEnd: `span ${item.cols}`,
-              gridRowEnd: `span ${item.rows}`,
+              gridColumnEnd: `span ${item.ColNumber}`,
+              gridRowEnd: `span ${item.RowNumber}`,
             }}
           >
             <div className={`card-content ${loadedItems[item.id] ? 'loaded' : ''}`}>
@@ -46,41 +170,34 @@ const MasonryGrid = () => {
                   <div className="loading-progress"></div>
                 </>
               )}
-              {item.type === 'vimeo' ? (
+              {item.CardType === 'Video' ? (
                 <div className="video-container">
                   <iframe
-                    src={`https://player.vimeo.com/video/${item.videoId}?h=${item.hId}&autoplay=1&loop=1&muted=1&background=1`}
-                    width="100%"
-                    height="100%"
+                    src={`https://player.vimeo.com/video/${item.MainCardMedia.url}?background=1&autoplay=1&loop=1&byline=0&title=0`}
                     frameBorder="0"
-                    allow="autoplay; fullscreen; picture-in-picture"
-                    allowFullScreen
-                    style={{ borderRadius: '10px' }}
-                    title={`Vimeo Video ${item.videoId}`}
+                    allow="autoplay; fullscreen"
                     onLoad={() => handleItemLoad(item.id)}
                   ></iframe>
                 </div>
               ) : (
-                <img 
-                  src={item.image} 
-                  alt={`Card ${item.id}`} 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                <img
+                  src={`http://localhost:1337${item.MainCardMedia.formats.large?.url || item.MainCardMedia.formats.medium.url}`}
+                  alt={item.MainCardMedia.alternativeText || item.Title}
                   onLoad={() => handleItemLoad(item.id)}
                 />
               )}
               <div className="card-overlay">
-                <h3>{item.title}</h3>
-                <p>{item.description}</p>
-                <a href={`/work/${item.slug}`} className="card-action">
-                  View Project <ArrowIcon />
+                <h3>{item.Title}</h3>
+                <p>{item.Descriptions}</p>
+                <a href={`/work/${item.slug}`} className="learn-more">
+                  Learn More <ArrowIcon />
                 </a>
               </div>
             </div>
           </div>
         ))}
       </div>
-      {/* Clients Section */}
-      <ClientsSection className="mt-20" />
+      <ClientsSection />
     </div>
   );
 };
