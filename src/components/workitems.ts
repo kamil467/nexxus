@@ -16,104 +16,27 @@ interface WorkItem {
 }
 
 const workItems: WorkItem[] = [
-   /* {
+   
+    {
         id: 1,
-        cols: 1,
-        rows: 1,
-        type: 'image',
-        image: 'https://images.unsplash.com/photo-1734784548166-a1ffe07dd7cd?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxODJ8fHxlbnwwfHx8fHw%3D',
-        title: 'Urban Architecture',
-        slug: 'urban-architecture',
-        description: 'Modern architectural design showcasing the beauty of urban landscapes.',
-        overview: 'A comprehensive exploration of urban architectural elements that define modern cityscapes. This project focuses on the intersection of functionality and aesthetic appeal in contemporary urban design.',
-        capability: 'Architectural Design, 3D Modeling, Urban Planning, Sustainable Development',
-        team: 'Lead Architect: John Smith\nProject Manager: Sarah Johnson\nDesign Team: Michael Chen, Emma Davis',
-        relatedItems: [
-            { type: 'image', src: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=60' },
-            { type: 'video', videoId: '1058323026', hId: 'b97a3cc228' },
-            { type: 'video', videoId: '1058621851', hId: '3caccb6ab6' }
-        ]
-    },*/
-
-    {
-        id: 9,
-        cols: 1,
-        rows: 3,
-        type: 'vimeo',
-        videoId: '1061002506',
-        hId: 'd595762e8c',
-        title: 'Food & Restaurant',
-        slug: 'food-restaurant',
-        description: 'A culinary journey that showcases the best in food and restaurant culture.',
-        overview: '',
-        capability: '',
-        team: '',
-        relatedItems: [
-            { type: 'video', videoId: '1061002506', hId: 'd595762e8c' },
-            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
-        ]
-    },
-    {
-        id: 2,
         cols: 3,
         rows: 3,
-        type: 'vimeo',
-        videoId: '1061002395',
+        type: 'youtube',
+        videoId: '4cdS0BA8P90',
         hId: '4f447e7fe9',
        // image: 'https://plus.unsplash.com/premium_photo-1739091068170-5486fbb36cff?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxMjV8fHxlbnwwfHx8fHw%3D',
-        title: "Food & Restaurant",
-        slug: 'food-restaurant-1',
-        description: 'A vibrant hub for culinary experiences.',
-        overview: 'A food and restaurant project that showcases the best in culinary artistry and culinary culture.',
-        capability: 'Culinary Artistry, Culinary Culture, Culinary Education, Culinary Innovation',
-        team: 'Chef: John Doe\nCulinary Director: Sarah Johnson\nCulinary Team: Michael Chen, Emma Davis',
+        title: "Pre Wedding Shoot",
+        slug: 'pre-wedding-shoot',
+        description: 'Wedding cinematography that captures the essence of your love story',
+        overview: 'A beautiful pre-wedding shoot that showcases the couple\'s journey and their special moments together. Our team specializes in creating timeless memories through artistic cinematography and storytelling.',
+        capability: 'Wedding Cinematography, Creative Direction, Candid Photography, Story-Driven Narratives',
+        team: 'Creative Director: Sarah Williams\nCinematographer: Michael Chen\nPhotographer: Emma Davis\nEditor: James Thompson',
         relatedItems: [
             { type: 'image', src: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&auto=format&fit=crop&q=60' },
-            { type: 'video', videoId: '1061002395', hId: '4f447e7fe9' }
+            { type: 'video', videoId: '4cdS0BA8P90', hId: 'KiEt9WQdn7A' }
         ]
     },
- /*   {
-        id: 3,
-        cols: 1,
-        rows: 2,
-        type: 'image',
-        image: 'https://images.unsplash.com/photo-1739403386250-080677ac4c53?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxMzR8fHxlbnwwfHx8fHw%3D',
-        title: 'Urban Oasis',
-        slug: 'urban-oasis',
-        description: 'A serene escape from the hustle and bustle of city life.',
-        relatedItems: [
-            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
-            { type: 'image', src: 'https://images.unsplash.com/photo-1726137569971-cdfa45c3138e?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
-        ]
-    },
-    {
-        id: 4,
-        cols: 1,
-        rows: 2,
-        type: 'image',
-        image: 'https://images.unsplash.com/photo-1734907865880-6eb669831b9e?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxODB8fHxlbnwwfHx8fHw%3D',
-        title: 'Rustic Charm',
-        slug: 'rustic-charm',
-        description: 'A cozy retreat that embodies the warmth of rural living.',
-        relatedItems: [
-            { type: 'video', videoId: '654321', hId: '654321' },
-            { type: 'image', src: 'https://images.unsplash.com/photo-1726137569971-cdfa45c3138e?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
-        ]
-    },
-    {
-        id: 5,
-        cols: 1,
-        rows: 1,
-        type: 'image',
-        image: 'https://images.unsplash.com/photo-1739531722390-04a6942231e2?q=80&w=2942&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fHw%3D',
-        title: 'Modern Minimalism',
-        slug: 'modern-minimalism',
-        description: 'A sleek and sophisticated design that celebrates simplicity.',
-        relatedItems: [
-            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
-            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
-        ]
-    },
+   
     {
         id: 6,
         cols: 2,
@@ -141,28 +64,29 @@ const workItems: WorkItem[] = [
             { type: 'video', videoId: '1058623325', hId: '475b69db9b' }
         ]
     },
-    */
+
    
     {
-        id: 10,
-        cols: 1,
+        id: 2,
+        cols: 3,
         rows: 3,
-        type: 'vimeo',
+        type: 'youtube',
       //  image: 'https://images.unsplash.com/photo-1586768798120-95597acaa6e3?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxOTJ8fHxlbnwwfHx8fHw%3D',
-      videoId: '1061002650',
+      videoId: 'zJG2lmRFr0c',
       hId: '4875906def', 
-      title: 'Content video',
-        slug: 'content-video',
-        description: 'A video that showcases the content of your business or service.',
-        capability: 'Content Strategy, Content Creation, Content Marketing',
-        team: 'Content Manager: Sarah Johnson\nContent Editor: John Doe',
+      title: 'Village Grand Wedding',
+      slug: 'village-grand-wedding',
+      description: 'A cinematic celebration of traditional village wedding customs and modern love',
+      overview: 'An enchanting wedding film that beautifully captures the rich traditions and vibrant celebrations of a village wedding. From traditional ceremonies to modern festivities, this film showcases the perfect blend of cultural heritage and contemporary romance.',
+      capability: 'Traditional Wedding Documentation, Cultural Cinematography, Aerial Videography, Documentary Storytelling',
+      team: 'Lead Cinematographer: David Kumar\nCultural Director: Priya Sharma\nAerial Photographer: Michael Chen\nLocal Traditions Consultant: Raj Patel',
         relatedItems: [
-            { type: 'video', videoId: '1061002650', hId: '4875906def' },
+            { type: 'video', videoId: 'zJG2lmRFr0c', hId: '4875906def' },
             { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
         ]
     },
     {
-        id: 8,
+        id: 3,
         cols: 3,
         rows: 3,
         type: 'vimeo',
@@ -181,23 +105,10 @@ const workItems: WorkItem[] = [
     },
 
   
-  /*  {
-        id: 11,
-        cols: 2,
-        rows: 2,
-        type: 'image',
-        image: 'https://images.unsplash.com/photo-1738008896551-9ab767d9e6ac?q=80&w=2998&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        title: 'Rustic Elegance',
-        slug: 'rustic-elegance',
-        description: 'A charming blend of traditional and modern elements, creating a warm and inviting atmosphere.',
-        relatedItems: [
-            { type: 'video', videoId: '1058623325', hId: '475b69db9b' },
-            { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
-        ]
-    },
-    */
+
+    
     {
-        id: 12,
+        id: 2,
         cols: 1,
         rows: 3,
         type: 'vimeo',
@@ -215,20 +126,7 @@ const workItems: WorkItem[] = [
             { type: 'image', src: 'https://images.unsplash.com/photo-1737513090777-b87774e10186?q=80&w=2923&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
         ]
     },
-    /*
-    {
-        id: 13,
-        cols: 2,
-        rows: 1,
-        type: 'image',
-        image: 'https://plus.unsplash.com/premium_photo-1738637796692-d29db83fb7c4?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwzODV8fHxlbnwwfHx8fHw%3D',
-        title: 'Sunset Serenade',
-        slug: 'sunset-serenade',
-        description: 'A warm and romantic atmosphere, perfect for a peaceful evening.',
-        relatedItems: [
-            { type: 'video', videoId: '1058623325', hId: '475b69db9b' }
-        ]
-    },
+    
    /*
     {
         id: 14,

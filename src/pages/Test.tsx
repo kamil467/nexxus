@@ -60,14 +60,28 @@ const MasonryGrid = () => {
                     onLoad={() => handleItemLoad(item.id)}
                   ></iframe>
                 </div>
-              ) : (
+              ) : item.type === 'image' ? (
                 <img 
                   src={item.image} 
                   alt={`Card ${item.id}`} 
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   onLoad={() => handleItemLoad(item.id)}
                 />
-              )}
+              ) : item.type === 'youtube' ? (
+                <div className="video-container">
+                <iframe
+                  src={`https://www.youtube.com/embed/${item.videoId}?autoplay=1&loop=1&mute=1&showinfo=0&controls=0&rel=0`}
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  style={{ borderRadius: '10px' }}
+                  title={`YouTube Video ${item.videoId}`}
+                  onLoad={() => handleItemLoad(item.id)}
+                ></iframe>
+              </div>
+              ) : null}
               <div className="card-overlay">
                 <h3>{item.title}</h3>
                 <p>{item.description}</p>

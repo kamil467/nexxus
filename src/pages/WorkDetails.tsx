@@ -90,10 +90,10 @@ const WorkDetails = () => {
                     </div>
                   )}
                   <iframe
-                    src={`https://player.vimeo.com/video/${item.videoId}?h=${item.hId}&autoplay=0&controls=1`}
+                    src={`https://www.youtube.com/embed/${item.videoId}?autoplay=1&loop=1&rel=0&mute=1&modestbranding=1&controls=1`}
                     className="w-full aspect-video rounded-lg md:rounded-none"
                     frameBorder="0"
-                    allow="autoplay; fullscreen; picture-in-picture"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                     title={`Related video ${index + 1}`}
                     style={{ pointerEvents: 'auto' }}
