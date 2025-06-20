@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Leaf, Menu, X } from 'lucide-react';
+import { Leaf, Menu, X, Lock } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import LoginModal from './LoginModal';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const { user, isAdmin, signOut } = useAuth();
 
   const scrollToWork = () => {
     const workSection = document.getElementById('work');
@@ -15,6 +19,16 @@ const Navbar = () => {
 
   const handleLinkClick = () => {
     setIsOpen(false);
+  };
+
+  const handleAdminClick = () => {
+    if (user) {
+      // If already logged in, navigate to admin page
+      window.location.href = '/work';
+    } else {
+      // If not logged in, open login modal
+      setIsLoginModalOpen(true);
+    }
   };
 
   return (
@@ -74,6 +88,29 @@ const Navbar = () => {
             >
               Contact
             </Link>
+            
+            {/* Admin Button - Only visible to admins or for login */}
+            {(isAdmin || !user) && (
+              <button
+                onClick={handleAdminClick}
+                className="flex items-center text-gray-600 hover:text-[#A9AC87] transition-colors ml-2"
+                title={user ? "Admin Mode" : "Admin Login"}
+              >
+                <Lock size={18} className="mr-1" />
+                {user ? 'Admin' : 'Login'}
+              </button>
+            )}
+            
+            {/* Logout Button - Only visible when logged in */}
+            {user && (
+              <button
+                onClick={signOut}
+                className="text-gray-600 hover:text-red-500 transition-colors"
+                title="Logout"
+              >
+                Logout
+              </button>
+            )}
           </div>
         </div>
       </nav>
@@ -119,10 +156,37 @@ const Navbar = () => {
               >
                 Contact
               </Link>
+              
+              {/* Admin Button in Mobile Menu */}
+              {(isAdmin || !user) && (
+                <button
+                  onClick={handleAdminClick}
+                  className="flex items-center text-lg text-gray-800 hover:text-[#A9AC87] transition-colors font-light"
+                >
+                  <Lock size={18} className="mr-2" />
+                  {user ? 'Admin Mode' : 'Admin Login'}
+                </button>
+              )}
+              
+              {/* Logout Button in Mobile Menu */}
+              {user && (
+                <button
+                  onClick={signOut}
+                  className="text-lg text-gray-800 hover:text-red-500 transition-colors font-light"
+                >
+                  Logout
+                </button>
+              )}
             </div>
           </div>
         </>
       )}
+      
+      {/* Login Modal */}
+      <LoginModal 
+        isOpen={isLoginModalOpen} 
+        onClose={() => setIsLoginModalOpen(false)} 
+      />
     </>
   );
 };

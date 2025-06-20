@@ -9,23 +9,26 @@ import Test from './pages/Test';
 import WorkDetails from './pages/WorkDetails';
 import ScrollToTop from './components/ScrollToTop';
 import './styles/animations.css';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <ScrollToTop />
-      <main>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/work/:slug" element={<WorkDetails />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-         <Route path="/work" element={<Test />} />  
-        </Routes>
-      </main>
-      <Footer />
-    </div>
+    <AuthProvider>
+      <div className="min-h-screen bg-white">
+        <Navbar />
+        <ScrollToTop />
+        <main>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/work/:slug" element={<WorkDetails />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+           <Route path="/work" element={<Test />} />  
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </AuthProvider>
   );
 }
 

@@ -5,12 +5,22 @@ import ClientsSection from '../components/ClientsSection';
 import { supabase } from '../api/supabase';
 import { WorkItem } from '../api/supabase';
 import WorkItemAdmin from '../components/WorkItemAdmin';
+import { useAuth } from '../context/AuthContext';
 
 const MasonryGrid = () => {
   const [workItems, setWorkItems] = useState<WorkItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [loadedItems, setLoadedItems] = useState<{ [key: number]: boolean }>({});
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const { isAdmin, user, session, loading: authLoading } = useAuth(); // Get more auth context data for debugging
+  
+  // Debug authentication state
+  useEffect(() => {
+    console.log('Auth Debug - isAdmin:', isAdmin);
+    console.log('Auth Debug - user:', user);
+    console.log('Auth Debug - session:', session);
+    console.log('Auth Debug - authLoading:', authLoading);
+    console.log('Auth Debug - user email:', user?.email);
+  }, [isAdmin, user, session, authLoading]);
   
   // Fetch work items from Supabase
   const fetchWorkItems = async () => {
@@ -36,11 +46,6 @@ const MasonryGrid = () => {
   useEffect(() => {
     fetchWorkItems();
   }, []);
-  
-  // Toggle admin mode
-  const toggleAdminMode = () => {
-    setIsAdmin(!isAdmin);
-  };
   
   // Function to open edit modal for a work item
   const openEditModal = (item: WorkItem) => {
@@ -107,16 +112,8 @@ const MasonryGrid = () => {
 
   return (
     <div>
-      {/* Admin Toggle Button */}
-      <div className="admin-toggle-container flex justify-end mb-4 pr-4">
-        <button 
-          onClick={toggleAdminMode} 
-          className={`px-4 py-2 rounded-md ${isAdmin ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'} text-white transition-colors`}
-        >
-          {isAdmin ? 'Exit Admin Mode' : 'Enter Admin Mode'}
-        </button>
-      </div>
-      
+     
+
       {/* Admin Panel - Hidden but accessible for event handling */}
       <div className="admin-panel-container">
         {isAdmin && (
@@ -138,7 +135,11 @@ const MasonryGrid = () => {
         </div>
       ) : (
         <div className="masonry-grid">
-          {workItems.map((item) => (
+          {workItems.map((item) => {
+            // Debug log for each item
+            console.log(`Rendering admin controls for item ${item.id}: isAdmin=${isAdmin}`);
+            
+            return (
             <div
               key={item.id}
               className="masonry-item"
@@ -220,7 +221,7 @@ const MasonryGrid = () => {
                 ) : item.type === 'youtube' ? (
                   <Link to={`/work/${item.slug}`} className="video-container">
                     <iframe
-                        src={`https://www.youtube.com/embed/${item.videoId}?autoplay=1&loop=1&mute=1&showinfo=0&controls=0&rel=0`}
+                      src={`https://www.youtube.com/embed/${item.videoId}?autoplay=1&loop=1&mute=1&showinfo=0&controls=0&rel=0`}
                       style={{ border: 0 }}
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
@@ -242,7 +243,8 @@ const MasonryGrid = () => {
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
       {/* Clients Section */}
