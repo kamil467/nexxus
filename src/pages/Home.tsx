@@ -3,6 +3,7 @@ import { ArrowDown, Users, Building2, Award, Star } from 'lucide-react';
 import Test from './Test';
 import ClientsSection from '../components/ClientsSection';
 
+
 // Dummy client logos - Replace with actual client logos
 const clients = [
   { id: 1, name: 'Client 1', logo: 'https://placehold.co/200x80/A9AC87/white?text=Client+1' },

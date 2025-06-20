@@ -1,19 +1,5 @@
-interface WorkItem {
-    id: number;
-    cols: number;
-    rows: number;
-    type: string;
-    image?: string;
-    videoId?: string;
-    hId?: string;
-    title: string;
-    slug: string;
-    description: string;
-    relatedItems: Array<{ type: string; src?: string; videoId?: string; hId?: string }>;
-    overview?: string;
-    capability?: string;
-    team?: string;
-}
+import { WorkItem } from "../api/supabase";
+
 
 const workItems: WorkItem[] = [
    
