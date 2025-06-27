@@ -11,16 +11,7 @@ const MasonryGrid = () => {
   const [workItems, setWorkItems] = useState<WorkItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [loadedItems, setLoadedItems] = useState<{ [key: number]: boolean }>({});
-  const { isAdmin, user, session, loading: authLoading } = useAuth(); // Get more auth context data for debugging
-  
-  // Debug authentication state
-  useEffect(() => {
-    console.log('Auth Debug - isAdmin:', isAdmin);
-    console.log('Auth Debug - user:', user);
-    console.log('Auth Debug - session:', session);
-    console.log('Auth Debug - authLoading:', authLoading);
-    console.log('Auth Debug - user email:', user?.email);
-  }, [isAdmin, user, session, authLoading]);
+  const { isAdmin } = useAuth();
   
   // Fetch work items from Supabase
   const fetchWorkItems = async () => {
@@ -136,9 +127,6 @@ const MasonryGrid = () => {
       ) : (
         <div className="masonry-grid">
           {workItems.map((item) => {
-            // Debug log for each item
-            console.log(`Rendering admin controls for item ${item.id}: isAdmin=${isAdmin}`);
-            
             return (
             <div
               key={item.id}

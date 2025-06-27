@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { WorkItem } from '../api/supabase';
+import { WorkItem, RelatedItem } from '../api/supabase';
 import { supabase } from '../api/supabase';
 
 interface WorkItemAdminProps {
@@ -14,7 +14,19 @@ const WorkItemAdmin: React.FC<WorkItemAdminProps> = ({ onWorkItemsChange, isAdmi
   const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
   
   // Form tabs
-  const [activeTab, setActiveTab] = useState<'basic' | 'details'>('basic');
+  const [activeTab, setActiveTab] = useState<'basic' | 'details' | 'related'>('basic');
+  
+  // Related Items state
+  const [relatedItems, setRelatedItems] = useState<RelatedItem[]>([]);
+  const [isAddingRelatedItem, setIsAddingRelatedItem] = useState(false);
+  const [editingRelatedItemIndex, setEditingRelatedItemIndex] = useState<number | null>(null);
+  const [relatedItemForm, setRelatedItemForm] = useState<Partial<RelatedItem>>({
+    type: 'image',
+    src: '',
+    videoId: '',
+    title: '',
+    description: ''
+  });
   
   // Form state
   // Add effect for event listener
@@ -61,6 +73,61 @@ const WorkItemAdmin: React.FC<WorkItemAdminProps> = ({ onWorkItemsChange, isAdmi
     team: ''
   });
 
+  // Related Items functions
+  const addRelatedItem = () => {
+    if (relatedItemForm.title && (relatedItemForm.src || relatedItemForm.videoId)) {
+      const newItem: RelatedItem = {
+        ...relatedItemForm,
+        id: Date.now() // Temporary ID for frontend management
+      } as RelatedItem;
+      
+      setRelatedItems([...relatedItems, newItem]);
+      resetRelatedItemForm();
+      setIsAddingRelatedItem(false);
+    }
+  };
+
+  const editRelatedItem = (index: number) => {
+    const item = relatedItems[index];
+    setRelatedItemForm(item);
+    setEditingRelatedItemIndex(index);
+    setIsAddingRelatedItem(true);
+  };
+
+  const updateRelatedItem = () => {
+    if (editingRelatedItemIndex !== null && relatedItemForm.title && (relatedItemForm.src || relatedItemForm.videoId)) {
+      const updatedItems = [...relatedItems];
+      updatedItems[editingRelatedItemIndex] = { ...relatedItemForm } as RelatedItem;
+      setRelatedItems(updatedItems);
+      resetRelatedItemForm();
+      setIsAddingRelatedItem(false);
+      setEditingRelatedItemIndex(null);
+    }
+  };
+
+  const removeRelatedItem = (index: number) => {
+    const updatedItems = relatedItems.filter((_, i) => i !== index);
+    setRelatedItems(updatedItems);
+  };
+
+  const resetRelatedItemForm = () => {
+    setRelatedItemForm({
+      type: 'image',
+      src: '',
+      videoId: '',
+      title: '',
+      description: ''
+    });
+  };
+
+  const handleRelatedItemInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setRelatedItemForm({
+      ...relatedItemForm,
+      [name]: value
+    });
+  };
+
   const openAddModal = () => {
     setFormData({
       title: '',
@@ -77,6 +144,8 @@ const WorkItemAdmin: React.FC<WorkItemAdminProps> = ({ onWorkItemsChange, isAdmi
       capability: '',
       team: ''
     });
+    setRelatedItems([]);
+    resetRelatedItemForm();
     setFormMode('add');
     setIsModalOpen(true);
   };
@@ -99,6 +168,11 @@ const WorkItemAdmin: React.FC<WorkItemAdminProps> = ({ onWorkItemsChange, isAdmi
       capability: item.capability || '',
       team: item.team || ''
     });
+    
+    // Set related items from the work item
+    setRelatedItems(item.relatedItems || []);
+    resetRelatedItemForm();
+    
     console.log('Opening edit modal with data:', item);
     console.log('Parsed cols and rows:', {
       cols: typeof item.cols === 'string' ? parseInt(item.cols as string) : item.cols,
@@ -111,6 +185,10 @@ const WorkItemAdmin: React.FC<WorkItemAdminProps> = ({ onWorkItemsChange, isAdmi
   const closeModal = () => {
     setIsModalOpen(false);
     setCurrentItem(null);
+    setRelatedItems([]);
+    resetRelatedItemForm();
+    setIsAddingRelatedItem(false);
+    setEditingRelatedItemIndex(null);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -162,7 +240,8 @@ const WorkItemAdmin: React.FC<WorkItemAdminProps> = ({ onWorkItemsChange, isAdmi
     const finalFormData = {
       ...formData,
       cols: Number(formData.cols) || 1,
-      rows: Number(formData.rows) || 1
+      rows: Number(formData.rows) || 1,
+      relatedItems: relatedItems // Include related items from state
     };
     
     // Force cols and rows to be numbers for TypeScript
@@ -170,6 +249,7 @@ const WorkItemAdmin: React.FC<WorkItemAdminProps> = ({ onWorkItemsChange, isAdmi
     finalFormData.rows = Number(finalFormData.rows);
     
     console.log('Submitting form data:', finalFormData);
+    console.log('Related items being submitted:', relatedItems);
     
     try {
       if (formMode === 'add') {
@@ -300,6 +380,13 @@ const WorkItemAdmin: React.FC<WorkItemAdminProps> = ({ onWorkItemsChange, isAdmi
                   onClick={() => setActiveTab('details')}
                 >
                   Details Content
+                </button>
+                <button
+                  type="button"
+                  className={`py-2 px-4 ${activeTab === 'related' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                  onClick={() => setActiveTab('related')}
+                >
+                  Related Items
                 </button>
               </div>
               
@@ -464,10 +551,141 @@ const WorkItemAdmin: React.FC<WorkItemAdminProps> = ({ onWorkItemsChange, isAdmi
                       rows={4}
                     ></textarea>
                   </div>
-                  
+                </div>
+              )}
+              
+              {/* Related Items Tab */}
+              {activeTab === 'related' && (
+                <div className="grid grid-cols-1 gap-4">
                   <div className="col-span-1">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Related Items</label>
-                    <p className="text-sm text-gray-500 mb-2">Related items can be managed after creating the work item.</p>
+                    <h3 className="text-lg font-bold mb-2">Related Items</h3>
+                    <ul>
+                      {relatedItems.map((item, index) => (
+                        <li key={index} className="mb-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm">{item.title}</span>
+                            <div className="flex space-x-2">
+                              <button
+                                type="button"
+                                onClick={() => editRelatedItem(index)}
+                                className="text-gray-500 hover:text-gray-700"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => removeRelatedItem(index)}
+                                className="text-gray-500 hover:text-gray-700"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+                                  <line x1="18" y1="9" x2="12" y2="15"></line>
+                                  <line x1="12" y1="9" x2="18" y2="15"></line>
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                    {isAddingRelatedItem ? (
+                      <div className="mt-4">
+                        <h4 className="text-sm font-bold mb-2">Add New Related Item</h4>
+                        <div className="grid grid-cols-1 gap-2">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                            <input
+                              type="text"
+                              name="title"
+                              value={relatedItemForm.title}
+                              onChange={handleRelatedItemInputChange}
+                              className="w-full p-2 border border-gray-300 rounded-md"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                            <select
+                              name="type"
+                              value={relatedItemForm.type}
+                              onChange={handleRelatedItemInputChange}
+                              className="w-full p-2 border border-gray-300 rounded-md"
+                              required
+                            >
+                              <option value="image">Image</option>
+                              <option value="vimeo">Vimeo</option>
+                              <option value="youtube">YouTube</option>
+                            </select>
+                          </div>
+                          {relatedItemForm.type === 'image' && (
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                              <input
+                                type="url"
+                                name="src"
+                                value={relatedItemForm.src}
+                                onChange={handleRelatedItemInputChange}
+                                className="w-full p-2 border border-gray-300 rounded-md"
+                                required={relatedItemForm.type === 'image'}
+                              />
+                            </div>
+                          )}
+                          {(relatedItemForm.type === 'vimeo' || relatedItemForm.type === 'youtube') && (
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Video ID</label>
+                              <input
+                                type="text"
+                                name="videoId"
+                                value={relatedItemForm.videoId}
+                                onChange={handleRelatedItemInputChange}
+                                className="w-full p-2 border border-gray-300 rounded-md"
+                                required={relatedItemForm.type === 'vimeo' || relatedItemForm.type === 'youtube'}
+                              />
+                            </div>
+                          )}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <textarea
+                              name="description"
+                              value={relatedItemForm.description}
+                              onChange={handleRelatedItemInputChange}
+                              className="w-full p-2 border border-gray-300 rounded-md"
+                              rows={2}
+                            ></textarea>
+                          </div>
+                          <div className="flex justify-end">
+                            <button
+                              type="button"
+                              onClick={editingRelatedItemIndex !== null ? updateRelatedItem : addRelatedItem}
+                              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                            >
+                              {editingRelatedItemIndex !== null ? 'Update' : 'Add'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsAddingRelatedItem(false);
+                                resetRelatedItemForm();
+                              }}
+                              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 ml-2"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setIsAddingRelatedItem(true)}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 mt-4"
+                      >
+                        Add Related Item
+                      </button>
+                    )}
                   </div>
                 </div>
               )}

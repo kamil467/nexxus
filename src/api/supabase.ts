@@ -25,7 +25,7 @@ export interface WorkItem {
 
 export interface RelatedItem {
   id?: number;
-  type: 'image' | 'video';
+  type: 'image' | 'vimeo' | 'youtube';
   src?: string;
   videoId?: string;
   title?: string;
