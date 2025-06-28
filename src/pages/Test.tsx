@@ -116,6 +116,7 @@ const MasonryGrid = () => {
                       allowFullScreen
                       style={{ borderRadius: '10px' }}
                       title={`YouTube Video ${item.videoId}`}
+                      loading="lazy"
                       onLoad={() => handleItemLoad(item.id)}
                     ></iframe>
                   </div>

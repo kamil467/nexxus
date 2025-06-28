@@ -174,6 +174,7 @@ const WorkDetails = () => {
                     allowFullScreen
                     title={`Related video ${index + 1}`}
                     style={{ pointerEvents: 'auto' }}
+                    loading="lazy"
                     onLoad={() => handleMediaLoad(`video-${index}`)}
                   ></iframe>
                 </div>
