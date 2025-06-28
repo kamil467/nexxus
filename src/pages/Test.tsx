@@ -30,23 +30,29 @@ const MasonryGrid = () => {
   // Auto-advance carousel on mobile
   useEffect(() => {
     if (!isMobile || workItems.length === 0) return;
-
+    
     const startSlideTimer = () => {
-      slideTimerRef.current = setInterval(() => {
-        setCurrentMobileIndex(prev => 
-          prev === workItems.length - 1 ? 0 : prev + 1
-        );
-      }, 4000); // Change slide every 4 seconds
-    };
-
-    startSlideTimer();
-
-    return () => {
-      if (slideTimerRef.current) {
-        clearInterval(slideTimerRef.current);
+      // Only start timer after first item is loaded
+      if (loadedItems[workItems[0]?.id]) {
+        slideTimerRef.current = setInterval(() => {
+          setCurrentMobileIndex(prev => prev === workItems.length - 1 ? 0 : prev + 1);
+        }, 4000);
       }
     };
-  }, [isMobile, workItems.length]);
+    
+    startSlideTimer();
+    
+    return () => {
+      if (slideTimerRef.current) clearInterval(slideTimerRef.current);
+    };
+  }, [isMobile, workItems.length, loadedItems]);
+
+  // Update video autoplay when slide changes (mobile only)
+  useEffect(() => {
+    if (!isMobile) return;
+    // Force re-render of iframes when slide changes to update autoplay parameter
+    // This ensures the current video starts playing when it becomes active
+  }, [currentMobileIndex, isMobile]);
 
   // Fetch work items from Supabase
   useEffect(() => {
@@ -105,9 +111,9 @@ const MasonryGrid = () => {
       changeSlide(currentMobileIndex - 1);
     }
     
-    // Resume auto-advance after touch
+    // Resume auto-advance after user interaction
     setTimeout(() => {
-      if (isMobile && workItems.length > 0) {
+      if (isMobile && workItems.length > 0 && loadedItems[workItems[0]?.id]) {
         slideTimerRef.current = setInterval(() => {
           setCurrentMobileIndex(prev => 
             prev === workItems.length - 1 ? 0 : prev + 1
@@ -184,15 +190,40 @@ const MasonryGrid = () => {
                         )}
                         
                         {item.type === 'vimeo' ? (
-                          <div className="video-container">
+                          <div className="video-container" style={{ position: 'relative' }}>
+                            {!loadedItems[item.id] && (
+                              <div className="video-thumbnail-overlay">
+                                <img
+                                  src={`https://vumbnail.com/${item.videoId}.jpg`}
+                                  alt={item.title}
+                                  className="video-thumbnail"
+                                  style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                    borderRadius: '10px'
+                                  }}
+                                />
+                                <div className="loading-spinner" style={{
+                                  position: 'absolute',
+                                  top: '50%',
+                                  left: '50%',
+                                  transform: 'translate(-50%, -50%)',
+                                  color: 'white',
+                                  fontSize: '20px'
+                                }}>Loading...</div>
+                              </div>
+                            )}
                             <iframe
-                              src={`https://player.vimeo.com/video/${item.videoId}?h=${item.hId}&autoplay=1&loop=1&muted=1&background=1`}
+                              src={`https://player.vimeo.com/video/${item.videoId}?h=${item.hId}&autoplay=${workItems.findIndex(w => w.id === item.id) === 0 || workItems.findIndex(w => w.id === item.id) === currentMobileIndex ? 1 : 0}&loop=1&muted=1&background=1`}
                               width="100%"
                               height="100%"
                               frameBorder="0"
                               allow="autoplay; fullscreen; picture-in-picture"
                               allowFullScreen
                               className="video-iframe"
+                              loading={workItems.findIndex(w => w.id === item.id) === 0 ? "eager" : "lazy"}
+                              style={{ opacity: loadedItems[item.id] ? 1 : 0 }}
                               onLoad={() => handleItemLoad(item.id)}
                             />
                           </div>
@@ -204,13 +235,39 @@ const MasonryGrid = () => {
                             onLoad={() => handleItemLoad(item.id)}
                           />
                         ) : item.type === 'youtube' ? (
-                          <div className="video-container">
+                          <div className="video-container" style={{ position: 'relative' }}>
+                            {!loadedItems[item.id] && (
+                              <div className="video-thumbnail-overlay">
+                                <img
+                                  src={`https://img.youtube.com/vi/${item.videoId}/maxresdefault.jpg`}
+                                  alt={item.title}
+                                  className="video-thumbnail"
+                                  style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                    borderRadius: '10px'
+                                  }}
+                                />
+                                <div className="loading-spinner" style={{
+                                  position: 'absolute',
+                                  top: '50%',
+                                  left: '50%',
+                                  transform: 'translate(-50%, -50%)',
+                                  color: 'white',
+                                  fontSize: '20px',
+                                  textShadow: '0 2px 4px rgba(0,0,0,0.7)'
+                                }}>Loading...</div>
+                              </div>
+                            )}
                             <iframe
-                              src={`https://www.youtube.com/embed/${item.videoId}?autoplay=1&loop=1&mute=1&controls=0&playlist=${item.videoId}`}
+                              src={`https://www.youtube.com/embed/${item.videoId}?autoplay=${workItems.findIndex(w => w.id === item.id) === 0 || workItems.findIndex(w => w.id === item.id) === currentMobileIndex ? 1 : 0}&loop=1&mute=1&controls=0&playlist=${item.videoId}`}
                               frameBorder="0"
                               allow="autoplay; encrypted-media"
                               allowFullScreen
                               className="video-iframe"
+                              loading={workItems.findIndex(w => w.id === item.id) === 0 ? "eager" : "lazy"}
+                              style={{ opacity: loadedItems[item.id] ? 1 : 0 }}
                               onLoad={() => handleItemLoad(item.id)}
                             />
                           </div>
@@ -278,6 +335,7 @@ const MasonryGrid = () => {
                           style={{ borderRadius: '10px' }}
                           title={`Vimeo Video ${item.videoId}`}
                           onLoad={() => handleItemLoad(item.id)}
+                          
                         ></iframe>
                       </div>
                     ) : item.type === 'image' ? (
