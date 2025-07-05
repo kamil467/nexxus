@@ -3,6 +3,7 @@ import './MasanoryGrid.css';
 import ClientsSection from '../components/ClientsSection';
 import { supabase } from '../api/supabase';
 import { WorkItem } from '../api/supabase';
+import MuxPlayer from '@mux/mux-player-react';
 
 const MasonryGrid = () => {
   const [workItems, setWorkItems] = useState<WorkItem[]>([]);
@@ -189,42 +190,28 @@ const MasonryGrid = () => {
                           </div>
                         )}
                         
-                        {item.type === 'vimeo' ? (
+                        {item.type === 'mux' ? (
                           <div className="video-container" style={{ position: 'relative' }}>
-                            {!loadedItems[item.id] && (
-                              <div className="video-thumbnail-overlay">
-                                <img
-                                  src={`https://vumbnail.com/${item.videoId}.jpg`}
-                                  alt={item.title}
-                                  className="video-thumbnail"
-                                  style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover',
-                                    borderRadius: '10px'
-                                  }}
-                                />
-                                <div className="loading-spinner" style={{
-                                  position: 'absolute',
-                                  top: '50%',
-                                  left: '50%',
-                                  transform: 'translate(-50%, -50%)',
-                                  color: 'white',
-                                  fontSize: '20px'
-                                }}>Loading...</div>
-                              </div>
-                            )}
-                            <iframe
-                              src={`https://player.vimeo.com/video/${item.videoId}?h=${item.hId}&autoplay=${workItems.findIndex(w => w.id === item.id) === 0 || workItems.findIndex(w => w.id === item.id) === currentMobileIndex ? 1 : 0}&loop=1&muted=1&background=1`}
-                              width="100%"
-                              height="100%"
-                              frameBorder="0"
-                              allow="autoplay; fullscreen; picture-in-picture"
-                              allowFullScreen
-                              className="video-iframe"
-                              loading={workItems.findIndex(w => w.id === item.id) === 0 ? "eager" : "lazy"}
-                              style={{ opacity: loadedItems[item.id] ? 1 : 0 }}
-                              onLoad={() => handleItemLoad(item.id)}
+                            <MuxPlayer
+                              playbackId="yx01ISyLqV01pW717tjgvpjhay0002eLjZ9Bn1qwq5KNtuc"
+                              metadata={{
+                                video_title: 'NXW Scholarship event video',
+                                viewer_user_id: 'Placeholder (optional)',
+                              }}
+                              autoPlay={workItems.findIndex(w => w.id === item.id) === 0 || workItems.findIndex(w => w.id === item.id) === currentMobileIndex}
+                              muted={true}
+                              loop={true}
+                              playsInline={true}
+                              style={{ 
+                                borderRadius: '0',
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                border: 'none',
+                                outline: 'none',
+                                background: 'transparent'
+                              }}
+                              onLoadStart={() => handleItemLoad(item.id)}
                             />
                           </div>
                         ) : item.type === 'image' ? (
@@ -234,43 +221,6 @@ const MasonryGrid = () => {
                             className="masonry-image"
                             onLoad={() => handleItemLoad(item.id)}
                           />
-                        ) : item.type === 'youtube' ? (
-                          <div className="video-container" style={{ position: 'relative' }}>
-                            {!loadedItems[item.id] && (
-                              <div className="video-thumbnail-overlay">
-                                <img
-                                  src={`https://img.youtube.com/vi/${item.videoId}/maxresdefault.jpg`}
-                                  alt={item.title}
-                                  className="video-thumbnail"
-                                  style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover',
-                                    borderRadius: '10px'
-                                  }}
-                                />
-                                <div className="loading-spinner" style={{
-                                  position: 'absolute',
-                                  top: '50%',
-                                  left: '50%',
-                                  transform: 'translate(-50%, -50%)',
-                                  color: 'white',
-                                  fontSize: '20px',
-                                  textShadow: '0 2px 4px rgba(0,0,0,0.7)'
-                                }}>Loading...</div>
-                              </div>
-                            )}
-                            <iframe
-                              src={`https://www.youtube.com/embed/${item.videoId}?autoplay=${workItems.findIndex(w => w.id === item.id) === 0 || workItems.findIndex(w => w.id === item.id) === currentMobileIndex ? 1 : 0}&loop=1&mute=1&controls=0&playlist=${item.videoId}`}
-                              frameBorder="0"
-                              allow="autoplay; encrypted-media"
-                              allowFullScreen
-                              className="video-iframe"
-                              loading={workItems.findIndex(w => w.id === item.id) === 0 ? "eager" : "lazy"}
-                              style={{ opacity: loadedItems[item.id] ? 1 : 0 }}
-                              onLoad={() => handleItemLoad(item.id)}
-                            />
-                          </div>
                         ) : null}
                         
                         {loadedItems[item.id] && (
@@ -291,12 +241,12 @@ const MasonryGrid = () => {
                 </div>
                 
                 {/* Carousel Indicators - Only show when videos exist */}
-                {workItems.some(item => item.type === 'vimeo' || item.type === 'youtube') && (
+                {workItems.some(item => item.type === 'mux') && (
                   <div className="mobile-carousel-indicators">
                     {workItems.map((item, index) => (
                       <button
                         key={index}
-                        className={`carousel-dot ${index === currentMobileIndex ? 'active' : ''} ${(item.type === 'vimeo' || item.type === 'youtube') ? 'video-dot' : 'image-dot'}`}
+                        className={`carousel-dot ${index === currentMobileIndex ? 'active' : ''} ${item.type === 'mux' ? 'video-dot' : 'image-dot'}`}
                         onClick={() => changeSlide(index)}
                         disabled={isAnimating}
                       />
@@ -311,6 +261,8 @@ const MasonryGrid = () => {
                 <div
                   key={item.id}
                   className="masonry-item"
+                  data-cols={item.cols}
+                  data-rows={item.rows}
                   style={{
                     gridColumnEnd: `span ${item.cols}`,
                     gridRowEnd: `span ${item.rows}`,
@@ -323,43 +275,38 @@ const MasonryGrid = () => {
                         <div className="loading-progress"></div>
                       </>
                     )}
-                    {item.type === 'vimeo' ? (
+                    {item.type === 'mux' ? (
                       <div className="video-container">
-                        <iframe
-                          src={`https://player.vimeo.com/video/${item.videoId}?h=${item.hId}&autoplay=1&loop=1&muted=1&background=1`}
-                          width="100%"
-                          height="100%"
-                          frameBorder="0"
-                          allow="autoplay; fullscreen; picture-in-picture"
-                          allowFullScreen
-                          style={{ borderRadius: '10px' }}
-                          title={`Vimeo Video ${item.videoId}`}
-                          onLoad={() => handleItemLoad(item.id)}
-                          
-                        ></iframe>
+                        <MuxPlayer
+                          playbackId={item.muxPlaybackId}
+                          metadata={{
+                            video_title: 'NXW Scholarship event video',
+                            viewer_user_id: 'Placeholder (optional)',
+                          }}
+                          autoPlay={true}
+                          muted={true}
+                          loop={true}
+                          playsInline={true}
+
+                          style={{ 
+                            borderRadius: '0',
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            border: 'none',
+                            outline: 'none',
+                            background: 'transparent'
+                          }}
+                          onLoadStart={() => handleItemLoad(item.id)}
+                        />
                       </div>
                     ) : item.type === 'image' ? (
                       <img 
                         src={item.image} 
                         alt={`Card ${item.id}`} 
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '0' }}
                         onLoad={() => handleItemLoad(item.id)}
                       />
-                    ) : item.type === 'youtube' ? (
-                      <div className="video-container">
-                        <iframe
-                          src={`https://www.youtube.com/embed/${item.videoId}?autoplay=1&loop=1&mute=1&playlist=${item.videoId}&controls=0&modestbranding=1&rel=0&iv_load_policy=3`}
-                          width="100%"
-                          height="100%"
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          style={{ borderRadius: '10px' }}
-                          title={`YouTube Video ${item.videoId}`}
-                          loading="lazy"
-                          onLoad={() => handleItemLoad(item.id)}
-                        ></iframe>
-                      </div>
                     ) : null}
                     <div className="card-overlay">
                       <h3>{item.title}</h3>

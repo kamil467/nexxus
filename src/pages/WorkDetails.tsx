@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, X } from 'react-feather';
 import { supabase } from '../api/supabase';
 import { WorkItem } from '../api/supabase';
+import MuxPlayer from '@mux/mux-player-react';
 
 const WorkDetails = () => {
   const [loadingStates, setLoadingStates] = useState<{ [key: string]: boolean }>({});
@@ -166,17 +167,26 @@ const WorkDetails = () => {
                       <div className="animate-spin rounded-full h-10 w-10 md:h-12 md:w-12 border-t-2 border-b-2 border-[#A9AC87]"></div>
                     </div>
                   )}
-                  <iframe
-                    src={`https://www.youtube.com/embed/${item.videoId}?autoplay=1&loop=1&rel=0&mute=1&modestbranding=1&controls=1`}
-                    className="w-full aspect-video rounded-lg md:rounded-none"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    title={`Related video ${index + 1}`}
-                    style={{ pointerEvents: 'auto' }}
-                    loading="lazy"
-                    onLoad={() => handleMediaLoad(`video-${index}`)}
-                  ></iframe>
+                  {item.muxPlaybackId ? (
+                    <MuxPlayer
+                      playbackId={item.muxPlaybackId}
+                      metadata={{
+                        video_title: `${currentProject?.title} - Related Video ${index + 1}`,
+                        video_id: `${currentProject?.slug}-related-${index}`,
+                        viewer_user_id: 'anonymous-user',
+                      }}
+                      autoPlay
+                      muted
+                      loop
+                      className="w-full aspect-video rounded-lg md:rounded-none"
+                      style={{ pointerEvents: 'auto' }}
+                      onLoadStart={() => handleMediaLoad(`video-${index}`)}
+                    />
+                  ) : (
+                    <div className="w-full aspect-video rounded-lg md:rounded-none bg-gray-200 flex items-center justify-center">
+                      <p className="text-gray-500">No video available</p>
+                    </div>
+                  )}
                 </div>
               </div>
               <hr className="my-2 md:my-4 border-t border-gray-200" />
