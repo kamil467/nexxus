@@ -1,10 +1,15 @@
 .masonry-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    grid-auto-rows: 150px;
-    grid-gap: 20px;
-    padding: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-auto-rows: 200px;
+    gap: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100%;
     grid-auto-flow: dense;
+    background: transparent;
+    border: none !important;
+    outline: none !important;
   }
   
   /* Loading container styles */
@@ -44,20 +49,22 @@
   @media (max-width: 768px) {
     .masonry-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      grid-auto-rows: 200px;
-      grid-gap: 12px;
-      padding: 12px;
+      grid-template-columns: repeat(3, 1fr);
+      grid-auto-rows: 120px;
+      gap: 0;
+      padding: 0;
     }
 
+    /* 16:9 videos: 2 columns, 3 rows */
     .masonry-item[style*="grid-column-end: span 2"] {
       grid-column-end: span 2 !important;
-      grid-row-end: span 2 !important;
+      grid-row-end: span 3 !important;
     }
 
-    .masonry-item[style*="grid-row-end: span 2"],
+    /* 9:16 videos: 1 column, 3 rows */
     .masonry-item[style*="grid-row-end: span 3"] {
-      grid-row-end: span 2 !important;
+      grid-column-end: span 1 !important;
+      grid-row-end: span 3 !important;
     }
 
     h3 {
@@ -116,13 +123,15 @@
   }
   
   .masonry-item {
-    display: flex;
-    flex-direction: column;
-    border-radius: 15px;
+    display: block;
+    border-radius: 0;
     padding: 0;
+    margin: 0;
     transition: transform 0.3s ease;
     overflow: hidden;
     position: relative;
+    border: none;
+    background: transparent;
   }
   
   .masonry-item:hover {
@@ -132,12 +141,12 @@
   .card-content {
     width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    display: block;
     box-sizing: border-box;
     position: relative;
+    background: transparent;
+    padding: 0;
+    margin: 0;
   }
 
   .card-content img {
@@ -148,6 +157,7 @@
     position: absolute;
     top: 0;
     left: 0;
+    border-radius: 0 !important;
   }
 
   .masonry-item:hover .card-content img {
@@ -157,24 +167,250 @@
   .video-container {
     width: 100%;
     height: 100%;
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
     overflow: hidden;
+    border-radius: 0 !important;
+    background: transparent;
+    padding: 0;
+    margin: 0;
   }
   
-  .video-container iframe {
+  .video-container iframe,
+  .video-container mux-player {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     border: none;
-    border-radius: 10px;
+    border-radius: 0 !important;
+    object-fit: cover;
+    display: block;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Ensure MuxPlayer fills completely */
+  mux-player {
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    background: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  mux-player video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Remove any potential borders from MuxPlayer internal elements */
+  mux-player *,
+  mux-player *::before,
+  mux-player *::after {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    border-bottom: none !important;
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+  }
+  
+  /* Specifically target MuxPlayer controls and bottom elements */
+  mux-player [slot="media"],
+  mux-player [slot="poster"],
+  mux-player media-controller,
+  mux-player media-loading-indicator,
+  mux-player media-control-bar,
+  mux-player .mux-player,
+  mux-player div,
+  mux-player span {
+    border: none !important;
+    border-bottom: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Hide MuxPlayer controls completely to prevent bottom border */
+  mux-player::part(controls),
+  mux-player::part(control-bar),
+  mux-player::part(bottom-controls),
+  mux-player [part="controls"],
+  mux-player [part="control-bar"],
+  mux-player [part="bottom-controls"] {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    border: none !important;
+  }
+  
+  /* Force hide any control elements that might create borders */
+  mux-player media-control-bar,
+  mux-player .media-control-bar,
+  mux-player [role="toolbar"],
+  mux-player [data-media-control-bar] {
+    display: none !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    border: none !important;
+  }
+  
+  /* Ultimate bottom border elimination with sharp edges */
+  mux-player,
+  mux-player *,
+  .video-container,
+  .video-container * {
+    border-bottom: 0px solid transparent !important;
+    border: 0px solid transparent !important;
+    box-shadow: none !important;
+    outline: 0px solid transparent !important;
+    border-radius: 0 !important;
+  }
+  
+  /* Video container - seamless and borderless */ 
+  .video-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+  }
+  
+  .video-container mux-player {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  
+  /* Target MuxPlayer web component specifically - complete border elimination */
+  mux-player {
+    --controls: none !important;
+    --media-object-fit: cover !important;
+    --media-object-position: center !important;
+    --controls-backdrop-color: transparent !important;
+    --controls-background: transparent !important;
+    --control-bar-background: transparent !important;
+    --live-badge-background: transparent !important;
+    --seek-backward-button: none !important;
+    --seek-forward-button: none !important;
+    --mute-button: none !important;
+    --captions-button: none !important;
+    --airplay-button: none !important;
+    --pip-button: none !important;
+    --fullscreen-button: none !important;
+    --cast-button: none !important;
+    --playback-rate-button: none !important;
+    --volume-range: none !important;
+    --time-range: none !important;
+    --time-display: none !important;
+    --duration-display: none !important;
+    --title-display: none !important;
+    --loading-indicator: none !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Hide any shadow DOM elements that could create borders */
+  mux-player[controls] {
+    --controls: none !important;
+  }
+  
+  /* Ensure proper grid item sizing based on cols and rows */
+  .masonry-item {
+    position: relative;
+    overflow: hidden;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+  }
+  
+  .card-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+  }
+  
+  /* Portrait videos (9:16) - 1 col, 3 rows */
+  .masonry-item[data-cols="1"][data-rows="3"] {
+    aspect-ratio: 9/16;
+  }
+  
+  /* Landscape videos (16:9) - 2 cols, 3 rows */
+  .masonry-item[data-cols="2"][data-rows="3"] {
+    aspect-ratio: 16/9;
+  }
+  
+  /* Specific optimization for 16:9 videos (cols: 2, rows: 3) */
+  .masonry-item[style*="grid-column-end: span 2"][style*="grid-row-end: span 3"] {
+    aspect-ratio: auto;
+  }
+  
+  .masonry-item[style*="grid-column-end: span 2"][style*="grid-row-end: span 3"] mux-player,
+  .masonry-item[style*="grid-column-end: span 2"][style*="grid-row-end: span 3"] mux-player video {
+    object-fit: cover !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
+  /* Specific optimization for 9:16 videos (cols: 1, rows: 3) */
+  .masonry-item[style*="grid-column-end: span 1"][style*="grid-row-end: span 3"] {
+    aspect-ratio: auto;
+  }
+  
+  .masonry-item[style*="grid-column-end: span 1"][style*="grid-row-end: span 3"] mux-player,
+  .masonry-item[style*="grid-column-end: span 1"][style*="grid-row-end: span 3"] mux-player video {
+    object-fit: cover !important;
+    width: 100% !important;
+    height: 100% !important;
   }
 
   .masonry-item {
     position: relative;
     overflow: hidden;
-    border-radius: 15px;
+    border-radius: 0 !important;
   }
 
   .card-content {
@@ -199,6 +435,7 @@
     align-items: center;
     text-align: center;
     padding: 20px;
+    border-radius: 0 !important;
   }
 
   .card-action {
@@ -312,7 +549,7 @@
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
     background-size: 200% 100%;
     animation: loading 1.5s infinite;
-    border-radius: 15px;
+    border-radius: 0 !important;
   }
 
   @keyframes loading {
@@ -348,8 +585,8 @@
     transform: translate(-50%, -50%);
     width: 48px;
     height: 48px;
-    border: 3px solid #f0f0f0;
-    border-radius: 50%;
+    border: 2px solid #007BFF;
+    border-radius: 0 !important;
     display: inline-block;
     position: relative;
     box-sizing: border-box;

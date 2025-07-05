@@ -11,12 +11,11 @@ export interface WorkItem {
     rows: number;
     type: string;
     image?: string;
-    videoId?: string;
-    hId?: string;
+    muxPlaybackId?: string;
     title: string;
     slug: string;
     description: string;
-    relatedItems: Array<{ type: string; src?: string; videoId?: string; hId?: string }>;
+    relatedItems: Array<{ type: string; src?: string; muxPlaybackId?: string }>;
     overview?: string;
     capability?: string;
     team?: string;
