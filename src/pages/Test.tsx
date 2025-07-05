@@ -198,10 +198,11 @@ const MasonryGrid = () => {
                                 video_title: 'NXW Scholarship event video',
                                 viewer_user_id: 'Placeholder (optional)',
                               }}
-                              autoPlay={workItems.findIndex(w => w.id === item.id) === 0 || workItems.findIndex(w => w.id === item.id) === currentMobileIndex}
-                              muted={true}
-                              loop={true}
-                              playsInline={true}
+                              autoPlay={(workItems.findIndex(w => w.id === item.id) === 0 || workItems.findIndex(w => w.id === item.id) === currentMobileIndex) ? "muted" : undefined}
+                              muted
+                              loop
+                              playsInline
+                              preload="auto"
                               style={{ 
                                 borderRadius: '0',
                                 width: '100%',
@@ -212,6 +213,15 @@ const MasonryGrid = () => {
                                 background: 'transparent'
                               }}
                               onLoadStart={() => handleItemLoad(item.id)}
+                              onCanPlay={(e) => {
+                                const video = e.target as any;
+                                const shouldAutoplay = workItems.findIndex(w => w.id === item.id) === 0 || workItems.findIndex(w => w.id === item.id) === currentMobileIndex;
+                                if (video && video.play && shouldAutoplay) {
+                                  video.play().catch(() => {
+                                    // Autoplay blocked
+                                  });
+                                }
+                              }}
                             />
                           </div>
                         ) : item.type === 'image' ? (
@@ -283,11 +293,11 @@ const MasonryGrid = () => {
                             video_title: 'NXW Scholarship event video',
                             viewer_user_id: 'Placeholder (optional)',
                           }}
-                          autoPlay={true}
-                          muted={true}
-                          loop={true}
-                          playsInline={true}
-
+                          autoPlay="muted"
+                          muted
+                          loop
+                          playsInline
+                          preload="auto"
                           style={{ 
                             borderRadius: '0',
                             width: '100%',
@@ -298,6 +308,14 @@ const MasonryGrid = () => {
                             background: 'transparent'
                           }}
                           onLoadStart={() => handleItemLoad(item.id)}
+                          onCanPlay={(e) => {
+                            const video = e.target as any;
+                            if (video && video.play) {
+                              video.play().catch(() => {
+                                // Autoplay blocked, which is normal for some browsers
+                              });
+                            }
+                          }}
                         />
                       </div>
                     ) : item.type === 'image' ? (
