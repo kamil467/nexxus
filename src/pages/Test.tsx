@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import './MasanoryGrid.css';
 import ClientsSection from '../components/ClientsSection';
 import { supabase } from '../api/supabase';
@@ -9,12 +9,7 @@ const MasonryGrid = () => {
   const [workItems, setWorkItems] = useState<WorkItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [loadedItems, setLoadedItems] = useState<{ [key: number]: boolean }>({});
-  const [currentMobileIndex, setCurrentMobileIndex] = useState<number>(0);
   const [isMobile, setIsMobile] = useState<boolean>(false);
-  const [touchStart, setTouchStart] = useState<number>(0);
-  const [touchEnd, setTouchEnd] = useState<number>(0);
-  const [isAnimating, setIsAnimating] = useState<boolean>(false);
-  const slideTimerRef = useRef<NodeJS.Timeout>();
 
   // Check if mobile device
   useEffect(() => {
@@ -27,33 +22,6 @@ const MasonryGrid = () => {
     
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-
-  // Auto-advance carousel on mobile
-  useEffect(() => {
-    if (!isMobile || workItems.length === 0) return;
-    
-    const startSlideTimer = () => {
-      // Only start timer after first item is loaded
-      if (loadedItems[workItems[0]?.id]) {
-        slideTimerRef.current = setInterval(() => {
-          setCurrentMobileIndex(prev => prev === workItems.length - 1 ? 0 : prev + 1);
-        }, 4000);
-      }
-    };
-    
-    startSlideTimer();
-    
-    return () => {
-      if (slideTimerRef.current) clearInterval(slideTimerRef.current);
-    };
-  }, [isMobile, workItems.length, loadedItems]);
-
-  // Update video autoplay when slide changes (mobile only)
-  useEffect(() => {
-    if (!isMobile) return;
-    // Force re-render of iframes when slide changes to update autoplay parameter
-    // This ensures the current video starts playing when it becomes active
-  }, [currentMobileIndex, isMobile]);
 
   // Fetch work items from Supabase
   useEffect(() => {
@@ -84,69 +52,7 @@ const MasonryGrid = () => {
     setLoadedItems(prev => ({ ...prev, [id]: true }));
   };
 
-  // Touch handlers for manual control
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX);
-    setTouchEnd(0);
-    // Pause auto-advance when user touches
-    if (slideTimerRef.current) {
-      clearInterval(slideTimerRef.current);
-    }
-  };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > 50;
-    const isRightSwipe = distance < -50;
-    
-    if (isLeftSwipe && currentMobileIndex < workItems.length - 1) {
-      changeSlide(currentMobileIndex + 1);
-    }
-    if (isRightSwipe && currentMobileIndex > 0) {
-      changeSlide(currentMobileIndex - 1);
-    }
-    
-    // Resume auto-advance after user interaction
-    setTimeout(() => {
-      if (isMobile && workItems.length > 0 && loadedItems[workItems[0]?.id]) {
-        slideTimerRef.current = setInterval(() => {
-          setCurrentMobileIndex(prev => 
-            prev === workItems.length - 1 ? 0 : prev + 1
-          );
-        }, 4000);
-      }
-    }, 1000);
-  };
-
-  const changeSlide = (newSlide: number) => {
-    if (isAnimating || newSlide < 0 || newSlide >= workItems.length) return;
-    setIsAnimating(true);
-    setCurrentMobileIndex(newSlide);
-    setTimeout(() => setIsAnimating(false), 300);
-  };
-
-  const ArrowIcon = () => (
-    <svg 
-      className="arrow-icon" 
-      width="18" 
-      height="18" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round"
-    >
-      <line x1="5" y1="12" x2="19" y2="12"></line>
-      <polyline points="12 5 19 12 12 19"></polyline>
-    </svg>
-  );
 
   return (
     <div>
@@ -162,107 +68,105 @@ const MasonryGrid = () => {
       ) : (
         <>
           {isMobile ? (
-            <div className="mobile-single-view">
-              <div 
-                className="mobile-carousel-container"
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-              >
-                <div 
-                  className="mobile-carousel-track"
-                  style={{ transform: `translateX(-${currentMobileIndex * 100}%)` }}
-                >
-                  {workItems.map((item) => (
-                    <div
-                      key={item.id}
-                      className="mobile-carousel-slide"
-                    >
-                      <div
-                        className="masonry-item mobile-item"
-                        style={{
-                          background: loadedItems[item.id] ? 'transparent' : '#f0f0f0',
-                        }}
-                      >
-                        {!loadedItems[item.id] && (
-                          <div className="loading-skeleton">
-                            <div className="skeleton-animation"></div>
-                          </div>
-                        )}
+            /* Mobile Instagram-style vertical scroll */
+            <div className="mobile-scroll-view">
+              <div className="mobile-scroll-container">
+                {workItems.map((item, index) => (
+                  <div
+                    key={item.id}
+                    className={`mobile-scroll-item ${loadedItems[item.id] ? 'loaded' : ''}`}
+                    data-index={index}
+                  >
+                    <div className="mobile-video-wrapper">
+                      {!loadedItems[item.id] && (
+                        <div className="loading-skeleton">
+                          <div className="skeleton-animation"></div>
+                        </div>
+                      )}
+                      
+                      {item.type === 'mux' ? (
+                        <MuxPlayer
+                          playbackId={item.muxPlaybackId}
+                          autoPlay={true}
+                          muted={true}
+                          loop={true}
+                          playsInline={true}
+                          preload="auto"
+                          onCanPlay={(e) => {
+                            const target = e.target as any;
+                            // Force play for mobile autoplay
+                            if (target && target.play) {
+                              target.play().catch((error: any) => {
+                                console.log('Autoplay prevented:', error);
+                              });
+                            }
+                          }}
+                          onLoadedData={() => handleItemLoad(item.id)}
+                          style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                        />
+                      ) : item.type === 'image' ? (
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="mobile-scroll-image"
+                          onLoad={() => handleItemLoad(item.id)}
+                        />
+                      ) : null}
+                      
+                      {/* Innovative Mobile Project Info */}
+                      <div className="mobile-project-display">
+                        {/* Progress indicator at top */}
+                        <div className="mobile-progress-bar">
+                          <div className="progress-fill"></div>
+                        </div>
                         
-                        {item.type === 'mux' ? (
-                          <div className="video-container" style={{ position: 'relative' }}>
-                            <MuxPlayer
-                              playbackId="yx01ISyLqV01pW717tjgvpjhay0002eLjZ9Bn1qwq5KNtuc"
-                              metadata={{
-                                video_title: 'NXW Scholarship event video',
-                                viewer_user_id: 'Placeholder (optional)',
-                              }}
-                              autoPlay={(workItems.findIndex(w => w.id === item.id) === 0 || workItems.findIndex(w => w.id === item.id) === currentMobileIndex) ? "muted" : undefined}
-                              muted
-                              loop
-                              playsInline
-                              preload="auto"
-                              style={{ 
-                                borderRadius: '0',
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover',
-                                border: 'none',
-                                outline: 'none',
-                                background: 'transparent'
-                              }}
-                              onLoadStart={() => handleItemLoad(item.id)}
-                              onCanPlay={(e) => {
-                                const video = e.target as any;
-                                const shouldAutoplay = workItems.findIndex(w => w.id === item.id) === 0 || workItems.findIndex(w => w.id === item.id) === currentMobileIndex;
-                                if (video && video.play && shouldAutoplay) {
-                                  video.play().catch(() => {
-                                    // Autoplay blocked
-                                  });
-                                }
-                              }}
-                            />
+                        {/* Floating glassmorphism card */}
+                        <div className="mobile-floating-card">
+                          <div className="card-header">
+                            <div className="project-category">Portfolio</div>
+                            <div className="project-index">{index + 1}/{workItems.length}</div>
                           </div>
-                        ) : item.type === 'image' ? (
-                          <img
-                            src={item.image}
-                            alt={item.title}
-                            className="masonry-image"
-                            onLoad={() => handleItemLoad(item.id)}
-                          />
-                        ) : null}
-                        
-                        {loadedItems[item.id] && (
-                          <div className="card-overlay mobile-overlay">
-                            <h3>{item.title}</h3>
-                            <p>{item.description}</p>
+                          
+                          <div className="card-content">
+                            <h2 className="project-title">{item.title}</h2>
+                            <p className="project-description">{item.description}</p>
+                            
+                            <div className="project-tags">
+                              <span className="tag">Creative</span>
+                              <span className="tag">Design</span>
+                              <span className="tag">Portfolio</span>
+                            </div>
+                          </div>
+                          
+                          <div className="card-actions">
                             <a 
                               href={`/work/${item.slug}`}
-                              className="view-project-btn"
+                              className="primary-action-btn icon-only"
+                              title="View Project"
                             >
-                              View Project <ArrowIcon />
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2"/>
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+                              </svg>
                             </a>
+                            
+                            <button className="action-btn share-btn">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M8.59 13.51l6.83 3.98m-.01-10.98l-6.82 3.98M21 5a3 3 0 11-6 0 3 3 0 016 0zM9 12a3 3 0 11-6 0 3 3 0 016 0zM21 19a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" strokeWidth="2"/>
+                              </svg>
+                            </button>
                           </div>
-                        )}
+                        </div>
+                        
+                        {/* Subtle scroll indicator */}
+                        <div className="scroll-indicator">
+                          <div className="scroll-text">Swipe up for next</div>
+                          <div className="scroll-arrow">↑</div>
+                        </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-                
-                {/* Carousel Indicators - Only show when videos exist */}
-                {workItems.some(item => item.type === 'mux') && (
-                  <div className="mobile-carousel-indicators">
-                    {workItems.map((item, index) => (
-                      <button
-                        key={index}
-                        className={`carousel-dot ${index === currentMobileIndex ? 'active' : ''} ${item.type === 'mux' ? 'video-dot' : 'image-dot'}`}
-                        onClick={() => changeSlide(index)}
-                        disabled={isAnimating}
-                      />
-                    ))}
                   </div>
-                )}
+                ))}
               </div>
             </div>
           ) : (
@@ -329,8 +233,11 @@ const MasonryGrid = () => {
                     <div className="card-overlay">
                       <h3>{item.title}</h3>
                       <p>{item.description}</p>
-                      <a href={`/work/${item.slug}`} className="card-action">
-                        View Project <ArrowIcon />
+                      <a href={`/work/${item.slug}`} className="card-action icon-only" title="View Project">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2"/>
+                          <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+                        </svg>
                       </a>
                     </div>
                   </div>
