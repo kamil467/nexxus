@@ -636,20 +636,16 @@
   /* Mobile Instagram-style vertical scroll */
   .mobile-scroll-view {
     width: 100vw;
-    height: 100vh;
     position: relative;
-    overflow: hidden;
+    /* Remove fixed height to allow normal page flow */
   }
 
   .mobile-scroll-container {
     width: 100%;
-    height: 100vh;
-    overflow-y: auto;
-    scroll-snap-type: y mandatory;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
+    /* Remove container scrolling - use page scroll instead */
+    overflow: visible;
+    scroll-snap-type: none; /* Disable container snapping */
+    position: relative;
   }
 
   .mobile-scroll-container::-webkit-scrollbar {
@@ -659,9 +655,15 @@
   .mobile-scroll-item {
     width: 100vw;
     height: 100vh;
+    height: 100dvh; /* Dynamic viewport height */
     position: relative;
     scroll-snap-align: start;
-    scroll-snap-stop: always;
+    scroll-snap-stop: always; /* Force stop at each video */
+    display: flex;
+    flex-direction: column;
+    background: #000;
+    overflow: hidden;
+    flex-shrink: 0; /* Prevent compression */
   }
 
   .mobile-video-wrapper {
@@ -673,6 +675,69 @@
     transform: translateZ(0); /* Enable hardware acceleration */
     backface-visibility: hidden;
     will-change: transform;
+  }
+
+  /* Footer spacer for mobile */
+  .mobile-footer-spacer {
+    width: 100vw;
+    height: 100vh; /* Full viewport height for proper snapping */
+    height: 100dvh; /* Dynamic viewport height */
+    background: linear-gradient(180deg, #000 0%, #1a1a1a 50%, #2a2a2a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    scroll-snap-align: start; /* Snap to start like videos */
+    scroll-snap-stop: always; /* Force stop at end section */
+    flex-shrink: 0; /* Prevent compression */
+    position: relative;
+  }
+
+  .end-of-content {
+    text-align: center;
+    color: white;
+    max-width: 300px;
+  }
+
+  .end-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+    gap: 15px;
+  }
+
+  .end-line {
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  }
+
+  .end-text {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 300;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .end-description {
+    font-size: 16px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+  }
+
+  .contact-link {
+    color: #A9AC87;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  .contact-link:hover {
+    color: #96997A;
+    text-decoration: underline;
   }
 
   .mobile-video-wrapper mux-player {
@@ -1373,20 +1438,68 @@
   will-change: opacity;
 }
 
-/* Viewport-based optimizations for mobile */
+/* Mobile scroll optimization without aggressive snapping */
 @media (max-width: 767px) {
+  /* Smooth scrolling for better UX */
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body {
+    overscroll-behavior: contain;
+  }
+
+  /* Video section with internal snapping */
+  .mobile-scroll-view {
+    position: relative;
+  }
+
   .mobile-scroll-container {
-    height: 100vh;
-    height: 100dvh; /* Dynamic viewport height */
-    scroll-snap-type: y mandatory;
-    scroll-snap-stop: always;
+    overflow: visible !important;
+    scroll-snap-type: none !important;
   }
 
   .mobile-scroll-item {
+    height: 100vh !important;
+    height: 100dvh !important;
+    flex-shrink: 0 !important;
+    /* Only snap within video section context */
     scroll-snap-align: start;
-    scroll-snap-stop: always;
-    height: 100vh;
-    height: 100dvh;
+  }
+
+  .mobile-footer-spacer {
+    height: 100vh !important;
+    height: 100dvh !important;
+    scroll-snap-align: start;
+  }
+
+  /* Allow normal scrolling for other sections */
+  .hero-section {
+    /* Ensure hero section has proper height */
+    min-height: 100vh;
+    min-height: 100dvh;
+    scroll-snap-align: none;
+  }
+
+  .client-section {
+    /* Allow natural height for client section */
+    min-height: auto;
+    scroll-snap-align: none;
+    padding: 80px 20px;
+  }
+
+  footer {
+    /* Allow natural height for footer */
+    min-height: auto;
+    scroll-snap-align: none;
+    padding: 60px 20px;
+  }
+
+  /* Ensure video section doesn't interfere with other sections */
+  .mobile-scroll-view {
+    position: relative;
+    z-index: 1;
   }
 
   /* Optimize floating elements */

@@ -24,6 +24,10 @@ const MasonryGrid = () => {
   const [videoPaused, setVideoPaused] = useState<Map<number, boolean>>(new Map());
   const [showPlayIcon, setShowPlayIcon] = useState<Map<number, boolean>>(new Map());
 
+  // Scroll snapping state for precise video control
+  const isScrolling = useRef<boolean>(false);
+  const scrollEndTimeout = useRef<NodeJS.Timeout | null>(null);
+
   // Share handler for mobile
   const handleShare = useCallback(async (item: any) => {
     const shareData = {
@@ -115,6 +119,56 @@ const MasonryGrid = () => {
       }
     }
   }, [isMuted, activeAudioVideo, currentVideoIndex]);
+
+  // Enhanced scroll snapping for precise video positioning
+  const handleScrollSnap = useCallback(() => {
+    if (!isMobile || !containerRef.current) return;
+
+    const container = containerRef.current;
+    const containerHeight = container.clientHeight;
+    const scrollTop = container.scrollTop;
+
+    // Calculate which video should be in view
+    const targetVideoIndex = Math.round(scrollTop / containerHeight);
+    const targetScrollPosition = targetVideoIndex * containerHeight;
+
+    // Only snap if we're not already at the correct position
+    if (Math.abs(scrollTop - targetScrollPosition) > 10) {
+      container.scrollTo({
+        top: targetScrollPosition,
+        behavior: 'smooth'
+      });
+    }
+  }, [isMobile]);
+
+  // Handle scroll end for snapping
+  const handleScrollEnd = useCallback(() => {
+    if (!isMobile || !containerRef.current) return;
+
+    isScrolling.current = false;
+
+    // Clear existing timeout
+    if (scrollEndTimeout.current) {
+      clearTimeout(scrollEndTimeout.current);
+    }
+
+    // Snap to nearest video after scroll ends
+    scrollEndTimeout.current = setTimeout(() => {
+      handleScrollSnap();
+    }, 150); // Small delay to ensure scroll has stopped
+  }, [isMobile, handleScrollSnap]);
+
+  // Handle scroll start
+  const handleScrollStart = useCallback(() => {
+    if (!isMobile) return;
+
+    isScrolling.current = true;
+
+    // Clear snap timeout when starting new scroll
+    if (scrollEndTimeout.current) {
+      clearTimeout(scrollEndTimeout.current);
+    }
+  }, [isMobile]);
 
   // Manage single audio playback when video becomes visible
   const handleVideoVisibilityChange = useCallback((index: number, isVisible: boolean) => {
@@ -218,6 +272,8 @@ const MasonryGrid = () => {
       clearTimeout(timeoutId);
     };
   }, [checkMobile]);
+
+
 
   // Fetch work items from Supabase
   useEffect(() => {
@@ -324,6 +380,71 @@ const MasonryGrid = () => {
       shouldLoad: Math.abs(index - currentVideoIndex) <= 1 // Load current and adjacent items
     }));
   }, [workItems, isMobile, visibleItems, currentVideoIndex]);
+
+  // Intelligent scroll management for mobile
+  useEffect(() => {
+    if (!isMobile) return;
+
+    let scrollTimeout: NodeJS.Timeout | null = null;
+    let isScrolling = false;
+
+    const handleScroll = () => {
+      isScrolling = true;
+
+      // Clear existing timeout
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+
+      // Set timeout to detect scroll end
+      scrollTimeout = setTimeout(() => {
+        isScrolling = false;
+
+        // Get current scroll position
+        const scrollY = window.scrollY;
+        const windowHeight = window.innerHeight;
+
+        // Find video section bounds
+        const videoSection = document.querySelector('.mobile-scroll-view') as HTMLElement;
+        if (!videoSection) return;
+
+        const videoSectionRect = videoSection.getBoundingClientRect();
+        const videoSectionTop = scrollY + videoSectionRect.top;
+        const videoSectionBottom = videoSectionTop + videoSection.offsetHeight;
+
+        // Check if we're within the video section
+        const isInVideoSection = scrollY >= videoSectionTop - windowHeight * 0.3 &&
+                                scrollY <= videoSectionBottom - windowHeight * 0.7;
+
+        if (isInVideoSection) {
+          // Snap to nearest video within the video section
+          const relativeScroll = scrollY - videoSectionTop;
+          const videoIndex = Math.round(relativeScroll / windowHeight);
+          const targetScroll = videoSectionTop + (videoIndex * windowHeight);
+
+          // Only snap if we're not already close to the target
+          if (Math.abs(scrollY - targetScroll) > 50) {
+            window.scrollTo({
+              top: targetScroll,
+              behavior: 'smooth'
+            });
+          }
+        }
+        // If outside video section, allow normal scrolling (no snapping)
+
+      }, 150); // Wait for scroll to end
+    };
+
+    // Add scroll listener
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+    };
+  }, [isMobile, mobileItems.length]);
 
   // Performance optimization: Reduce re-renders for mobile
   useEffect(() => {
@@ -532,6 +653,22 @@ const MasonryGrid = () => {
                     </div>
                   </div>
                 ))}
+
+                {/* Footer spacer to allow scrolling past last video */}
+                <div className="mobile-footer-spacer">
+                  <div className="end-of-content">
+                    <div className="end-indicator">
+                      <div className="end-line"></div>
+                      <span className="end-text">End of portfolio</span>
+                      <div className="end-line"></div>
+                    </div>
+                    <p className="end-description">
+                      Thanks for viewing our work!
+                      <br />
+                      <a href="/contact" className="contact-link">Get in touch</a> to discuss your project.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           ) : (
