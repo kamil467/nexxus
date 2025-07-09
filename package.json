@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@mux/mux-player-react": "^3.5.1",
+    "@mux/mux-player-react": "latest",
     "@supabase/supabase-js": "^2.50.0",
     "lucide-react": "^0.344.0",
     "mux": "^0.0.2",
