@@ -15,6 +15,51 @@ const MasonryGrid = () => {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Share handler for mobile
+  const handleShare = useCallback(async (item: any) => {
+    const shareData = {
+      title: item.title,
+      text: item.description,
+      url: `${window.location.origin}/work/${item.slug}`
+    };
+
+    try {
+      // Check if Web Share API is supported (mobile browsers)
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback: Copy to clipboard
+        await navigator.clipboard.writeText(shareData.url);
+
+        // Show a temporary notification (you could replace with a toast library)
+        const notification = document.createElement('div');
+        notification.textContent = 'Link copied to clipboard!';
+        notification.style.cssText = `
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: rgba(0, 0, 0, 0.8);
+          color: white;
+          padding: 12px 20px;
+          border-radius: 8px;
+          z-index: 1000;
+          font-size: 14px;
+          backdrop-filter: blur(10px);
+        `;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 2000);
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+      // Fallback: Open in new tab for sharing
+      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(item.title)}&url=${encodeURIComponent(shareData.url)}`, '_blank');
+    }
+  }, []);
+
   // Optimized mobile detection with debouncing
   const checkMobile = useCallback(() => {
     setIsMobile(window.innerWidth < 768);
@@ -241,14 +286,14 @@ const MasonryGrid = () => {
                           <div className="status-left">
                             <span className="project-counter">{item.index + 1} / {workItems.length}</span>
                           </div>
-                          <div className="status-right">
+                          {/* <div className="status-right">
                             <button className="info-toggle-btn" title="Toggle Info">
                               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                                 <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
                                 <path d="M12 16v-4M12 8h.01" stroke="currentColor" strokeWidth="2"/>
                               </svg>
                             </button>
-                          </div>
+                          </div> */}
                         </div>
 
                         {/* Bottom Gradient Overlay */}
@@ -270,9 +315,13 @@ const MasonryGrid = () => {
                               </svg>
                             </a>
 
-                            <button className="mobile-share-btn" title="Share">
+                            <button
+                              className="mobile-share-btn"
+                              onClick={() => handleShare(item)}
+                              title="Share"
+                            >
                               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                <path d="M8.59 13.51l6.83 3.98m-.01-10.98l-6.82 3.98M21 5a3 3 0 11-6 0 3 3 0 016 0zM9 12a3 3 0 11-6 0 3 3 0 016 0zM21 19a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" strokeWidth="2"/>
+                                <path d="M8.59 13.51l6.83 3.98m-.01-10.98l-6.82 3.98M21 5a3 3 0 11-6 0 3 3 0 616 0zM9 12a3 3 0 11-6 0 3 3 0 016 0zM21 19a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" strokeWidth="2"/>
                               </svg>
                             </button>
                           </div>
