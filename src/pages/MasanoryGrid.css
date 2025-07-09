@@ -1464,8 +1464,214 @@
     height: 100vh !important;
     height: 100dvh !important;
     flex-shrink: 0 !important;
-    /* Only snap within video section context */
     scroll-snap-align: start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* Portrait videos (9:16) - Full screen reels style */
+  .mobile-scroll-item.fullscreen-mode {
+    background: #000;
+  }
+
+  .mobile-scroll-item.fullscreen-mode .mobile-video-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  .mobile-scroll-item.fullscreen-mode .portrait-wrapper {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Landscape videos (16:9) - Contained with padding */
+  .mobile-scroll-item.contained-mode {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    padding: 40px 20px;
+  }
+
+  .mobile-scroll-item.contained-mode .mobile-video-wrapper {
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 16/9;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  .mobile-scroll-item.contained-mode .landscape-wrapper {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Square videos - Centered with padding */
+  .mobile-scroll-item.contained-mode .square-wrapper {
+    width: 90%;
+    aspect-ratio: 1/1;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Video player styling for different modes */
+  .mobile-scroll-item.fullscreen-mode mux-player {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 0 !important;
+  }
+
+  .mobile-scroll-item.contained-mode mux-player {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 12px !important;
+  }
+
+  /* Enhanced overlay positioning for different modes */
+  .mobile-scroll-item.fullscreen-mode .mobile-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+  }
+
+  .mobile-scroll-item.contained-mode .mobile-overlay {
+    position: absolute;
+    top: 40px;
+    left: 20px;
+    right: 20px;
+    bottom: 40px;
+    z-index: 10;
+    border-radius: 12px;
+  }
+
+  /* Title positioning for different modes */
+  .mobile-scroll-item.contained-mode .mobile-project-info {
+    position: absolute;
+    bottom: -60px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    padding: 0 20px;
+  }
+
+  .mobile-scroll-item.contained-mode .mobile-project-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+
+  .mobile-scroll-item.contained-mode .mobile-project-description {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
+  }
+
+  /* Minimal overlay for landscape videos */
+  .mobile-overlay-minimal {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+  }
+
+  .mute-toggle-btn-minimal {
+    background: rgba(0, 0, 0, 0.6);
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s ease;
+  }
+
+  .mute-toggle-btn-minimal:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: scale(1.05);
+  }
+
+  /* External project info styling */
+  .mobile-project-info {
+    position: absolute;
+    bottom: -80px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    padding: 0 20px;
+  }
+
+  .mobile-project-info .mobile-project-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .mobile-project-info .mobile-project-description {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.5;
+    margin-bottom: 20px;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .mobile-action-buttons-external {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .mobile-view-btn-external,
+  .mobile-share-btn-external {
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .mobile-view-btn-external {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  }
+
+  .mobile-view-btn-external:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+  }
+
+  .mobile-share-btn-external {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .mobile-share-btn-external:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
   }
 
   .mobile-footer-spacer {
