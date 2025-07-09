@@ -15,6 +15,15 @@ const MasonryGrid = () => {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Audio state management
+  const [isMuted, setIsMuted] = useState<boolean>(true); // Start muted for better UX
+  const [activeAudioVideo, setActiveAudioVideo] = useState<number | null>(null); // Track which video has audio
+  const videoRefs = useRef<Map<number, any>>(new Map());
+
+  // Video playback state management
+  const [videoPaused, setVideoPaused] = useState<Map<number, boolean>>(new Map());
+  const [showPlayIcon, setShowPlayIcon] = useState<Map<number, boolean>>(new Map());
+
   // Share handler for mobile
   const handleShare = useCallback(async (item: any) => {
     const shareData = {
@@ -59,6 +68,134 @@ const MasonryGrid = () => {
       window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(item.title)}&url=${encodeURIComponent(shareData.url)}`, '_blank');
     }
   }, []);
+
+  // Mute/Unmute handler with single audio management
+  const handleMuteToggle = useCallback(() => {
+    const newMutedState = !isMuted;
+    setIsMuted(newMutedState);
+
+    if (newMutedState) {
+      // If muting, mute all videos
+      videoRefs.current.forEach((videoRef) => {
+        if (videoRef && videoRef.muted !== undefined) {
+          videoRef.muted = true;
+        }
+      });
+      setActiveAudioVideo(null);
+    } else {
+      // If unmuting, only unmute the currently visible video
+      const currentVideo = videoRefs.current.get(currentVideoIndex);
+      if (currentVideo && currentVideo.muted !== undefined) {
+        // Mute all other videos first
+        videoRefs.current.forEach((videoRef, index) => {
+          if (videoRef && videoRef.muted !== undefined) {
+            videoRef.muted = index !== currentVideoIndex;
+          }
+        });
+        setActiveAudioVideo(currentVideoIndex);
+      }
+    }
+  }, [isMuted, currentVideoIndex]);
+
+  // Store video ref for mute control with single audio management
+  const setVideoRef = useCallback((index: number, ref: any) => {
+    if (ref) {
+      videoRefs.current.set(index, ref);
+      // Apply audio state: only the active video or current video gets audio
+      if (isMuted) {
+        ref.muted = true;
+      } else {
+        ref.muted = activeAudioVideo !== null ? activeAudioVideo !== index : index !== currentVideoIndex;
+      }
+    } else {
+      videoRefs.current.delete(index);
+      // If this was the active audio video, clear it
+      if (activeAudioVideo === index) {
+        setActiveAudioVideo(null);
+      }
+    }
+  }, [isMuted, activeAudioVideo, currentVideoIndex]);
+
+  // Manage single audio playback when video becomes visible
+  const handleVideoVisibilityChange = useCallback((index: number, isVisible: boolean) => {
+    if (!isMuted && isVisible && index === currentVideoIndex) {
+      // Mute all other videos
+      videoRefs.current.forEach((videoRef, videoIndex) => {
+        if (videoRef && videoRef.muted !== undefined) {
+          videoRef.muted = videoIndex !== index;
+        }
+      });
+      setActiveAudioVideo(index);
+    }
+  }, [isMuted, currentVideoIndex]);
+
+  // Touch gesture handler for play/pause
+  const handleVideoTouch = useCallback((index: number, event: React.TouchEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const videoRef = videoRefs.current.get(index);
+    if (!videoRef) return;
+
+    const isPaused = videoRef.paused;
+
+    if (isPaused) {
+      // Play video and manage audio
+      videoRef.play().catch((error: any) => {
+        console.log('Play failed:', error);
+      });
+
+      // If not muted, ensure only this video has audio
+      if (!isMuted) {
+        videoRefs.current.forEach((otherVideoRef, otherIndex) => {
+          if (otherVideoRef && otherVideoRef.muted !== undefined) {
+            otherVideoRef.muted = otherIndex !== index;
+          }
+        });
+        setActiveAudioVideo(index);
+      }
+
+      setVideoPaused(prev => new Map(prev.set(index, false)));
+      setShowPlayIcon(prev => new Map(prev.set(index, false)));
+    } else {
+      // Pause video
+      videoRef.pause();
+      setVideoPaused(prev => new Map(prev.set(index, true)));
+      setShowPlayIcon(prev => new Map(prev.set(index, true)));
+
+      // If this was the active audio video, clear it
+      if (activeAudioVideo === index) {
+        setActiveAudioVideo(null);
+      }
+
+      // Hide play icon after 2 seconds
+      setTimeout(() => {
+        setShowPlayIcon(prev => new Map(prev.set(index, false)));
+      }, 2000);
+    }
+  }, [isMuted, activeAudioVideo]);
+
+  // Double tap prevention
+  const lastTapRef = useRef<number>(0);
+  const handleSingleTap = useCallback((index: number, event: React.TouchEvent) => {
+    const now = Date.now();
+    const timeSinceLastTap = now - lastTapRef.current;
+
+    if (timeSinceLastTap < 300) {
+      // Double tap detected, ignore
+      return;
+    }
+
+    lastTapRef.current = now;
+
+    // Delay to check if it's really a single tap
+    setTimeout(() => {
+      const timeSinceThisTap = Date.now() - lastTapRef.current;
+      if (timeSinceThisTap >= 250) {
+        handleVideoTouch(index, event);
+      }
+    }, 250);
+  }, [handleVideoTouch]);
 
   // Optimized mobile detection with debouncing
   const checkMobile = useCallback(() => {
@@ -130,17 +267,39 @@ const MasonryGrid = () => {
           setVisibleItems(prev => new Set(prev).add(index));
           setCurrentVideoIndex(index);
 
-          // Pause videos that are not in view for better performance
+          // Handle video playback and audio management
           const video = entry.target.querySelector('mux-player') as any;
           if (video && video.play) {
             video.play().catch(() => {});
+
+            // Manage single audio playback
+            if (!isMuted) {
+              // Mute all other videos when this one becomes visible
+              videoRefs.current.forEach((videoRef, videoIndex) => {
+                if (videoRef && videoRef.muted !== undefined) {
+                  videoRef.muted = videoIndex !== index;
+                }
+              });
+              setActiveAudioVideo(index);
+            }
           }
+
+          // Call visibility change handler
+          handleVideoVisibilityChange(index, true);
         } else {
           // Pause videos that are out of view
           const video = entry.target.querySelector('mux-player') as any;
           if (video && video.pause) {
             video.pause();
           }
+
+          // If this was the active audio video, clear it
+          if (activeAudioVideo === index) {
+            setActiveAudioVideo(null);
+          }
+
+          // Call visibility change handler
+          handleVideoVisibilityChange(index, false);
         }
       });
     }, options);
@@ -227,30 +386,56 @@ const MasonryGrid = () => {
                       )}
 
                       {item.type === 'mux' && item.shouldLoad ? (
-                        <MuxPlayer
-                          playbackId={item.muxPlaybackId}
-                          autoPlay={item.isVisible}
-                          muted={true}
-                          loop={true}
-                          playsInline={true}
-                          preload={item.shouldLoad ? "metadata" : "none"}
-                          onCanPlay={(e) => {
-                            if (!item.isVisible) return;
-                            const target = e.target as any;
-                            if (target && target.play) {
-                              target.play().catch((error: any) => {
-                                console.log('Autoplay prevented:', error);
-                              });
-                            }
-                          }}
-                          onLoadedData={() => handleItemLoad(item.id)}
-                          style={{
-                            objectFit: 'cover',
-                            width: '100%',
-                            height: '100%',
-                            willChange: item.isVisible ? 'transform' : 'auto'
-                          }}
-                        />
+                        <div className="video-container-with-overlay">
+                          <MuxPlayer
+                            ref={(ref) => setVideoRef(item.index, ref)}
+                            playbackId={item.muxPlaybackId}
+                            autoPlay={item.isVisible}
+                            muted={isMuted || activeAudioVideo !== item.index}
+                            loop={true}
+                            playsInline={true}
+                            preload={item.shouldLoad ? "metadata" : "none"}
+                            onCanPlay={(e) => {
+                              if (!item.isVisible) return;
+                              const target = e.target as any;
+                              if (target && target.play) {
+                                target.play().catch((error: any) => {
+                                  console.log('Autoplay prevented:', error);
+                                });
+                              }
+                            }}
+                            onLoadedData={() => handleItemLoad(item.id)}
+                            style={{
+                              objectFit: 'cover',
+                              width: '100%',
+                              height: '100%',
+                              willChange: item.isVisible ? 'transform' : 'auto'
+                            }}
+                          />
+
+                          {/* Touch overlay for play/pause gestures */}
+                          <div
+                            className="video-touch-overlay"
+                            onTouchEnd={(e) => handleSingleTap(item.index, e)}
+                          >
+                            {/* Play/Pause icon overlay */}
+                            {showPlayIcon.get(item.index) && (
+                              <div className="play-pause-icon">
+                                {videoPaused.get(item.index) ? (
+                                  // Play icon
+                                  <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                                    <path d="M8 5v14l11-7z" fill="white" stroke="white" strokeWidth="2"/>
+                                  </svg>
+                                ) : (
+                                  // Pause icon
+                                  <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                                    <path d="M6 4h4v16H6zM14 4h4v16h-4z" fill="white" stroke="white" strokeWidth="2"/>
+                                  </svg>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       ) : item.type === 'image' && item.shouldLoad ? (
                         <img
                           src={item.image}
@@ -286,14 +471,25 @@ const MasonryGrid = () => {
                           <div className="status-left">
                             <span className="project-counter">{item.index + 1} / {workItems.length}</span>
                           </div>
-                          {/* <div className="status-right">
-                            <button className="info-toggle-btn" title="Toggle Info">
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                                <path d="M12 16v-4M12 8h.01" stroke="currentColor" strokeWidth="2"/>
-                              </svg>
+                          <div className="status-right">
+                            <button
+                              className="mute-toggle-btn"
+                              onClick={handleMuteToggle}
+                              title={isMuted ? "Unmute" : "Mute"}
+                            >
+                              {isMuted ? (
+                                // Muted icon
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                  <path d="M11 5L6 9H2v6h4l5 4V5zM22 9l-6 6M16 9l6 6" stroke="currentColor" strokeWidth="2"/>
+                                </svg>
+                              ) : (
+                                // Unmuted icon
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                  <path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07" stroke="currentColor" strokeWidth="2"/>
+                                </svg>
+                              )}
                             </button>
-                          </div> */}
+                          </div>
                         </div>
 
                         {/* Bottom Gradient Overlay */}
