@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import './MasanoryGrid.css';
 import ClientsSection from '../components/ClientsSection';
 import { supabase } from '../api/supabase';
@@ -10,18 +10,32 @@ const MasonryGrid = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [loadedItems, setLoadedItems] = useState<{ [key: number]: boolean }>({});
   const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [visibleItems, setVisibleItems] = useState<Set<number>>(new Set());
+  const [currentVideoIndex, setCurrentVideoIndex] = useState<number>(0);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Check if mobile device
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
+  // Optimized mobile detection with debouncing
+  const checkMobile = useCallback(() => {
+    setIsMobile(window.innerWidth < 768);
   }, []);
+
+  useEffect(() => {
+    checkMobile();
+
+    // Debounced resize handler for better performance
+    let timeoutId: NodeJS.Timeout;
+    const debouncedResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(checkMobile, 150);
+    };
+
+    window.addEventListener('resize', debouncedResize, { passive: true });
+    return () => {
+      window.removeEventListener('resize', debouncedResize);
+      clearTimeout(timeoutId);
+    };
+  }, [checkMobile]);
 
   // Fetch work items from Supabase
   useEffect(() => {
@@ -48,9 +62,92 @@ const MasonryGrid = () => {
     fetchWorkItems();
   }, []);
 
-  const handleItemLoad = (id: number) => {
+  // Optimized item load handler
+  const handleItemLoad = useCallback((id: number) => {
     setLoadedItems(prev => ({ ...prev, [id]: true }));
-  };
+  }, []);
+
+  // Intersection Observer for mobile viewport optimization
+  useEffect(() => {
+    if (!isMobile || !containerRef.current) return;
+
+    const options = {
+      root: null,
+      rootMargin: '50px 0px', // Load items 50px before they enter viewport
+      threshold: 0.1
+    };
+
+    observerRef.current = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const index = parseInt(entry.target.getAttribute('data-index') || '0');
+
+        if (entry.isIntersecting) {
+          setVisibleItems(prev => new Set(prev).add(index));
+          setCurrentVideoIndex(index);
+
+          // Pause videos that are not in view for better performance
+          const video = entry.target.querySelector('mux-player') as any;
+          if (video && video.play) {
+            video.play().catch(() => {});
+          }
+        } else {
+          // Pause videos that are out of view
+          const video = entry.target.querySelector('mux-player') as any;
+          if (video && video.pause) {
+            video.pause();
+          }
+        }
+      });
+    }, options);
+
+    // Observe all mobile scroll items
+    const items = containerRef.current.querySelectorAll('.mobile-scroll-item');
+    items.forEach(item => observerRef.current?.observe(item));
+
+    return () => {
+      observerRef.current?.disconnect();
+    };
+  }, [isMobile, workItems]);
+
+  // Memoized mobile items for better performance
+  const mobileItems = useMemo(() => {
+    if (!isMobile) return [];
+
+    return workItems.map((item, index) => ({
+      ...item,
+      index,
+      isVisible: visibleItems.has(index),
+      shouldLoad: Math.abs(index - currentVideoIndex) <= 1 // Load current and adjacent items
+    }));
+  }, [workItems, isMobile, visibleItems, currentVideoIndex]);
+
+  // Performance optimization: Reduce re-renders for mobile
+  useEffect(() => {
+    if (!isMobile) return;
+
+    // Enable hardware acceleration for smooth scrolling
+    if (containerRef.current) {
+      containerRef.current.style.transform = 'translateZ(0)';
+      containerRef.current.style.willChange = 'scroll-position';
+    }
+
+    // Optimize for mobile performance
+    const optimizeForMobile = () => {
+      // Disable hover effects on mobile for better performance
+      document.body.classList.add('mobile-optimized');
+
+      // Reduce animation complexity on lower-end devices
+      if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) {
+        document.body.classList.add('reduced-motion');
+      }
+    };
+
+    optimizeForMobile();
+
+    return () => {
+      document.body.classList.remove('mobile-optimized', 'reduced-motion');
+    };
+  }, [isMobile]);
 
 
 
@@ -68,14 +165,14 @@ const MasonryGrid = () => {
       ) : (
         <>
           {isMobile ? (
-            /* Mobile Instagram-style vertical scroll */
+            /* Mobile Instagram-style vertical scroll - Performance Optimized */
             <div className="mobile-scroll-view">
-              <div className="mobile-scroll-container">
-                {workItems.map((item, index) => (
+              <div className="mobile-scroll-container" ref={containerRef}>
+                {mobileItems.map((item) => (
                   <div
                     key={item.id}
                     className={`mobile-scroll-item ${loadedItems[item.id] ? 'loaded' : ''}`}
-                    data-index={index}
+                    data-index={item.index}
                   >
                     <div className="mobile-video-wrapper">
                       {!loadedItems[item.id] && (
@@ -83,18 +180,18 @@ const MasonryGrid = () => {
                           <div className="skeleton-animation"></div>
                         </div>
                       )}
-                      
-                      {item.type === 'mux' ? (
+
+                      {item.type === 'mux' && item.shouldLoad ? (
                         <MuxPlayer
                           playbackId={item.muxPlaybackId}
-                          autoPlay={true}
+                          autoPlay={item.isVisible}
                           muted={true}
                           loop={true}
                           playsInline={true}
-                          preload="auto"
+                          preload={item.shouldLoad ? "metadata" : "none"}
                           onCanPlay={(e) => {
+                            if (!item.isVisible) return;
                             const target = e.target as any;
-                            // Force play for mobile autoplay
                             if (target && target.play) {
                               target.play().catch((error: any) => {
                                 console.log('Autoplay prevented:', error);
@@ -102,66 +199,89 @@ const MasonryGrid = () => {
                             }
                           }}
                           onLoadedData={() => handleItemLoad(item.id)}
-                          style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                          style={{
+                            objectFit: 'cover',
+                            width: '100%',
+                            height: '100%',
+                            willChange: item.isVisible ? 'transform' : 'auto'
+                          }}
                         />
-                      ) : item.type === 'image' ? (
+                      ) : item.type === 'image' && item.shouldLoad ? (
                         <img
                           src={item.image}
                           alt={item.title}
                           className="mobile-scroll-image"
+                          loading="lazy"
                           onLoad={() => handleItemLoad(item.id)}
+                          style={{
+                            willChange: item.isVisible ? 'transform' : 'auto'
+                          }}
                         />
-                      ) : null}
-                      
-                      {/* Innovative Mobile Project Info */}
-                      <div className="mobile-project-display">
-                        {/* Progress indicator at top */}
-                        <div className="mobile-progress-bar">
-                          <div className="progress-fill"></div>
+                      ) : (
+                        // Placeholder for items that shouldn't load yet
+                        <div
+                          className="item-placeholder"
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            backgroundColor: '#f0f0f0',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                        >
+                          <div className="loading-spinner"></div>
                         </div>
-                        
-                        {/* Floating glassmorphism card */}
-                        <div className="mobile-floating-card">
-                          <div className="card-header">
-                            <div className="project-category">Portfolio</div>
-                            <div className="project-index">{index + 1}/{workItems.length}</div>
+                      )}
+                      
+                      {/* Modern Mobile Project Overlay */}
+                      <div className="mobile-overlay-container">
+                        {/* Top Status Bar */}
+                        <div className="mobile-status-bar">
+                          <div className="status-left">
+                            <span className="project-counter">{item.index + 1} / {workItems.length}</span>
                           </div>
-                          
-                          <div className="card-content">
-                            <h2 className="project-title">{item.title}</h2>
-                            <p className="project-description">{item.description}</p>
-                            
-                            <div className="project-tags">
-                              <span className="tag">Creative</span>
-                              <span className="tag">Design</span>
-                              <span className="tag">Portfolio</span>
-                            </div>
+                          <div className="status-right">
+                            <button className="info-toggle-btn" title="Toggle Info">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                                <path d="M12 16v-4M12 8h.01" stroke="currentColor" strokeWidth="2"/>
+                              </svg>
+                            </button>
                           </div>
-                          
-                          <div className="card-actions">
-                            <a 
+                        </div>
+
+                        {/* Bottom Gradient Overlay */}
+                        <div className="mobile-bottom-overlay">
+                          <div className="project-info">
+                            <h3 className="mobile-project-title">{item.title}</h3>
+                            <p className="mobile-project-description">{item.description}</p>
+                          </div>
+
+                          <div className="mobile-action-bar">
+                            <a
                               href={`/work/${item.slug}`}
-                              className="primary-action-btn icon-only"
+                              className="mobile-view-btn"
                               title="View Project"
                             >
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2"/>
-                                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+                              <span>View Project</span>
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2"/>
                               </svg>
                             </a>
-                            
-                            <button className="action-btn share-btn">
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+
+                            <button className="mobile-share-btn" title="Share">
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                                 <path d="M8.59 13.51l6.83 3.98m-.01-10.98l-6.82 3.98M21 5a3 3 0 11-6 0 3 3 0 016 0zM9 12a3 3 0 11-6 0 3 3 0 016 0zM21 19a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" strokeWidth="2"/>
                               </svg>
                             </button>
                           </div>
                         </div>
-                        
-                        {/* Subtle scroll indicator */}
-                        <div className="scroll-indicator">
-                          <div className="scroll-text">Swipe up for next</div>
-                          <div className="scroll-arrow">↑</div>
+
+                        {/* Scroll Indicator */}
+                        <div className="mobile-scroll-hint">
+                          <div className="scroll-line"></div>
+                          <span className="scroll-text">Swipe up</span>
                         </div>
                       </div>
                     </div>
