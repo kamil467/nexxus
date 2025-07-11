@@ -1574,8 +1574,8 @@
     left: 0 !important;
     right: 0 !important;
     display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
+    justify-content: flex-end !important;
+    align-items: flex-start !important;
     padding: 0 30px !important;
     z-index: 10 !important;
     pointer-events: none !important;
@@ -1589,7 +1589,7 @@
   }
 
   .theater-minimal-controls .mute-toggle-btn {
-    background: rgba(0, 0, 0, 0.6) !important;
+    background: rgba(0, 0, 0, 0.2) !important;
     border: none !important;
     border-radius: 50% !important;
     width: 40px !important;
@@ -1597,15 +1597,16 @@
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    color: white !important;
+    color: rgba(255, 255, 255, 0.7) !important;
     cursor: pointer !important;
     transition: all 0.2s ease !important;
     pointer-events: auto !important;
-    backdrop-filter: blur(10px) !important;
+    backdrop-filter: blur(5px) !important;
   }
 
   .theater-minimal-controls .mute-toggle-btn:hover {
-    background: rgba(0, 0, 0, 0.8) !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
     transform: scale(1.05) !important;
   }
 
@@ -1732,8 +1733,8 @@
     left: 20px !important;
     right: 20px !important;
     display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
+    justify-content: flex-end !important;
+    align-items: flex-start !important;
     z-index: 10 !important;
     pointer-events: none !important;
   }
