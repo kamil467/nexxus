@@ -28,6 +28,8 @@ const MasonryGrid = () => {
   const isScrolling = useRef<boolean>(false);
   const scrollEndTimeout = useRef<NodeJS.Timeout | null>(null);
 
+
+
   // Share handler for mobile
   const handleShare = useCallback(async (item: any) => {
     const shareData = {
@@ -72,6 +74,8 @@ const MasonryGrid = () => {
       window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(item.title)}&url=${encodeURIComponent(shareData.url)}`, '_blank');
     }
   }, []);
+
+
 
   // Mute/Unmute handler with single audio management
   const handleMuteToggle = useCallback(() => {
@@ -369,16 +373,25 @@ const MasonryGrid = () => {
     };
   }, [isMobile, workItems]);
 
-  // Memoized mobile items for better performance
+  // Memoized mobile items with aspect ratio detection
   const mobileItems = useMemo(() => {
     if (!isMobile) return [];
 
-    return workItems.map((item, index) => ({
-      ...item,
-      index,
-      isVisible: visibleItems.has(index),
-      shouldLoad: Math.abs(index - currentVideoIndex) <= 1 // Load current and adjacent items
-    }));
+    return workItems.map((item, index) => {
+      // Determine video aspect ratio based on cols/rows
+      const isPortrait = item.cols === 1 && item.rows === 3; // 9:16 videos
+      const isLandscape = (item.cols === 2 && item.rows === 2) || (item.cols === 2 && item.rows === 3); // 16:9 videos
+      const isSquare = item.cols === item.rows; // Square videos
+
+      return {
+        ...item,
+        index,
+        isVisible: visibleItems.has(index),
+        shouldLoad: Math.abs(index - currentVideoIndex) <= 1,
+        aspectRatio: isPortrait ? 'portrait' : isLandscape ? 'landscape' : isSquare ? 'square' : 'auto',
+        displayMode: isPortrait ? 'fullscreen' : 'theater' // Portrait = reels, Landscape = theater mode
+      };
+    });
   }, [workItems, isMobile, visibleItems, currentVideoIndex]);
 
   // Intelligent scroll management for mobile
@@ -496,10 +509,11 @@ const MasonryGrid = () => {
                 {mobileItems.map((item) => (
                   <div
                     key={item.id}
-                    className={`mobile-scroll-item ${loadedItems[item.id] ? 'loaded' : ''}`}
+                    className={`mobile-scroll-item ${loadedItems[item.id] ? 'loaded' : ''} ${item.displayMode}-mode`}
                     data-index={item.index}
+                    data-aspect-ratio={item.aspectRatio}
                   >
-                    <div className="mobile-video-wrapper">
+                    <div className={`mobile-video-wrapper ${item.aspectRatio}-wrapper`}>
                       {!loadedItems[item.id] && (
                         <div className="loading-skeleton">
                           <div className="skeleton-animation"></div>
@@ -527,14 +541,57 @@ const MasonryGrid = () => {
                             }}
                             onLoadedData={() => handleItemLoad(item.id)}
                             style={{
-                              objectFit: 'cover',
+                              objectFit: item.displayMode === 'theater' ? 'contain' : 'cover',
                               width: '100%',
-                              height: '100%',
-                              willChange: item.isVisible ? 'transform' : 'auto'
+                              height: item.displayMode === 'theater' ? 'auto' : '100%',
+                              willChange: item.isVisible ? 'transform' : 'auto',
+                              display: 'block',
+                              visibility: 'visible'
                             }}
                           />
 
                           {/* Touch overlay for play/pause gestures */}
+                          <div
+                            className="video-touch-overlay"
+                            onTouchEnd={(e) => handleSingleTap(item.index, e)}
+                          >
+                            {/* Play/Pause icon overlay */}
+                            {showPlayIcon.get(item.index) && (
+                              <div className="play-pause-icon">
+                                {videoPaused.get(item.index) ? (
+                                  // Play icon
+                                  <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                                    <path d="M8 5v14l11-7z" fill="white" stroke="white" strokeWidth="2"/>
+                                  </svg>
+                                ) : (
+                                  // Pause icon
+                                  <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                                    <path d="M6 4h4v16H6zM14 4h4v16h-4z" fill="white" stroke="white" strokeWidth="2"/>
+                                  </svg>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ) : item.type === 'vimeo' && item.shouldLoad ? (
+                        <div className="video-container-with-overlay">
+                          <iframe
+                            src={`https://player.vimeo.com/video/${item.videoId}?h=${item.hId}&autoplay=1&loop=1&muted=1&background=1&controls=0&title=0&byline=0&portrait=0`}
+                            style={{
+                              width: '100%',
+                              height: item.displayMode === 'theater' ? 'auto' : '100%',
+                              border: 'none',
+                              borderRadius: '0',
+                              objectFit: item.displayMode === 'theater' ? 'contain' : 'cover',
+                              display: 'block',
+                              visibility: 'visible'
+                            }}
+                            allow="autoplay; fullscreen; picture-in-picture"
+                            allowFullScreen
+                            onLoad={() => handleItemLoad(item.id)}
+                          />
+
+                          {/* Touch overlay for Vimeo videos */}
                           <div
                             className="video-touch-overlay"
                             onTouchEnd={(e) => handleSingleTap(item.index, e)}
@@ -575,70 +632,68 @@ const MasonryGrid = () => {
                           style={{
                             width: '100%',
                             height: '100%',
-                            backgroundColor: '#f0f0f0',
+                            backgroundColor: item.displayMode === 'fullscreen' ? '#333' : '#f0f0f0',
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center'
+                            justifyContent: 'center',
+                            color: item.displayMode === 'fullscreen' ? 'white' : 'black'
                           }}
                         >
                           <div className="loading-spinner"></div>
                         </div>
                       )}
                       
-                      {/* Modern Mobile Project Overlay */}
-                      <div className="mobile-overlay-container">
-                        {/* Top Status Bar */}
-                        <div className="mobile-status-bar">
-                          <div className="status-left">
-                            <span className="project-counter">{item.index + 1} / {workItems.length}</span>
-                          </div>
-                          <div className="status-right">
-                            <button
-                              className="mute-toggle-btn"
-                              onClick={handleMuteToggle}
-                              title={isMuted ? "Unmute" : "Mute"}
-                            >
-                              {isMuted ? (
-                                // Muted icon
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                  <path d="M11 5L6 9H2v6h4l5 4V5zM22 9l-6 6M16 9l6 6" stroke="currentColor" strokeWidth="2"/>
-                                </svg>
-                              ) : (
-                                // Unmuted icon
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                  <path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07" stroke="currentColor" strokeWidth="2"/>
-                                </svg>
-                              )}
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Bottom Gradient Overlay */}
-                        <div className="mobile-bottom-overlay">
-                          <div className="project-info">
-                            <h3 className="mobile-project-title">{item.title}</h3>
-                            <p className="mobile-project-description">{item.description}</p>
+                      {/* Conditional Mobile Project Overlay */}
+                      {item.displayMode === 'fullscreen' ? (
+                        /* Full overlay for portrait videos */
+                        <div className="mobile-overlay-container">
+                          {/* Top Status Bar */}
+                          <div className="mobile-status-bar">
+                            <div className="status-left">
+                            </div>
+                            <div className="status-right">
+                              <button
+                                className="mute-toggle-btn"
+                                onClick={handleMuteToggle}
+                                title={isMuted ? "Unmute" : "Mute"}
+                              >
+                                {isMuted ? (
+                                  // Muted icon
+                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <path d="M11 5L6 9H2v6h4l5 4V5zM22 9l-6 6M16 9l6 6" stroke="currentColor" strokeWidth="2"/>
+                                  </svg>
+                                ) : (
+                                  // Unmuted icon
+                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07" stroke="currentColor" strokeWidth="2"/>
+                                  </svg>
+                                )}
+                              </button>
+                            </div>
                           </div>
 
-                          <div className="mobile-action-bar">
-                            <a
-                              href={`/work/${item.slug}`}
-                              className="mobile-view-btn"
-                              title="View Project"
-                            >
-                              <span>View Project</span>
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2"/>
-                              </svg>
-                            </a>
+                          {/* Bottom Gradient Overlay */}
+                          <div className="mobile-bottom-overlay">
+                            <div className="project-info">
+                              <h3 className="mobile-project-title">{item.title}</h3>
+                              <p className="mobile-project-description">{item.description}</p>
+                            </div>
 
-                            <button
-                              className="mobile-share-btn"
-                              onClick={() => handleShare(item)}
-                              title="Share"
-                            >
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                <path d="M8.59 13.51l6.83 3.98m-.01-10.98l-6.82 3.98M21 5a3 3 0 11-6 0 3 3 0 616 0zM9 12a3 3 0 11-6 0 3 3 0 016 0zM21 19a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" strokeWidth="2"/>
+                            <div className="mobile-action-bar">
+                              <a
+                                href={`/work/${item.slug}`}
+                                className="mobile-view-btn"
+                                title="View Project Portfolio"
+                              >
+                              </a>
+
+                              <button
+                                className="mobile-share-btn"
+                                onClick={() => handleShare(item)}
+                                title="Share"
+                              >
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                <path d="M7 17L17 7M17 7H7M17 7V17 616 0zM9 12a3 3 0 11-6 0 3 3 0 016 0zM21 19a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                               </svg>
                             </button>
                           </div>
@@ -650,7 +705,77 @@ const MasonryGrid = () => {
                           <span className="scroll-text">Swipe up</span>
                         </div>
                       </div>
+                      ) : (
+                        /* Theater mode - only essential controls, no info panel */
+                        <div className="theater-minimal-controls">
+                          <button
+                            className="mute-toggle-btn"
+                            onClick={handleMuteToggle}
+                            title={isMuted ? "Unmute" : "Mute"}
+                          >
+                            {isMuted ? (
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                <path d="M11 5L6 9H2v6h4l5 4V5zM22 9l-6 6M16 9l6 6" stroke="currentColor" strokeWidth="2"/>
+                              </svg>
+                            ) : (
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                <path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07" stroke="currentColor" strokeWidth="2"/>
+                              </svg>
+                            )}
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Project info for contained mode - positioned outside video */}
+                      {item.displayMode === 'contained' && (
+                        <div className="mobile-project-info">
+                          <div className="mobile-project-title">{item.title}</div>
+                          <div className="mobile-project-description">{item.description}</div>
+                          <div className="mobile-action-buttons-external">
+                            <a
+                              href={`/work/${item.slug}`}
+                              className="mobile-view-btn-external"
+                              title="View Project"
+                            >
+                              View Project
+                            </a>
+                            <button
+                              className="mobile-share-btn-external"
+                              onClick={() => handleShare(item)}
+                              title="Share"
+                            >
+                              Share
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
                     </div>
+
+                    {/* Project info for theater mode - positioned below entire video section */}
+                    {item.displayMode === 'theater' && (
+                      <div className="theater-project-info-below">
+                        <div className="theater-project-title-below">{item.title}</div>
+                        <div className="theater-project-description-below">{item.description}</div>
+                        <div className="theater-action-buttons-below">
+                          <a
+                            href={`/work/${item.slug}`}
+                            className="theater-view-btn-below"
+                            title="View Project Portfolio"
+                          >
+                          </a>
+                          <button
+                            className="theater-share-btn-below"
+                            onClick={() => handleShare(item)}
+                            title="Share"
+                          >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                              <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              </svg>
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
 

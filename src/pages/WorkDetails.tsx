@@ -4,6 +4,7 @@ import { ArrowLeft, Plus, X } from 'react-feather';
 import { supabase } from '../api/supabase';
 import { WorkItem } from '../api/supabase';
 import MuxPlayer from '@mux/mux-player-react';
+import ClientsSection from '../components/ClientsSection';
 
 const WorkDetails = () => {
   const [loadingStates, setLoadingStates] = useState<{ [key: string]: boolean }>({});
@@ -212,6 +213,9 @@ const WorkDetails = () => {
             </div>
           ))}
         </div>
+
+        {/* Clients Section */}
+        <ClientsSection className="mt-20" />
       </div>
     );
 };
