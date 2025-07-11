@@ -28,6 +28,8 @@ const MasonryGrid = () => {
   const isScrolling = useRef<boolean>(false);
   const scrollEndTimeout = useRef<NodeJS.Timeout | null>(null);
 
+
+
   // Share handler for mobile
   const handleShare = useCallback(async (item: any) => {
     const shareData = {
@@ -72,6 +74,8 @@ const MasonryGrid = () => {
       window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(item.title)}&url=${encodeURIComponent(shareData.url)}`, '_blank');
     }
   }, []);
+
+
 
   // Mute/Unmute handler with single audio management
   const handleMuteToggle = useCallback(() => {
@@ -385,7 +389,7 @@ const MasonryGrid = () => {
         isVisible: visibleItems.has(index),
         shouldLoad: Math.abs(index - currentVideoIndex) <= 1,
         aspectRatio: isPortrait ? 'portrait' : isLandscape ? 'landscape' : isSquare ? 'square' : 'auto',
-        displayMode: isPortrait ? 'fullscreen' : 'contained' // Portrait = fullscreen reels, others = contained
+        displayMode: isPortrait ? 'fullscreen' : 'theater' // Portrait = reels, Landscape = theater mode
       };
     });
   }, [workItems, isMobile, visibleItems, currentVideoIndex]);
@@ -537,14 +541,53 @@ const MasonryGrid = () => {
                             }}
                             onLoadedData={() => handleItemLoad(item.id)}
                             style={{
-                              objectFit: 'cover',
+                              objectFit: item.displayMode === 'theater' ? 'contain' : 'cover',
                               width: '100%',
-                              height: '100%',
+                              height: item.displayMode === 'theater' ? 'auto' : '100%',
                               willChange: item.isVisible ? 'transform' : 'auto'
                             }}
                           />
 
                           {/* Touch overlay for play/pause gestures */}
+                          <div
+                            className="video-touch-overlay"
+                            onTouchEnd={(e) => handleSingleTap(item.index, e)}
+                          >
+                            {/* Play/Pause icon overlay */}
+                            {showPlayIcon.get(item.index) && (
+                              <div className="play-pause-icon">
+                                {videoPaused.get(item.index) ? (
+                                  // Play icon
+                                  <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                                    <path d="M8 5v14l11-7z" fill="white" stroke="white" strokeWidth="2"/>
+                                  </svg>
+                                ) : (
+                                  // Pause icon
+                                  <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                                    <path d="M6 4h4v16H6zM14 4h4v16h-4z" fill="white" stroke="white" strokeWidth="2"/>
+                                  </svg>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ) : item.type === 'vimeo' && item.shouldLoad ? (
+                        <div className="video-container-with-overlay">
+                          <iframe
+                            src={`https://player.vimeo.com/video/${item.videoId}?h=${item.hId}&autoplay=1&loop=1&muted=1&background=1&controls=0&title=0&byline=0&portrait=0`}
+                            style={{
+                              width: '100%',
+                              height: item.displayMode === 'theater' ? 'auto' : '100%',
+                              border: 'none',
+                              borderRadius: '0',
+                              objectFit: item.displayMode === 'theater' ? 'contain' : 'cover'
+                            }}
+                            allow="autoplay; fullscreen; picture-in-picture"
+                            allowFullScreen
+                            onLoad={() => handleItemLoad(item.id)}
+                          />
+
+                          {/* Touch overlay for Vimeo videos */}
                           <div
                             className="video-touch-overlay"
                             onTouchEnd={(e) => handleSingleTap(item.index, e)}
@@ -663,19 +706,20 @@ const MasonryGrid = () => {
                         </div>
                       </div>
                       ) : (
-                        /* Minimal overlay for landscape videos */
-                        <div className="mobile-overlay-minimal">
+                        /* Theater mode - only essential controls, no info panel */
+                        <div className="theater-minimal-controls">
+                          <span className="project-counter">{item.index + 1} / {workItems.length}</span>
                           <button
-                            className="mute-toggle-btn-minimal"
+                            className="mute-toggle-btn"
                             onClick={handleMuteToggle}
                             title={isMuted ? "Unmute" : "Mute"}
                           >
                             {isMuted ? (
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                                 <path d="M11 5L6 9H2v6h4l5 4V5zM22 9l-6 6M16 9l6 6" stroke="currentColor" strokeWidth="2"/>
                               </svg>
                             ) : (
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                                 <path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07" stroke="currentColor" strokeWidth="2"/>
                               </svg>
                             )}
@@ -706,6 +750,8 @@ const MasonryGrid = () => {
                           </div>
                         </div>
                       )}
+
+
                     </div>
                   </div>
                 ))}
