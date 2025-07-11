@@ -1640,28 +1640,41 @@
   }
 
   .theater-view-btn-below {
-    flex: 1 !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #333 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 8px !important;
-    padding: 14px 20px !important;
-    border-radius: 25px !important;
-    background: linear-gradient(135deg, #a9ac87, #b8bb8f) !important;
-    color: white !important;
-    font-size: 14px !important;
-    font-weight: 600 !important;
     text-decoration: none !important;
     transition: all 0.3s ease !important;
-    box-shadow: 0 4px 20px rgba(169, 172, 135, 0.3) !important;
-    border: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
     cursor: pointer !important;
+    backdrop-filter: blur(10px) !important;
+    position: relative !important;
   }
 
   .theater-view-btn-below:hover {
-    background: linear-gradient(135deg, #9ba078, #b3b684) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 25px rgba(169, 172, 135, 0.4) !important;
+    background: rgba(255, 255, 255, 1) !important;
+    transform: translateY(-2px) scale(1.05) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  .theater-view-btn-below::after {
+    content: '' !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 20px !important;
+    height: 20px !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: contain !important;
   }
 
   .theater-share-btn-below {
@@ -1965,10 +1978,10 @@
 
   .mobile-view-btn-external,
   .mobile-share-btn-external {
-    padding: 12px 24px;
-    border-radius: 25px;
-    font-size: 14px;
-    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
     text-decoration: none;
     border: none;
     cursor: pointer;
@@ -1977,14 +1990,21 @@
   }
 
   .mobile-view-btn-external {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
   }
 
   .mobile-view-btn-external:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    background: rgba(255, 255, 255, 1);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
   .mobile-share-btn-external {
@@ -2218,32 +2238,49 @@
 .mobile-action-bar {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+  backdrop-filter: blur(10px);
 }
 
 .mobile-view-btn {
-  flex: 1;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  background: linear-gradient(135deg, #A9AC87, #C5C899);
-  color: white;
-  padding: 14px 20px;
-  border-radius: 25px;
   text-decoration: none;
-  font-size: 0.95rem;
-  font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(169, 172, 135, 0.3);
-  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   cursor: pointer;
+  backdrop-filter: blur(10px);
+  position: relative;
 }
 
 .mobile-view-btn:hover {
-  background: linear-gradient(135deg, #9ba078, #b3b684);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 25px rgba(169, 172, 135, 0.4);
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.mobile-view-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 
 .mobile-share-btn {
@@ -2404,6 +2441,74 @@
   }
 }
 
+/* Alternative Icon Options - Replace the background-image in .mobile-view-btn::after */
+
+/* Option 2: External Link Icon */
+.mobile-view-btn-external-icon::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17L17 7M17 7H7M17 7V17'/%3E%3C/svg%3E") !important;
+}
+
+/* Option 3: Info Circle Icon */
+.mobile-view-btn-info-icon::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 16v-4M12 8h.01'/%3E%3C/svg%3E") !important;
+}
+
+/* Option 4: Arrow in Circle Icon */
+.mobile-view-btn-arrow-icon::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 16l4-4-4-4M8 12h8'/%3E%3C/svg%3E") !important;
+}
+
+/* Option 5: Document/Details Icon */
+.mobile-view-btn-document-icon::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z'/%3E%3Cpolyline points='14,2 14,8 20,8'/%3E%3Cline x1='16' y1='13' x2='8' y2='13'/%3E%3Cline x1='16' y1='17' x2='8' y2='17'/%3E%3Cpolyline points='10,9 9,9 8,9'/%3E%3C/svg%3E") !important;
+}
+
+/* Alternative Design Option 2: Icon-Only Floating Button */
+.mobile-view-btn-icon-only {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+.mobile-view-btn-icon-only:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Alternative Design Option 3: Minimal Text Link */
+.mobile-view-btn-minimal {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.mobile-view-btn-minimal:hover {
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  transform: translateX(2px);
+}
+
 /* Responsive adjustments */
 @media (max-width: 375px) {
   .mobile-project-title {
@@ -2415,8 +2520,8 @@
   }
 
   .mobile-view-btn {
-    padding: 12px 16px;
-    font-size: 0.9rem;
+    padding: 7px 14px;
+    font-size: 0.75rem;
   }
 
   .mobile-share-btn {
