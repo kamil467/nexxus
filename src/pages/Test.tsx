@@ -683,7 +683,7 @@ const MasonryGrid = () => {
                               <a
                                 href={`/work/${item.slug}`}
                                 className="mobile-view-btn"
-                                title="View Project Details"
+                                title="View Project Portfolio"
                               >
                               </a>
 
@@ -693,7 +693,7 @@ const MasonryGrid = () => {
                                 title="Share"
                               >
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                <path d="M7 13.51l6.83 3.98m-.01-10.98l-6.82 3.98M21 5a3 3 0 11-6 0 3 3 0 616 0zM9 12a3 3 0 11-6 0 3 3 0 016 0zM21 19a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M7 17L17 7M17 7H7M17 7V17 616 0zM9 12a3 3 0 11-6 0 3 3 0 016 0zM21 19a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                               </svg>
                             </button>
                           </div>
@@ -761,7 +761,7 @@ const MasonryGrid = () => {
                           <a
                             href={`/work/${item.slug}`}
                             className="theater-view-btn-below"
-                            title="View Project Details"
+                            title="View Project Portfolio"
                           >
                           </a>
                           <button
