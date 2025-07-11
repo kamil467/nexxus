@@ -754,8 +754,37 @@ const MasonryGrid = () => {
                         </div>
                       )}
 
-
                     </div>
+
+                    {/* Project info for theater mode - positioned below entire video section */}
+                    {item.displayMode === 'theater' && (
+                      <div className="theater-project-info-below">
+                        <div className="theater-project-title-below">{item.title}</div>
+                        <div className="theater-project-description-below">{item.description}</div>
+                        <div className="theater-action-buttons-below">
+                          <a
+                            href={`/work/${item.slug}`}
+                            className="theater-view-btn-below"
+                            title="View Project"
+                          >
+                            <span>View Project</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                              <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2"/>
+                            </svg>
+                          </a>
+                          <button
+                            className="theater-share-btn-below"
+                            onClick={() => handleShare(item)}
+                            title="Share"
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                              <path d="M8.59 13.51l6.83 3.98m-.01-10.98l-6.82 3.98M21 5a3 3 0 11-6 0 3 3 0 616 0zM9 12a3 3 0 11-6 0 3 3 0 616 0zM21 19a3 3 0 11-6 0 3 3 0 616 0z" stroke="currentColor" strokeWidth="2"/>
+                              </svg>
+                            <span>Share</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
 
