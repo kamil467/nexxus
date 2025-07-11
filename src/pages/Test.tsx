@@ -24,10 +24,6 @@ const MasonryGrid = () => {
   const [videoPaused, setVideoPaused] = useState<Map<number, boolean>>(new Map());
   const [showPlayIcon, setShowPlayIcon] = useState<Map<number, boolean>>(new Map());
 
-  // Scroll snapping state for precise video control
-  const isScrolling = useRef<boolean>(false);
-  const scrollEndTimeout = useRef<NodeJS.Timeout | null>(null);
-
 
 
   // Share handler for mobile
@@ -105,15 +101,21 @@ const MasonryGrid = () => {
     }
   }, [isMuted, currentVideoIndex]);
 
-  // Store video ref for mute control with single audio management
+  // Enhanced video ref management with strict audio control
   const setVideoRef = useCallback((index: number, ref: any) => {
     if (ref) {
       videoRefs.current.set(index, ref);
-      // Apply audio state: only the active video or current video gets audio
+
+      // Apply strict audio state: only one video can have audio at a time
       if (isMuted) {
         ref.muted = true;
       } else {
         ref.muted = activeAudioVideo !== null ? activeAudioVideo !== index : index !== currentVideoIndex;
+      }
+
+      // Ensure only the current video plays, pause all others
+      if (index !== currentVideoIndex && ref.pause) {
+        ref.pause();
       }
     } else {
       videoRefs.current.delete(index);
@@ -124,55 +126,9 @@ const MasonryGrid = () => {
     }
   }, [isMuted, activeAudioVideo, currentVideoIndex]);
 
-  // Enhanced scroll snapping for precise video positioning
-  const handleScrollSnap = useCallback(() => {
-    if (!isMobile || !containerRef.current) return;
 
-    const container = containerRef.current;
-    const containerHeight = container.clientHeight;
-    const scrollTop = container.scrollTop;
 
-    // Calculate which video should be in view
-    const targetVideoIndex = Math.round(scrollTop / containerHeight);
-    const targetScrollPosition = targetVideoIndex * containerHeight;
 
-    // Only snap if we're not already at the correct position
-    if (Math.abs(scrollTop - targetScrollPosition) > 10) {
-      container.scrollTo({
-        top: targetScrollPosition,
-        behavior: 'smooth'
-      });
-    }
-  }, [isMobile]);
-
-  // Handle scroll end for snapping
-  const handleScrollEnd = useCallback(() => {
-    if (!isMobile || !containerRef.current) return;
-
-    isScrolling.current = false;
-
-    // Clear existing timeout
-    if (scrollEndTimeout.current) {
-      clearTimeout(scrollEndTimeout.current);
-    }
-
-    // Snap to nearest video after scroll ends
-    scrollEndTimeout.current = setTimeout(() => {
-      handleScrollSnap();
-    }, 150); // Small delay to ensure scroll has stopped
-  }, [isMobile, handleScrollSnap]);
-
-  // Handle scroll start
-  const handleScrollStart = useCallback(() => {
-    if (!isMobile) return;
-
-    isScrolling.current = true;
-
-    // Clear snap timeout when starting new scroll
-    if (scrollEndTimeout.current) {
-      clearTimeout(scrollEndTimeout.current);
-    }
-  }, [isMobile]);
 
   // Manage single audio playback when video becomes visible
   const handleVideoVisibilityChange = useCallback((index: number, isVisible: boolean) => {
@@ -309,37 +265,48 @@ const MasonryGrid = () => {
     setLoadedItems(prev => ({ ...prev, [id]: true }));
   }, []);
 
-  // Intersection Observer for mobile viewport optimization
+  // Enhanced Intersection Observer for mobile viewport optimization with improved audio management
   useEffect(() => {
     if (!isMobile || !containerRef.current) return;
 
     const options = {
       root: null,
-      rootMargin: '50px 0px', // Load items 50px before they enter viewport
-      threshold: 0.1
+      rootMargin: '0px 0px', // More precise detection
+      threshold: 0.6 // Video must be 60% visible to be considered "active"
     };
 
     observerRef.current = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         const index = parseInt(entry.target.getAttribute('data-index') || '0');
 
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
           setVisibleItems(prev => new Set(prev).add(index));
           setCurrentVideoIndex(index);
 
-          // Handle video playback and audio management
+          // Enhanced video playback and audio management
           const video = entry.target.querySelector('mux-player') as any;
+
+          // Handle MuxPlayer
           if (video && video.play) {
             video.play().catch(() => {});
 
-            // Manage single audio playback
+            // Ensure only this video has audio
             if (!isMuted) {
-              // Mute all other videos when this one becomes visible
+              // Immediately mute all other videos
               videoRefs.current.forEach((videoRef, videoIndex) => {
-                if (videoRef && videoRef.muted !== undefined) {
-                  videoRef.muted = videoIndex !== index;
+                if (videoRef && videoRef.muted !== undefined && videoIndex !== index) {
+                  videoRef.muted = true;
+                  // Also pause other videos for better performance
+                  if (videoRef.pause) {
+                    videoRef.pause();
+                  }
                 }
               });
+
+              // Unmute and play current video
+              if (video.muted !== undefined) {
+                video.muted = false;
+              }
               setActiveAudioVideo(index);
             }
           }
@@ -347,13 +314,25 @@ const MasonryGrid = () => {
           // Call visibility change handler
           handleVideoVisibilityChange(index, true);
         } else {
-          // Pause videos that are out of view
+          // More aggressive cleanup when video leaves viewport
+          setVisibleItems(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(index);
+            return newSet;
+          });
+
+          // Pause and mute videos that are out of view
           const video = entry.target.querySelector('mux-player') as any;
-          if (video && video.pause) {
-            video.pause();
+          if (video) {
+            if (video.pause) {
+              video.pause();
+            }
+            if (video.muted !== undefined) {
+              video.muted = true;
+            }
           }
 
-          // If this was the active audio video, clear it
+          // Clear active audio if this was the active video
           if (activeAudioVideo === index) {
             setActiveAudioVideo(null);
           }
@@ -371,7 +350,7 @@ const MasonryGrid = () => {
     return () => {
       observerRef.current?.disconnect();
     };
-  }, [isMobile, workItems]);
+  }, [isMobile, workItems, isMuted, activeAudioVideo]);
 
   // Memoized mobile items with aspect ratio detection
   const mobileItems = useMemo(() => {
@@ -394,15 +373,29 @@ const MasonryGrid = () => {
     });
   }, [workItems, isMobile, visibleItems, currentVideoIndex]);
 
-  // Intelligent scroll management for mobile
+  // Enhanced scroll management for mobile with improved transitions between aspect ratios
   useEffect(() => {
     if (!isMobile) return;
 
     let scrollTimeout: NodeJS.Timeout | null = null;
-    let isScrolling = false;
+    let lastScrollY = window.scrollY;
+    let scrollVelocity = 0;
 
     const handleScroll = () => {
-      isScrolling = true;
+      const currentScrollY = window.scrollY;
+      scrollVelocity = Math.abs(currentScrollY - lastScrollY);
+
+      // Remove visual effects that cause light artifacts
+
+      // Pause all videos during fast scrolling for better performance
+      if (scrollVelocity > 10) {
+        videoRefs.current.forEach((videoRef) => {
+          if (videoRef && videoRef.pause && !videoRef.paused) {
+            videoRef.pause();
+          }
+        });
+      }
+      lastScrollY = currentScrollY;
 
       // Clear existing timeout
       if (scrollTimeout) {
@@ -411,7 +404,9 @@ const MasonryGrid = () => {
 
       // Set timeout to detect scroll end
       scrollTimeout = setTimeout(() => {
-        isScrolling = false;
+        scrollVelocity = 0;
+
+        // Clean scroll end handling without visual effects
 
         // Get current scroll position
         const scrollY = window.scrollY;
@@ -425,27 +420,46 @@ const MasonryGrid = () => {
         const videoSectionTop = scrollY + videoSectionRect.top;
         const videoSectionBottom = videoSectionTop + videoSection.offsetHeight;
 
-        // Check if we're within the video section
-        const isInVideoSection = scrollY >= videoSectionTop - windowHeight * 0.3 &&
-                                scrollY <= videoSectionBottom - windowHeight * 0.7;
+        // Check if we're within the video section (more precise bounds)
+        const isInVideoSection = scrollY >= videoSectionTop - windowHeight * 0.1 &&
+                                scrollY <= videoSectionBottom - windowHeight * 0.9;
 
         if (isInVideoSection) {
-          // Snap to nearest video within the video section
+          // Gentle snapping logic - only snap when very close to a video boundary
           const relativeScroll = scrollY - videoSectionTop;
           const videoIndex = Math.round(relativeScroll / windowHeight);
           const targetScroll = videoSectionTop + (videoIndex * windowHeight);
 
-          // Only snap if we're not already close to the target
-          if (Math.abs(scrollY - targetScroll) > 50) {
+          // Only snap if we're very close to a video boundary (less aggressive)
+          if (Math.abs(scrollY - targetScroll) > 50 && Math.abs(scrollY - targetScroll) < 150) {
             window.scrollTo({
               top: targetScroll,
               behavior: 'smooth'
             });
           }
-        }
-        // If outside video section, allow normal scrolling (no snapping)
 
-      }, 150); // Wait for scroll to end
+          // Video is now active (no visual effects needed)
+
+          // Resume video playback for the current video after scroll ends
+          setTimeout(() => {
+            const currentVideo = videoRefs.current.get(videoIndex);
+            if (currentVideo && currentVideo.play) {
+              currentVideo.play().catch(() => {});
+
+              // Ensure audio management
+              if (!isMuted) {
+                videoRefs.current.forEach((videoRef, index) => {
+                  if (videoRef && videoRef.muted !== undefined) {
+                    videoRef.muted = index !== videoIndex;
+                  }
+                });
+                setActiveAudioVideo(videoIndex);
+              }
+            }
+          }, 200); // Reduced delay for snappier response
+        }
+
+      }, 200); // Gentler timeout to avoid interfering with normal scrolling
     };
 
     // Add scroll listener
@@ -457,7 +471,7 @@ const MasonryGrid = () => {
         clearTimeout(scrollTimeout);
       }
     };
-  }, [isMobile, mobileItems.length]);
+  }, [isMobile, mobileItems.length, isMuted]);
 
   // Performance optimization: Reduce re-renders for mobile
   useEffect(() => {
@@ -505,6 +519,19 @@ const MasonryGrid = () => {
           {isMobile ? (
             /* Mobile Instagram-style vertical scroll - Performance Optimized */
             <div className="mobile-scroll-view">
+              {/* Video Progress Indicator */}
+              <div className="mobile-video-progress">
+                {mobileItems.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`progress-dot ${
+                      index === currentVideoIndex ? 'active' :
+                      index < currentVideoIndex ? 'passed' : ''
+                    }`}
+                  />
+                ))}
+              </div>
+
               <div className="mobile-scroll-container" ref={containerRef}>
                 {mobileItems.map((item) => (
                   <div
@@ -699,10 +726,12 @@ const MasonryGrid = () => {
                           </div>
                         </div>
 
-                        {/* Scroll Indicator */}
+                        {/* Dynamic Scroll Indicator */}
                         <div className="mobile-scroll-hint">
                           <div className="scroll-line"></div>
-                          <span className="scroll-text">Swipe up</span>
+                          <span className="scroll-text">
+                            {item.index === mobileItems.length - 1 ? 'Swipe down' : 'Swipe up'}
+                          </span>
                         </div>
                       </div>
                       ) : (
@@ -747,6 +776,16 @@ const MasonryGrid = () => {
                               Share
                             </button>
                           </div>
+                        </div>
+                      )}
+
+                      {/* Dynamic Scroll Indicator for Theater Mode */}
+                      {item.displayMode === 'theater' && (
+                        <div className="mobile-scroll-hint">
+                          <div className="scroll-line"></div>
+                          <span className="scroll-text">
+                            {item.index === mobileItems.length - 1 ? 'Swipe down' : 'Swipe up'}
+                          </span>
                         </div>
                       )}
 

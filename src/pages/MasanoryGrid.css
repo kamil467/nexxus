@@ -675,17 +675,31 @@
     height: 100vh;
     height: 100dvh; /* Dynamic viewport height */
     position: relative;
-    scroll-snap-align: start;
-    scroll-snap-stop: always; /* Force stop at each video */
     display: flex;
     flex-direction: column;
     background: #000;
     overflow: hidden;
     flex-shrink: 0; /* Prevent compression */
-    /* Smooth transitions between videos */
-    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    /* Clean transitions without filter effects */
+    transition: transform 0.3s ease-out;
     transform: translateZ(0); /* Hardware acceleration */
     will-change: transform, opacity;
+  }
+
+  /* Clean transitions without visual effects */
+  .mobile-scroll-item.scrolling {
+    /* Remove blur and opacity effects that cause light artifacts */
+    transform: translateZ(0);
+  }
+
+  .mobile-scroll-item.active {
+    transform: translateZ(0);
+  }
+
+  /* Smooth aspect ratio transitions */
+  .mobile-scroll-item.fullscreen-mode,
+  .mobile-scroll-item.theater-mode {
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 
   .mobile-video-wrapper {
@@ -1480,9 +1494,9 @@
   will-change: opacity;
 }
 
-/* Mobile scroll optimization without aggressive snapping */
+/* Enhanced mobile scroll optimization for consistent aspect ratio transitions */
 @media (max-width: 767px) {
-  /* Smooth scrolling for better UX */
+  /* Smooth scrolling for better UX - but NO scroll snap on page level */
   html {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
@@ -1506,11 +1520,15 @@
     height: 100vh !important;
     height: 100dvh !important;
     flex-shrink: 0 !important;
-    scroll-snap-align: start;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
+    /* Ensure consistent behavior across aspect ratios */
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    max-height: 100vh !important;
+    max-height: 100dvh !important;
   }
 
 
@@ -1653,7 +1671,8 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
     cursor: pointer !important;
-    backdrop-filter: blur(10px) !important;
+    backdrop-filter: none !important; /* Remove blur to prevent light effects */
+    background: rgba(0, 0, 0, 0.7) !important; /* Use solid background instead */
     position: relative !important;
   }
 
@@ -1689,7 +1708,8 @@
     color: white !important;
     cursor: pointer !important;
     transition: all 0.3s ease !important;
-    backdrop-filter: blur(10px) !important;
+    backdrop-filter: none !important; /* Remove blur to prevent light effects */
+    background: rgba(0, 0, 0, 0.7) !important; /* Use solid background instead */
   }
 
   .theater-share-btn-below:hover {
@@ -1705,7 +1725,8 @@
     align-items: center !important;
     justify-content: center !important;
     padding: 20px !important;
-    min-height: 100vh !important;
+    height: 100vh !important;
+    height: 100dvh !important;
     position: relative !important;
   }
 
@@ -1771,13 +1792,14 @@
 
   /* ===== FACEBOOK-STYLE FULL WIDTH FOR 16:9 VIDEOS ===== */
   .mobile-scroll-item.theater-mode {
-    /* Mini player style - reduced height for 16:9 videos */
+    /* Standardized height for consistent scrolling */
     background: #000 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     padding: 0 !important;
-    height: 85vh !important;
+    height: 100vh !important;
+    height: 100dvh !important;
   }
 
   .mobile-scroll-item.theater-mode .mobile-video-wrapper {
@@ -1794,7 +1816,8 @@
   .mobile-scroll-item.theater-mode .mobile-video-wrapper .mux-player {
     width: 100% !important;
     height: auto !important;
-    max-height: 85vh !important;
+    max-height: 90vh !important;
+    max-height: 90dvh !important;
     object-fit: contain !important;
     border-radius: 0 !important;
     background: #000 !important;
@@ -1809,10 +1832,7 @@
     min-height: 200px !important; /* Ensure minimum height for debugging */
   }
 
-  .mobile-scroll-item.theater-mode {
-    min-height: 100vh !important;
-    background: #000 !important;
-  }
+
 
   /* Theater mode minimal controls - positioned outside video area */
   .theater-minimal-controls {
@@ -1852,8 +1872,9 @@
     justify-content: center !important;
     color: white !important;
     cursor: pointer !important;
-    backdrop-filter: blur(10px) !important;
+    backdrop-filter: none !important; /* Remove blur to prevent light effects */
     transition: all 0.2s ease !important;
+    background: rgba(0, 0, 0, 0.7) !important; /* Use solid background instead */
   }
 
   .mute-toggle-btn:hover {
@@ -1931,8 +1952,9 @@
     justify-content: center;
     color: white;
     cursor: pointer;
-    backdrop-filter: blur(10px);
+    backdrop-filter: none; /* Remove blur to prevent light effects */
     transition: all 0.2s ease;
+    background: rgba(0, 0, 0, 0.7); /* Use solid background instead */
   }
 
   .mute-toggle-btn-minimal:hover {
@@ -2052,12 +2074,13 @@
     z-index: 1;
   }
 
-  /* Optimize floating elements */
+  /* Optimize floating elements - remove blur effects that cause light artifacts */
   .mobile-floating-card {
-    backdrop-filter: blur(8px); /* Reduced blur for performance */
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: none; /* Remove blur to prevent light effects */
+    -webkit-backdrop-filter: none;
     contain: layout style;
     will-change: transform;
+    background: rgba(0, 0, 0, 0.8); /* Use solid background instead */
   }
 }
 
@@ -2163,8 +2186,9 @@
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 600;
-  backdrop-filter: blur(10px);
+  backdrop-filter: none; /* Remove blur to prevent light effects */
   border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.7); /* Use solid background instead */
 }
 
 .mute-toggle-btn {
@@ -2178,8 +2202,9 @@
   justify-content: center;
   color: white;
   cursor: pointer;
-  backdrop-filter: blur(10px);
+  backdrop-filter: none; /* Remove blur to prevent light effects */
   transition: all 0.3s ease;
+  background: rgba(0, 0, 0, 0.7); /* Use solid background instead */
 }
 
 .mute-toggle-btn:hover {
@@ -2458,6 +2483,43 @@
     opacity: 1;
     transform: translateY(-3px);
   }
+}
+
+/* Video Progress Indicator */
+.mobile-video-progress {
+  position: fixed;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 100;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.mobile-video-progress.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mobile-video-progress .progress-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-video-progress .progress-dot.active {
+  background: white;
+  transform: scale(1.5);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+.mobile-video-progress .progress-dot.passed {
+  background: rgba(255, 255, 255, 0.7);
 }
 
 /* PROJECT-FOCUSED Icon Options - Replace the background-image in .mobile-view-btn::after */
