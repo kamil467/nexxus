@@ -544,7 +544,9 @@ const MasonryGrid = () => {
                               objectFit: item.displayMode === 'theater' ? 'contain' : 'cover',
                               width: '100%',
                               height: item.displayMode === 'theater' ? 'auto' : '100%',
-                              willChange: item.isVisible ? 'transform' : 'auto'
+                              willChange: item.isVisible ? 'transform' : 'auto',
+                              display: 'block',
+                              visibility: 'visible'
                             }}
                           />
 
@@ -580,7 +582,9 @@ const MasonryGrid = () => {
                               height: item.displayMode === 'theater' ? 'auto' : '100%',
                               border: 'none',
                               borderRadius: '0',
-                              objectFit: item.displayMode === 'theater' ? 'contain' : 'cover'
+                              objectFit: item.displayMode === 'theater' ? 'contain' : 'cover',
+                              display: 'block',
+                              visibility: 'visible'
                             }}
                             allow="autoplay; fullscreen; picture-in-picture"
                             allowFullScreen
@@ -628,10 +632,11 @@ const MasonryGrid = () => {
                           style={{
                             width: '100%',
                             height: '100%',
-                            backgroundColor: '#f0f0f0',
+                            backgroundColor: item.displayMode === 'fullscreen' ? '#333' : '#f0f0f0',
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center'
+                            justifyContent: 'center',
+                            color: item.displayMode === 'fullscreen' ? 'white' : 'black'
                           }}
                         >
                           <div className="loading-spinner"></div>
@@ -645,7 +650,6 @@ const MasonryGrid = () => {
                           {/* Top Status Bar */}
                           <div className="mobile-status-bar">
                             <div className="status-left">
-                              <span className="project-counter">{item.index + 1} / {workItems.length}</span>
                             </div>
                             <div className="status-right">
                               <button
@@ -708,7 +712,6 @@ const MasonryGrid = () => {
                       ) : (
                         /* Theater mode - only essential controls, no info panel */
                         <div className="theater-minimal-controls">
-                          <span className="project-counter">{item.index + 1} / {workItems.length}</span>
                           <button
                             className="mute-toggle-btn"
                             onClick={handleMuteToggle}

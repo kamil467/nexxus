@@ -702,14 +702,18 @@
     justify-content: center;
   }
 
-  /* 9:16 wrapper - Instagram reels style */
-  .mobile-video-wrapper.9-16-wrapper {
-    width: 100% !important;
-    height: 100% !important;
+  /* 9:16 wrapper - Instagram web reels style */
+  .mobile-scroll-item.fullscreen-mode .mobile-video-wrapper.portrait-wrapper {
+    width: auto !important;
+    height: 85vh !important;
+    max-width: calc(85vh * 9 / 16) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
   }
 
   /* 16:9 wrapper - Facebook style */
-  .mobile-video-wrapper.16-9-wrapper {
+  .mobile-video-wrapper.landscape-wrapper {
     width: 100% !important;
     height: auto !important;
     max-height: 100% !important;
@@ -1509,21 +1513,7 @@
     position: relative;
   }
 
-  /* Portrait videos (9:16) - Full screen reels style */
-  .mobile-scroll-item.fullscreen-mode {
-    background: #000;
-  }
 
-  .mobile-scroll-item.fullscreen-mode .mobile-video-wrapper {
-    width: 100%;
-    height: 100%;
-    position: relative;
-  }
-
-  .mobile-scroll-item.fullscreen-mode .portrait-wrapper {
-    width: 100%;
-    height: 100%;
-  }
 
   /* Theater mode for 16:9 videos - Instagram-style mini player */
 
@@ -1619,25 +1609,76 @@
     transform: scale(1.05) !important;
   }
 
-  /* ===== INSTAGRAM-STYLE REELS FOR 9:16 VIDEOS ===== */
+  /* ===== INSTAGRAM WEB-STYLE REELS FOR 9:16 VIDEOS ===== */
   .mobile-scroll-item.fullscreen-mode {
-    /* Instagram reels style - full screen immersive */
+    /* Instagram web style - centered with black space around */
     background: #000 !important;
-    padding: 0 !important;
-  }
-
-  .mobile-scroll-item.fullscreen-mode .mobile-video-wrapper {
-    width: 100% !important;
-    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px !important;
+    min-height: 100vh !important;
     position: relative !important;
   }
 
-  .mobile-scroll-item.fullscreen-mode .mobile-video-wrapper video,
-  .mobile-scroll-item.fullscreen-mode .mobile-video-wrapper .mux-player {
+  .mobile-scroll-item.fullscreen-mode .mobile-video-wrapper {
+    width: calc(85vh * 9 / 16) !important; /* Fixed width based on aspect ratio */
+    height: 85vh !important; /* Take most of viewport height but leave space */
+    position: relative !important;
+    border-radius: 12px !important; /* Rounded corners like Instagram web */
+    overflow: hidden !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+    background: #000 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* All video containers in fullscreen mode */
+  .mobile-scroll-item.fullscreen-mode .video-container-with-overlay,
+  .mobile-scroll-item.fullscreen-mode .video-container {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    position: relative !important;
+  }
+
+  /* All video elements in fullscreen mode */
+  .mobile-scroll-item.fullscreen-mode video,
+  .mobile-scroll-item.fullscreen-mode mux-player,
+  .mobile-scroll-item.fullscreen-mode iframe {
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
-    border-radius: 0 !important;
+    border-radius: 12px !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: #000 !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  /* Ensure loading skeletons don't interfere in fullscreen mode */
+  .mobile-scroll-item.fullscreen-mode .loading-skeleton {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 0 !important;
+    border-radius: 12px !important;
+  }
+
+  /* Hide touch overlays that might interfere */
+  .mobile-scroll-item.fullscreen-mode .video-touch-overlay {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 2 !important;
+    background: transparent !important;
   }
 
   /* ===== FACEBOOK-STYLE FULL WIDTH FOR 16:9 VIDEOS ===== */
