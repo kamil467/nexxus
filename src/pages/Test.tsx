@@ -26,6 +26,8 @@ const MasonryGrid = () => {
 
 
 
+
+
   // Share handler for mobile
   const handleShare = useCallback(async (item: any) => {
     const shareData = {
@@ -73,50 +75,30 @@ const MasonryGrid = () => {
 
 
 
-  // Mute/Unmute handler with single audio management
+  // Simplified mute/unmute handler to avoid sync issues
   const handleMuteToggle = useCallback(() => {
     const newMutedState = !isMuted;
     setIsMuted(newMutedState);
 
-    if (newMutedState) {
-      // If muting, mute all videos
-      videoRefs.current.forEach((videoRef) => {
-        if (videoRef && videoRef.muted !== undefined) {
-          videoRef.muted = true;
-        }
-      });
-      setActiveAudioVideo(null);
+    if (!newMutedState) {
+      // When unmuting, set the current video as active
+      setActiveAudioVideo(currentVideoIndex);
     } else {
-      // If unmuting, only unmute the currently visible video
-      const currentVideo = videoRefs.current.get(currentVideoIndex);
-      if (currentVideo && currentVideo.muted !== undefined) {
-        // Mute all other videos first
-        videoRefs.current.forEach((videoRef, index) => {
-          if (videoRef && videoRef.muted !== undefined) {
-            videoRef.muted = index !== currentVideoIndex;
-          }
-        });
-        setActiveAudioVideo(currentVideoIndex);
-      }
+      // When muting, clear active audio
+      setActiveAudioVideo(null);
     }
+
+    // Let the MuxPlayer muted prop handle the actual muting
+    // This avoids direct manipulation that can cause sync issues
   }, [isMuted, currentVideoIndex]);
 
-  // Enhanced video ref management with strict audio control
+  // Store video ref for mute control with simplified audio management
   const setVideoRef = useCallback((index: number, ref: any) => {
     if (ref) {
       videoRefs.current.set(index, ref);
 
-      // Apply strict audio state: only one video can have audio at a time
-      if (isMuted) {
-        ref.muted = true;
-      } else {
-        ref.muted = activeAudioVideo !== null ? activeAudioVideo !== index : index !== currentVideoIndex;
-      }
-
-      // Ensure only the current video plays, pause all others
-      if (index !== currentVideoIndex && ref.pause) {
-        ref.pause();
-      }
+      // Simple audio state: let the MuxPlayer muted prop handle the state
+      // Don't manually set muted here to avoid sync issues
     } else {
       videoRefs.current.delete(index);
       // If this was the active audio video, clear it
@@ -124,7 +106,7 @@ const MasonryGrid = () => {
         setActiveAudioVideo(null);
       }
     }
-  }, [isMuted, activeAudioVideo, currentVideoIndex]);
+  }, [activeAudioVideo]);
 
 
 
@@ -133,12 +115,6 @@ const MasonryGrid = () => {
   // Manage single audio playback when video becomes visible
   const handleVideoVisibilityChange = useCallback((index: number, isVisible: boolean) => {
     if (!isMuted && isVisible && index === currentVideoIndex) {
-      // Mute all other videos
-      videoRefs.current.forEach((videoRef, videoIndex) => {
-        if (videoRef && videoRef.muted !== undefined) {
-          videoRef.muted = videoIndex !== index;
-        }
-      });
       setActiveAudioVideo(index);
     }
   }, [isMuted, currentVideoIndex]);
@@ -154,18 +130,25 @@ const MasonryGrid = () => {
     const isPaused = videoRef.paused;
 
     if (isPaused) {
-      // Play video and manage audio
-      videoRef.play().catch((error: any) => {
-        console.log('Play failed:', error);
-      });
-
-      // If not muted, ensure only this video has audio
-      if (!isMuted) {
-        videoRefs.current.forEach((otherVideoRef, otherIndex) => {
-          if (otherVideoRef && otherVideoRef.muted !== undefined) {
-            otherVideoRef.muted = otherIndex !== index;
-          }
+      // Play video and manage audio with retry logic
+      const playVideo = () => {
+        videoRef.play().catch((error: any) => {
+          console.log('Play failed, retrying:', error);
+          // Retry after a short delay
+          setTimeout(() => {
+            if (videoRef.paused) {
+              videoRef.play().catch((retryError: any) => {
+                console.log('Retry play failed:', retryError);
+              });
+            }
+          }, 100);
         });
+      };
+
+      playVideo();
+
+      // Update active audio video if not muted
+      if (!isMuted) {
         setActiveAudioVideo(index);
       }
 
@@ -265,74 +248,58 @@ const MasonryGrid = () => {
     setLoadedItems(prev => ({ ...prev, [id]: true }));
   }, []);
 
-  // Enhanced Intersection Observer for mobile viewport optimization with improved audio management
+  // Intersection Observer for mobile viewport optimization
   useEffect(() => {
     if (!isMobile || !containerRef.current) return;
 
     const options = {
       root: null,
-      rootMargin: '0px 0px', // More precise detection
-      threshold: 0.6 // Video must be 60% visible to be considered "active"
+      rootMargin: '50px 0px', // Load items 50px before they enter viewport
+      threshold: 0.1
     };
 
     observerRef.current = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         const index = parseInt(entry.target.getAttribute('data-index') || '0');
 
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+        if (entry.isIntersecting) {
           setVisibleItems(prev => new Set(prev).add(index));
           setCurrentVideoIndex(index);
 
-          // Enhanced video playback and audio management
+          // Handle video playback with better timing and multiple attempts
           const video = entry.target.querySelector('mux-player') as any;
-
-          // Handle MuxPlayer
-          if (video && video.play) {
-            video.play().catch(() => {});
-
-            // Ensure only this video has audio
-            if (!isMuted) {
-              // Immediately mute all other videos
-              videoRefs.current.forEach((videoRef, videoIndex) => {
-                if (videoRef && videoRef.muted !== undefined && videoIndex !== index) {
-                  videoRef.muted = true;
-                  // Also pause other videos for better performance
-                  if (videoRef.pause) {
-                    videoRef.pause();
+          if (video) {
+            // Try immediate play first
+            if (video.play && video.paused) {
+              video.play().catch(() => {
+                // If immediate play fails, try with a delay
+                setTimeout(() => {
+                  if (video.play && video.paused) {
+                    video.play().catch((error: any) => {
+                      console.log('Video play failed after delay:', error);
+                    });
                   }
-                }
+                }, 200);
               });
-
-              // Unmute and play current video
-              if (video.muted !== undefined) {
-                video.muted = false;
-              }
-              setActiveAudioVideo(index);
             }
           }
 
           // Call visibility change handler
           handleVideoVisibilityChange(index, true);
         } else {
-          // More aggressive cleanup when video leaves viewport
           setVisibleItems(prev => {
             const newSet = new Set(prev);
             newSet.delete(index);
             return newSet;
           });
 
-          // Pause and mute videos that are out of view
+          // Pause videos that are out of view
           const video = entry.target.querySelector('mux-player') as any;
-          if (video) {
-            if (video.pause) {
-              video.pause();
-            }
-            if (video.muted !== undefined) {
-              video.muted = true;
-            }
+          if (video && video.pause) {
+            video.pause();
           }
 
-          // Clear active audio if this was the active video
+          // If this was the active audio video, clear it
           if (activeAudioVideo === index) {
             setActiveAudioVideo(null);
           }
@@ -350,7 +317,7 @@ const MasonryGrid = () => {
     return () => {
       observerRef.current?.disconnect();
     };
-  }, [isMobile, workItems, isMuted, activeAudioVideo]);
+  }, [isMobile, workItems]);
 
   // Memoized mobile items with aspect ratio detection
   const mobileItems = useMemo(() => {
@@ -373,29 +340,42 @@ const MasonryGrid = () => {
     });
   }, [workItems, isMobile, visibleItems, currentVideoIndex]);
 
-  // Enhanced scroll management for mobile with improved transitions between aspect ratios
+  // Effect to handle audio state when currentVideoIndex changes
+  useEffect(() => {
+    if (!isMobile || isMuted) return;
+
+    // Update active audio video when current video changes
+    setActiveAudioVideo(currentVideoIndex);
+
+    // Let the MuxPlayer muted prop handle the actual audio state
+    // This avoids manual manipulation that can cause sync issues
+  }, [currentVideoIndex, isMuted, isMobile]);
+
+  // Effect to ensure videos play when they become visible
+  useEffect(() => {
+    if (!isMobile) return;
+
+    // When visible items change, ensure the current video is playing
+    const currentVideo = videoRefs.current.get(currentVideoIndex);
+    if (currentVideo && visibleItems.has(currentVideoIndex)) {
+      // Small delay to ensure the video is ready
+      setTimeout(() => {
+        if (currentVideo.paused && currentVideo.play) {
+          currentVideo.play().catch((error: any) => {
+            console.log('Failed to play current video:', error);
+          });
+        }
+      }, 150);
+    }
+  }, [visibleItems, currentVideoIndex, isMobile]);
+
+  // Intelligent scroll management for mobile
   useEffect(() => {
     if (!isMobile) return;
 
     let scrollTimeout: NodeJS.Timeout | null = null;
-    let lastScrollY = window.scrollY;
-    let scrollVelocity = 0;
 
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      scrollVelocity = Math.abs(currentScrollY - lastScrollY);
-
-      // Remove visual effects that cause light artifacts
-
-      // Pause all videos during fast scrolling for better performance
-      if (scrollVelocity > 10) {
-        videoRefs.current.forEach((videoRef) => {
-          if (videoRef && videoRef.pause && !videoRef.paused) {
-            videoRef.pause();
-          }
-        });
-      }
-      lastScrollY = currentScrollY;
 
       // Clear existing timeout
       if (scrollTimeout) {
@@ -404,9 +384,6 @@ const MasonryGrid = () => {
 
       // Set timeout to detect scroll end
       scrollTimeout = setTimeout(() => {
-        scrollVelocity = 0;
-
-        // Clean scroll end handling without visual effects
 
         // Get current scroll position
         const scrollY = window.scrollY;
@@ -420,46 +397,27 @@ const MasonryGrid = () => {
         const videoSectionTop = scrollY + videoSectionRect.top;
         const videoSectionBottom = videoSectionTop + videoSection.offsetHeight;
 
-        // Check if we're within the video section (more precise bounds)
-        const isInVideoSection = scrollY >= videoSectionTop - windowHeight * 0.1 &&
-                                scrollY <= videoSectionBottom - windowHeight * 0.9;
+        // Check if we're within the video section
+        const isInVideoSection = scrollY >= videoSectionTop - windowHeight * 0.3 &&
+                                scrollY <= videoSectionBottom - windowHeight * 0.7;
 
         if (isInVideoSection) {
-          // Gentle snapping logic - only snap when very close to a video boundary
+          // Snap to nearest video within the video section
           const relativeScroll = scrollY - videoSectionTop;
           const videoIndex = Math.round(relativeScroll / windowHeight);
           const targetScroll = videoSectionTop + (videoIndex * windowHeight);
 
-          // Only snap if we're very close to a video boundary (less aggressive)
-          if (Math.abs(scrollY - targetScroll) > 50 && Math.abs(scrollY - targetScroll) < 150) {
+          // Only snap if we're not already close to the target
+          if (Math.abs(scrollY - targetScroll) > 50) {
             window.scrollTo({
               top: targetScroll,
               behavior: 'smooth'
             });
           }
-
-          // Video is now active (no visual effects needed)
-
-          // Resume video playback for the current video after scroll ends
-          setTimeout(() => {
-            const currentVideo = videoRefs.current.get(videoIndex);
-            if (currentVideo && currentVideo.play) {
-              currentVideo.play().catch(() => {});
-
-              // Ensure audio management
-              if (!isMuted) {
-                videoRefs.current.forEach((videoRef, index) => {
-                  if (videoRef && videoRef.muted !== undefined) {
-                    videoRef.muted = index !== videoIndex;
-                  }
-                });
-                setActiveAudioVideo(videoIndex);
-              }
-            }
-          }, 200); // Reduced delay for snappier response
         }
+        // If outside video section, allow normal scrolling (no snapping)
 
-      }, 200); // Gentler timeout to avoid interfering with normal scrolling
+      }, 150); // Wait for scroll to end
     };
 
     // Add scroll listener
@@ -471,7 +429,7 @@ const MasonryGrid = () => {
         clearTimeout(scrollTimeout);
       }
     };
-  }, [isMobile, mobileItems.length, isMuted]);
+  }, [isMobile, mobileItems.length]);
 
   // Performance optimization: Reduce re-renders for mobile
   useEffect(() => {
@@ -552,21 +510,31 @@ const MasonryGrid = () => {
                           <MuxPlayer
                             ref={(ref) => setVideoRef(item.index, ref)}
                             playbackId={item.muxPlaybackId}
-                            autoPlay={item.isVisible}
-                            muted={isMuted || activeAudioVideo !== item.index}
+                            autoPlay={true}
+                            muted={isMuted || item.index !== currentVideoIndex}
                             loop={true}
                             playsInline={true}
                             preload={item.shouldLoad ? "metadata" : "none"}
                             onCanPlay={(e) => {
-                              if (!item.isVisible) return;
                               const target = e.target as any;
-                              if (target && target.play) {
+                              if (target && target.play && item.isVisible) {
+                                // Ensure video and audio are in sync
+                                target.currentTime = 0;
                                 target.play().catch((error: any) => {
                                   console.log('Autoplay prevented:', error);
                                 });
                               }
                             }}
-                            onLoadedData={() => handleItemLoad(item.id)}
+                            onLoadedData={(e) => {
+                              handleItemLoad(item.id);
+                              // Also try to play when data is loaded and video is visible
+                              const target = e.target as any;
+                              if (target && target.play && item.isVisible && target.paused) {
+                                target.play().catch((error: any) => {
+                                  console.log('Play on loaded data failed:', error);
+                                });
+                              }
+                            }}
                             style={{
                               objectFit: item.displayMode === 'theater' ? 'contain' : 'cover',
                               width: '100%',
@@ -578,6 +546,47 @@ const MasonryGrid = () => {
                           />
 
                           {/* Touch overlay for play/pause gestures */}
+                          <div
+                            className="video-touch-overlay"
+                            onTouchEnd={(e) => handleSingleTap(item.index, e)}
+                          >
+                            {/* Play/Pause icon overlay */}
+                            {showPlayIcon.get(item.index) && (
+                              <div className="play-pause-icon">
+                                {videoPaused.get(item.index) ? (
+                                  // Play icon
+                                  <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                                    <path d="M8 5v14l11-7z" fill="white" stroke="white" strokeWidth="2"/>
+                                  </svg>
+                                ) : (
+                                  // Pause icon
+                                  <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                                    <path d="M6 4h4v16H6zM14 4h4v16h-4z" fill="white" stroke="white" strokeWidth="2"/>
+                                  </svg>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ) : item.type === 'vimeo' && item.shouldLoad ? (
+                        <div className="video-container-with-overlay">
+                          <iframe
+                            src={`https://player.vimeo.com/video/${item.videoId}?h=${item.hId}&autoplay=1&loop=1&muted=1&background=1&controls=0&title=0&byline=0&portrait=0`}
+                            style={{
+                              width: '100%',
+                              height: item.displayMode === 'theater' ? 'auto' : '100%',
+                              border: 'none',
+                              borderRadius: '0',
+                              objectFit: item.displayMode === 'theater' ? 'contain' : 'cover',
+                              display: 'block',
+                              visibility: 'visible'
+                            }}
+                            allow="autoplay; fullscreen; picture-in-picture"
+                            allowFullScreen
+                            onLoad={() => handleItemLoad(item.id)}
+                          />
+
+                          {/* Touch overlay for Vimeo videos */}
                           <div
                             className="video-touch-overlay"
                             onTouchEnd={(e) => handleSingleTap(item.index, e)}
@@ -720,7 +729,7 @@ const MasonryGrid = () => {
                                 title="Share"
                               >
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                <path d="M7 17L17 7M17 7H7M17 7V17 616 0zM9 12a3 3 0 11-6 0 3 3 0 016 0zM21 19a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                               </svg>
                             </button>
                           </div>
