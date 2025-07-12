@@ -369,23 +369,42 @@ const MasonryGrid = () => {
     }
   }, [visibleItems, currentVideoIndex, isMobile]);
 
-  // Intelligent scroll management for mobile
+  // Perfect scroll snap management for mobile
   useEffect(() => {
     if (!isMobile) return;
 
     let scrollTimeout: NodeJS.Timeout | null = null;
+    let isSnapping = false;
+    let lastScrollY = window.scrollY;
+    let scrollVelocity = 0;
+    let lastScrollTime = Date.now();
 
     const handleScroll = () => {
+      // Prevent multiple snap operations
+      if (isSnapping) return;
+
+      const currentScrollY = window.scrollY;
+      const currentTime = Date.now();
+      const timeDelta = currentTime - lastScrollTime;
+
+      // Calculate scroll velocity for momentum-based snapping
+      if (timeDelta > 0) {
+        scrollVelocity = Math.abs(currentScrollY - lastScrollY) / timeDelta;
+      }
+
+      lastScrollY = currentScrollY;
+      lastScrollTime = currentTime;
 
       // Clear existing timeout
       if (scrollTimeout) {
         clearTimeout(scrollTimeout);
       }
 
+      // Adaptive timeout based on scroll velocity
+      const timeoutDuration = scrollVelocity > 2 ? 150 : 80;
+
       // Set timeout to detect scroll end
       scrollTimeout = setTimeout(() => {
-
-        // Get current scroll position
         const scrollY = window.scrollY;
         const windowHeight = window.innerHeight;
 
@@ -398,26 +417,57 @@ const MasonryGrid = () => {
         const videoSectionBottom = videoSectionTop + videoSection.offsetHeight;
 
         // Check if we're within the video section
-        const isInVideoSection = scrollY >= videoSectionTop - windowHeight * 0.3 &&
-                                scrollY <= videoSectionBottom - windowHeight * 0.7;
+        const isInVideoSection = scrollY >= videoSectionTop - windowHeight * 0.05 &&
+                                scrollY <= videoSectionBottom - windowHeight * 0.95;
 
         if (isInVideoSection) {
-          // Snap to nearest video within the video section
+          // Calculate which video we should snap to
           const relativeScroll = scrollY - videoSectionTop;
-          const videoIndex = Math.round(relativeScroll / windowHeight);
+          let videoIndex = Math.round(relativeScroll / windowHeight);
+
+          // Momentum-based snapping: if scrolling fast, snap in direction of scroll
+          if (scrollVelocity > 1.5) {
+            const scrollDirection = currentScrollY > lastScrollY ? 1 : -1;
+            const currentVideoIndex = Math.floor(relativeScroll / windowHeight);
+            videoIndex = scrollDirection > 0 ?
+              Math.min(currentVideoIndex + 1, mobileItems.length - 1) :
+              Math.max(currentVideoIndex, 0);
+          }
+
           const targetScroll = videoSectionTop + (videoIndex * windowHeight);
 
-          // Only snap if we're not already close to the target
-          if (Math.abs(scrollY - targetScroll) > 50) {
+          // Snap with adaptive threshold based on velocity
+          const snapThreshold = Math.min(20 + (scrollVelocity * 10), 100);
+          const scrollDifference = Math.abs(scrollY - targetScroll);
+
+          if (scrollDifference > snapThreshold && scrollDifference < windowHeight * 0.5) {
+            isSnapping = true;
+
+            // Add visual feedback during snap
+            const progressIndicator = document.querySelector('.mobile-video-progress') as HTMLElement;
+            if (progressIndicator) {
+              progressIndicator.style.transform = 'scale(1.1)';
+              progressIndicator.style.transition = 'transform 0.2s ease';
+            }
+
             window.scrollTo({
               top: targetScroll,
               behavior: 'smooth'
             });
+
+            // Reset snapping flag and visual feedback after animation completes
+            setTimeout(() => {
+              isSnapping = false;
+              scrollVelocity = 0; // Reset velocity after snap
+
+              if (progressIndicator) {
+                progressIndicator.style.transform = 'scale(1)';
+              }
+            }, 500);
           }
         }
-        // If outside video section, allow normal scrolling (no snapping)
 
-      }, 150); // Wait for scroll to end
+      }, timeoutDuration);
     };
 
     // Add scroll listener

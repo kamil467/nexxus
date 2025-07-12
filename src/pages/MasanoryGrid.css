@@ -47,15 +47,15 @@
   }
 
   @media (max-width: 768px) {
-    /* Enhanced smooth scrolling for mobile */
+    /* Enhanced smooth scrolling for mobile with proper snap */
     html {
-      scroll-behavior: smooth !important;
+      scroll-behavior: auto !important; /* Let JS handle smooth scrolling */
       -webkit-overflow-scrolling: touch !important;
       overscroll-behavior: contain !important;
     }
 
     body {
-      scroll-behavior: smooth !important;
+      scroll-behavior: auto !important; /* Let JS handle smooth scrolling */
       -webkit-overflow-scrolling: touch !important;
       overscroll-behavior: contain !important;
     }
@@ -655,15 +655,12 @@
 
   .mobile-scroll-container {
     width: 100%;
-    /* Enhanced smooth scrolling for better transitions */
+    /* Clean scroll container for JavaScript-controlled snapping */
     overflow: visible;
-    scroll-snap-type: none; /* Disable container snapping */
     position: relative;
     transform: translateZ(0); /* Hardware acceleration */
     will-change: scroll-position;
     -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-    overscroll-behavior: contain;
   }
 
   .mobile-scroll-container::-webkit-scrollbar {
