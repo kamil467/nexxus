@@ -24,21 +24,7 @@ const MasonryGrid = () => {
   const [videoPaused, setVideoPaused] = useState<Map<number, boolean>>(new Map());
   const [showPlayIcon, setShowPlayIcon] = useState<Map<number, boolean>>(new Map());
 
-  // Debug function for audio state (can be removed in production)
-  const debugAudioState = useCallback((context: string, videoIndex?: number) => {
-    console.log(`[Audio Debug - ${context}]`, {
-      isMuted,
-      activeAudioVideo,
-      currentVideoIndex,
-      videoIndex,
-      totalVideos: videoRefs.current.size,
-      videoStates: Array.from(videoRefs.current.entries()).map(([idx, ref]) => ({
-        index: idx,
-        muted: ref?.muted,
-        paused: ref?.paused
-      }))
-    });
-  }, [isMuted, activeAudioVideo, currentVideoIndex]);
+
 
 
 
@@ -89,63 +75,30 @@ const MasonryGrid = () => {
 
 
 
-  // Mute/Unmute handler with single audio management for mixed video types
+  // Simplified mute/unmute handler to avoid sync issues
   const handleMuteToggle = useCallback(() => {
     const newMutedState = !isMuted;
     setIsMuted(newMutedState);
 
-    if (newMutedState) {
-      // If muting, mute all videos regardless of type
-      videoRefs.current.forEach((videoRef) => {
-        if (videoRef && videoRef.muted !== undefined) {
-          videoRef.muted = true;
-        }
-      });
-      setActiveAudioVideo(null);
-    } else {
-      // If unmuting, only unmute the currently visible video (works for all video types)
-      videoRefs.current.forEach((videoRef, index) => {
-        if (videoRef && videoRef.muted !== undefined) {
-          // Only the current video should have audio
-          videoRef.muted = index !== currentVideoIndex;
-        }
-      });
-
-      // Set the current video as the active audio video
+    if (!newMutedState) {
+      // When unmuting, set the current video as active
       setActiveAudioVideo(currentVideoIndex);
-
-      // Debug audio state after unmute
-      debugAudioState('After Unmute', currentVideoIndex);
-
-      // Ensure the current video is playing if it exists
-      const currentVideo = videoRefs.current.get(currentVideoIndex);
-      if (currentVideo && currentVideo.play && currentVideo.paused) {
-        currentVideo.play().catch(() => {
-          console.log('Play failed for current video');
-        });
-      }
+    } else {
+      // When muting, clear active audio
+      setActiveAudioVideo(null);
     }
+
+    // Let the MuxPlayer muted prop handle the actual muting
+    // This avoids direct manipulation that can cause sync issues
   }, [isMuted, currentVideoIndex]);
 
-  // Store video ref for mute control with single audio management
+  // Store video ref for mute control with simplified audio management
   const setVideoRef = useCallback((index: number, ref: any) => {
     if (ref) {
       videoRefs.current.set(index, ref);
 
-      // Apply audio state: ensure proper audio management for mixed video types
-      if (isMuted) {
-        ref.muted = true;
-      } else {
-        // For unmuted state, only the current visible video should have audio
-        const shouldHaveAudio = index === currentVideoIndex;
-        ref.muted = !shouldHaveAudio;
-
-        // Update active audio video if this is the current video
-        if (shouldHaveAudio) {
-          setActiveAudioVideo(index);
-          debugAudioState('Video Ref Set', index);
-        }
-      }
+      // Simple audio state: let the MuxPlayer muted prop handle the state
+      // Don't manually set muted here to avoid sync issues
     } else {
       videoRefs.current.delete(index);
       // If this was the active audio video, clear it
@@ -153,7 +106,7 @@ const MasonryGrid = () => {
         setActiveAudioVideo(null);
       }
     }
-  }, [isMuted, activeAudioVideo, currentVideoIndex]);
+  }, [activeAudioVideo]);
 
 
 
@@ -162,12 +115,6 @@ const MasonryGrid = () => {
   // Manage single audio playback when video becomes visible
   const handleVideoVisibilityChange = useCallback((index: number, isVisible: boolean) => {
     if (!isMuted && isVisible && index === currentVideoIndex) {
-      // Mute all other videos
-      videoRefs.current.forEach((videoRef, videoIndex) => {
-        if (videoRef && videoRef.muted !== undefined) {
-          videoRef.muted = videoIndex !== index;
-        }
-      });
       setActiveAudioVideo(index);
     }
   }, [isMuted, currentVideoIndex]);
@@ -183,18 +130,25 @@ const MasonryGrid = () => {
     const isPaused = videoRef.paused;
 
     if (isPaused) {
-      // Play video and manage audio
-      videoRef.play().catch((error: any) => {
-        console.log('Play failed:', error);
-      });
-
-      // If not muted, ensure only this video has audio
-      if (!isMuted) {
-        videoRefs.current.forEach((otherVideoRef, otherIndex) => {
-          if (otherVideoRef && otherVideoRef.muted !== undefined) {
-            otherVideoRef.muted = otherIndex !== index;
-          }
+      // Play video and manage audio with retry logic
+      const playVideo = () => {
+        videoRef.play().catch((error: any) => {
+          console.log('Play failed, retrying:', error);
+          // Retry after a short delay
+          setTimeout(() => {
+            if (videoRef.paused) {
+              videoRef.play().catch((retryError: any) => {
+                console.log('Retry play failed:', retryError);
+              });
+            }
+          }, 100);
         });
+      };
+
+      playVideo();
+
+      // Update active audio video if not muted
+      if (!isMuted) {
         setActiveAudioVideo(index);
       }
 
@@ -312,40 +266,33 @@ const MasonryGrid = () => {
           setVisibleItems(prev => new Set(prev).add(index));
           setCurrentVideoIndex(index);
 
-          // Handle video playback and audio management for all video types
+          // Handle video playback with better timing and multiple attempts
           const video = entry.target.querySelector('mux-player') as any;
-          const vimeoVideo = entry.target.querySelector('iframe') as any;
-
-          // Handle MuxPlayer
-          if (video && video.play) {
-            video.play().catch(() => {});
-
-            // Manage single audio playback for mixed video types
-            if (!isMuted) {
-              // Ensure only this video has audio, regardless of video type
-              videoRefs.current.forEach((videoRef, videoIndex) => {
-                if (videoRef && videoRef.muted !== undefined) {
-                  videoRef.muted = videoIndex !== index;
-                }
+          if (video) {
+            // Try immediate play first
+            if (video.play && video.paused) {
+              video.play().catch(() => {
+                // If immediate play fails, try with a delay
+                setTimeout(() => {
+                  if (video.play && video.paused) {
+                    video.play().catch((error: any) => {
+                      console.log('Video play failed after delay:', error);
+                    });
+                  }
+                }, 200);
               });
-              setActiveAudioVideo(index);
             }
-          }
-
-          // Handle Vimeo videos (they auto-play but we need to manage audio state)
-          if (vimeoVideo && !isMuted) {
-            // Mute all other videos when Vimeo becomes visible
-            videoRefs.current.forEach((videoRef, videoIndex) => {
-              if (videoRef && videoRef.muted !== undefined) {
-                videoRef.muted = videoIndex !== index;
-              }
-            });
-            setActiveAudioVideo(index);
           }
 
           // Call visibility change handler
           handleVideoVisibilityChange(index, true);
         } else {
+          setVisibleItems(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(index);
+            return newSet;
+          });
+
           // Pause videos that are out of view
           const video = entry.target.querySelector('mux-player') as any;
           if (video && video.pause) {
@@ -397,18 +344,30 @@ const MasonryGrid = () => {
   useEffect(() => {
     if (!isMobile || isMuted) return;
 
-    // When the current video index changes, ensure proper audio management
-    videoRefs.current.forEach((videoRef, index) => {
-      if (videoRef && videoRef.muted !== undefined) {
-        const shouldHaveAudio = index === currentVideoIndex;
-        videoRef.muted = !shouldHaveAudio;
-      }
-    });
-
-    // Update active audio video
+    // Update active audio video when current video changes
     setActiveAudioVideo(currentVideoIndex);
-    debugAudioState('Current Video Index Changed', currentVideoIndex);
-  }, [currentVideoIndex, isMuted, isMobile, debugAudioState]);
+
+    // Let the MuxPlayer muted prop handle the actual audio state
+    // This avoids manual manipulation that can cause sync issues
+  }, [currentVideoIndex, isMuted, isMobile]);
+
+  // Effect to ensure videos play when they become visible
+  useEffect(() => {
+    if (!isMobile) return;
+
+    // When visible items change, ensure the current video is playing
+    const currentVideo = videoRefs.current.get(currentVideoIndex);
+    if (currentVideo && visibleItems.has(currentVideoIndex)) {
+      // Small delay to ensure the video is ready
+      setTimeout(() => {
+        if (currentVideo.paused && currentVideo.play) {
+          currentVideo.play().catch((error: any) => {
+            console.log('Failed to play current video:', error);
+          });
+        }
+      }, 150);
+    }
+  }, [visibleItems, currentVideoIndex, isMobile]);
 
   // Intelligent scroll management for mobile
   useEffect(() => {
@@ -551,21 +510,31 @@ const MasonryGrid = () => {
                           <MuxPlayer
                             ref={(ref) => setVideoRef(item.index, ref)}
                             playbackId={item.muxPlaybackId}
-                            autoPlay={item.isVisible}
-                            muted={isMuted || (activeAudioVideo !== null && activeAudioVideo !== item.index) || (activeAudioVideo === null && item.index !== currentVideoIndex)}
+                            autoPlay={true}
+                            muted={isMuted || item.index !== currentVideoIndex}
                             loop={true}
                             playsInline={true}
                             preload={item.shouldLoad ? "metadata" : "none"}
                             onCanPlay={(e) => {
-                              if (!item.isVisible) return;
                               const target = e.target as any;
-                              if (target && target.play) {
+                              if (target && target.play && item.isVisible) {
+                                // Ensure video and audio are in sync
+                                target.currentTime = 0;
                                 target.play().catch((error: any) => {
                                   console.log('Autoplay prevented:', error);
                                 });
                               }
                             }}
-                            onLoadedData={() => handleItemLoad(item.id)}
+                            onLoadedData={(e) => {
+                              handleItemLoad(item.id);
+                              // Also try to play when data is loaded and video is visible
+                              const target = e.target as any;
+                              if (target && target.play && item.isVisible && target.paused) {
+                                target.play().catch((error: any) => {
+                                  console.log('Play on loaded data failed:', error);
+                                });
+                              }
+                            }}
                             style={{
                               objectFit: item.displayMode === 'theater' ? 'contain' : 'cover',
                               width: '100%',
