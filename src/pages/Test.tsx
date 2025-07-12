@@ -92,7 +92,9 @@ const MasonryGrid = () => {
     // This avoids direct manipulation that can cause sync issues
   }, [isMuted, currentVideoIndex]);
 
-  // Store video ref for mute control with simplified audio management
+  // Store video refs for both main and background videos
+  const backgroundVideoRefs = useRef<Map<number, any>>(new Map());
+
   const setVideoRef = useCallback((index: number, ref: any) => {
     if (ref) {
       videoRefs.current.set(index, ref);
@@ -107,6 +109,14 @@ const MasonryGrid = () => {
       }
     }
   }, [activeAudioVideo]);
+
+  const setBackgroundVideoRef = useCallback((index: number, ref: any) => {
+    if (ref) {
+      backgroundVideoRefs.current.set(index, ref);
+    } else {
+      backgroundVideoRefs.current.delete(index);
+    }
+  }, []);
 
 
 
@@ -369,6 +379,38 @@ const MasonryGrid = () => {
     }
   }, [visibleItems, currentVideoIndex, isMobile]);
 
+  // Synchronize background video with main video for theater mode
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const syncVideos = () => {
+      const mainVideo = videoRefs.current.get(currentVideoIndex);
+      const backgroundVideo = backgroundVideoRefs.current.get(currentVideoIndex);
+
+      if (mainVideo && backgroundVideo) {
+        // Sync playback state
+        if (mainVideo.paused && !backgroundVideo.paused) {
+          backgroundVideo.pause();
+        } else if (!mainVideo.paused && backgroundVideo.paused) {
+          backgroundVideo.play().catch(() => {});
+        }
+
+        // Sync current time (with small tolerance to avoid constant updates)
+        const timeDifference = Math.abs(mainVideo.currentTime - backgroundVideo.currentTime);
+        if (timeDifference > 0.5) { // Only sync if difference is significant
+          backgroundVideo.currentTime = mainVideo.currentTime;
+        }
+      }
+    };
+
+    // Set up interval to sync videos periodically
+    const syncInterval = setInterval(syncVideos, 1000); // Sync every second
+
+    return () => {
+      clearInterval(syncInterval);
+    };
+  }, [currentVideoIndex, isMobile]);
+
   // Perfect scroll snap management for mobile
   useEffect(() => {
     if (!isMobile) return;
@@ -548,6 +590,29 @@ const MasonryGrid = () => {
                     data-index={item.index}
                     data-aspect-ratio={item.aspectRatio}
                   >
+                    {/* Blurred Background for Theater Mode (16:9 videos) - Performance Optimized */}
+                    {item.displayMode === 'theater' && item.type === 'mux' && item.shouldLoad && item.isVisible && (
+                      <div className="blurred-video-background">
+                        <MuxPlayer
+                          ref={(ref) => setBackgroundVideoRef(item.index, ref)}
+                          playbackId={item.muxPlaybackId}
+                          autoPlay={true}
+                          muted={true}
+                          loop={true}
+                          playsInline={true}
+                          preload={item.isVisible ? "metadata" : "none"}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            filter: 'blur(25px)',
+                            transform: 'scale(1.2)',
+                            opacity: '0.7'
+                          }}
+                        />
+                      </div>
+                    )}
+
                     <div className={`mobile-video-wrapper ${item.aspectRatio}-wrapper`}>
                       {!loadedItems[item.id] && (
                         <div className="loading-skeleton">
