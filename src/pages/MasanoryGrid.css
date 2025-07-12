@@ -47,15 +47,15 @@
   }
 
   @media (max-width: 768px) {
-    /* Enhanced smooth scrolling for mobile with proper snap */
+    /* Smooth scrolling for mobile - no global scroll snap */
     html {
-      scroll-behavior: auto !important; /* Let JS handle smooth scrolling */
+      scroll-behavior: smooth !important;
       -webkit-overflow-scrolling: touch !important;
       overscroll-behavior: contain !important;
     }
 
     body {
-      scroll-behavior: auto !important; /* Let JS handle smooth scrolling */
+      scroll-behavior: smooth !important;
       -webkit-overflow-scrolling: touch !important;
       overscroll-behavior: contain !important;
     }
@@ -646,16 +646,15 @@
     overflow: hidden;
   }
 
-  /* Mobile Instagram-style vertical scroll */
+  /* YouTube Shorts-style scroll snap - isolated to video section only */
   .mobile-scroll-view {
     width: 100vw;
     position: relative;
-    /* Remove fixed height to allow normal page flow */
+    /* Remove scroll snap from container - let individual items handle it */
   }
 
   .mobile-scroll-container {
     width: 100%;
-    /* Clean scroll container for JavaScript-controlled snapping */
     overflow: visible;
     position: relative;
     transform: translateZ(0); /* Hardware acceleration */
@@ -677,10 +676,9 @@
     background: #000;
     overflow: hidden;
     flex-shrink: 0; /* Prevent compression */
-    /* Clean transitions without filter effects */
-    transition: transform 0.3s ease-out;
-    transform: translateZ(0); /* Hardware acceleration */
-    will-change: transform, opacity;
+    /* Hardware acceleration for smooth performance */
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   /* Clean transitions without visual effects */
@@ -1510,7 +1508,6 @@
 
   .mobile-scroll-container {
     overflow: visible !important;
-    scroll-snap-type: none !important;
   }
 
   .mobile-scroll-item {
@@ -2075,9 +2072,9 @@
   }
 
   .mobile-footer-spacer {
-    height: 100vh !important;
-    height: 100dvh !important;
-    scroll-snap-align: start;
+    /* Allow normal height for footer - no forced viewport height */
+    min-height: 200px;
+    padding: 40px 20px;
   }
 
   /* Allow normal scrolling for other sections */
@@ -2085,20 +2082,17 @@
     /* Ensure hero section has proper height */
     min-height: 100vh;
     min-height: 100dvh;
-    scroll-snap-align: none;
   }
 
   .client-section {
     /* Allow natural height for client section */
     min-height: auto;
-    scroll-snap-align: none;
     padding: 80px 20px;
   }
 
   footer {
     /* Allow natural height for footer */
     min-height: auto;
-    scroll-snap-align: none;
     padding: 60px 20px;
   }
 

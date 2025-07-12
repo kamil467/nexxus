@@ -411,117 +411,76 @@ const MasonryGrid = () => {
     };
   }, [currentVideoIndex, isMobile]);
 
-  // Perfect scroll snap management for mobile
+  // YouTube Shorts-style scroll behavior - only within video section
   useEffect(() => {
     if (!isMobile) return;
 
-    let scrollTimeout: NodeJS.Timeout | null = null;
+    let ticking = false;
     let isSnapping = false;
-    let lastScrollY = window.scrollY;
-    let scrollVelocity = 0;
-    let lastScrollTime = Date.now();
 
     const handleScroll = () => {
-      // Prevent multiple snap operations
-      if (isSnapping) return;
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const scrollY = window.scrollY;
+          const windowHeight = window.innerHeight;
 
-      const currentScrollY = window.scrollY;
-      const currentTime = Date.now();
-      const timeDelta = currentTime - lastScrollTime;
+          // Find video section bounds
+          const videoSection = document.querySelector('.mobile-scroll-view') as HTMLElement;
+          if (!videoSection) return;
 
-      // Calculate scroll velocity for momentum-based snapping
-      if (timeDelta > 0) {
-        scrollVelocity = Math.abs(currentScrollY - lastScrollY) / timeDelta;
-      }
+          const videoSectionRect = videoSection.getBoundingClientRect();
+          const videoSectionTop = scrollY + videoSectionRect.top;
+          const videoSectionBottom = videoSectionTop + videoSection.offsetHeight;
 
-      lastScrollY = currentScrollY;
-      lastScrollTime = currentTime;
+          // Check if we're within the video section
+          const isInVideoSection = scrollY >= videoSectionTop - windowHeight * 0.1 &&
+                                  scrollY <= videoSectionBottom - windowHeight * 0.9;
 
-      // Clear existing timeout
-      if (scrollTimeout) {
-        clearTimeout(scrollTimeout);
-      }
+          if (isInVideoSection) {
+            // Calculate current video index
+            const relativeScroll = scrollY - videoSectionTop;
+            const newVideoIndex = Math.round(relativeScroll / windowHeight);
 
-      // Adaptive timeout based on scroll velocity
-      const timeoutDuration = scrollVelocity > 2 ? 150 : 80;
-
-      // Set timeout to detect scroll end
-      scrollTimeout = setTimeout(() => {
-        const scrollY = window.scrollY;
-        const windowHeight = window.innerHeight;
-
-        // Find video section bounds
-        const videoSection = document.querySelector('.mobile-scroll-view') as HTMLElement;
-        if (!videoSection) return;
-
-        const videoSectionRect = videoSection.getBoundingClientRect();
-        const videoSectionTop = scrollY + videoSectionRect.top;
-        const videoSectionBottom = videoSectionTop + videoSection.offsetHeight;
-
-        // Check if we're within the video section
-        const isInVideoSection = scrollY >= videoSectionTop - windowHeight * 0.05 &&
-                                scrollY <= videoSectionBottom - windowHeight * 0.95;
-
-        if (isInVideoSection) {
-          // Calculate which video we should snap to
-          const relativeScroll = scrollY - videoSectionTop;
-          let videoIndex = Math.round(relativeScroll / windowHeight);
-
-          // Momentum-based snapping: if scrolling fast, snap in direction of scroll
-          if (scrollVelocity > 1.5) {
-            const scrollDirection = currentScrollY > lastScrollY ? 1 : -1;
-            const currentVideoIndex = Math.floor(relativeScroll / windowHeight);
-            videoIndex = scrollDirection > 0 ?
-              Math.min(currentVideoIndex + 1, mobileItems.length - 1) :
-              Math.max(currentVideoIndex, 0);
-          }
-
-          const targetScroll = videoSectionTop + (videoIndex * windowHeight);
-
-          // Snap with adaptive threshold based on velocity
-          const snapThreshold = Math.min(20 + (scrollVelocity * 10), 100);
-          const scrollDifference = Math.abs(scrollY - targetScroll);
-
-          if (scrollDifference > snapThreshold && scrollDifference < windowHeight * 0.5) {
-            isSnapping = true;
-
-            // Add visual feedback during snap
-            const progressIndicator = document.querySelector('.mobile-video-progress') as HTMLElement;
-            if (progressIndicator) {
-              progressIndicator.style.transform = 'scale(1.1)';
-              progressIndicator.style.transition = 'transform 0.2s ease';
+            // Update current video index if it changed
+            if (newVideoIndex >= 0 && newVideoIndex < mobileItems.length && newVideoIndex !== currentVideoIndex) {
+              setCurrentVideoIndex(newVideoIndex);
             }
 
-            window.scrollTo({
-              top: targetScroll,
-              behavior: 'smooth'
-            });
+            // Apply YouTube Shorts-style snapping only within video section
+            if (!isSnapping) {
+              const targetVideoIndex = Math.round(relativeScroll / windowHeight);
+              const targetScroll = videoSectionTop + (targetVideoIndex * windowHeight);
+              const scrollDifference = Math.abs(scrollY - targetScroll);
 
-            // Reset snapping flag and visual feedback after animation completes
-            setTimeout(() => {
-              isSnapping = false;
-              scrollVelocity = 0; // Reset velocity after snap
+              // Snap if we're close but not exactly aligned
+              if (scrollDifference > 20 && scrollDifference < windowHeight * 0.3) {
+                isSnapping = true;
 
-              if (progressIndicator) {
-                progressIndicator.style.transform = 'scale(1)';
+                window.scrollTo({
+                  top: targetScroll,
+                  behavior: 'smooth'
+                });
+
+                setTimeout(() => {
+                  isSnapping = false;
+                }, 300);
               }
-            }, 500);
+            }
           }
-        }
 
-      }, timeoutDuration);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
-    // Add scroll listener
+    // Add scroll listener with passive flag for better performance
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      if (scrollTimeout) {
-        clearTimeout(scrollTimeout);
-      }
     };
-  }, [isMobile, mobileItems.length]);
+  }, [isMobile, mobileItems.length, currentVideoIndex]);
 
   // Performance optimization: Reduce re-renders for mobile
   useEffect(() => {
