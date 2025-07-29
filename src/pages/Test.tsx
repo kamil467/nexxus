@@ -278,7 +278,16 @@ const MasonryGrid = () => {
 
           // Handle video playback with better timing and multiple attempts
           const video = entry.target.querySelector('mux-player') as any;
-          if (video) {
+
+          if (video && video.play && video.paused) {
+          // Small delay to ensure video is ready
+          setTimeout(() => {
+            video.play().catch((error: any) => {
+              console.log('Video play failed:', error);
+            });
+          }, 100);
+        }
+        /*  if (video) {
             // Try immediate play first
             if (video.play && video.paused) {
               video.play().catch(() => {
@@ -293,6 +302,7 @@ const MasonryGrid = () => {
               });
             }
           }
+            */
 
           // Call visibility change handler
           handleVideoVisibilityChange(index, true);
@@ -305,7 +315,7 @@ const MasonryGrid = () => {
 
           // Pause videos that are out of view
           const video = entry.target.querySelector('mux-player') as any;
-          if (video && video.pause) {
+          if (video && video.pause && !video.paused) {
             video.pause();
           }
 
@@ -327,7 +337,7 @@ const MasonryGrid = () => {
     return () => {
       observerRef.current?.disconnect();
     };
-  }, [isMobile, workItems]);
+  }, [isMobile, workItems,activeAudioVideo, handleVideoVisibilityChange]);
 
   // Memoized mobile items with aspect ratio detection
   const mobileItems = useMemo(() => {
@@ -368,16 +378,20 @@ const MasonryGrid = () => {
     // When visible items change, ensure the current video is playing
     const currentVideo = videoRefs.current.get(currentVideoIndex);
     if (currentVideo && visibleItems.has(currentVideoIndex)) {
-      // Small delay to ensure the video is ready
-      setTimeout(() => {
+   
+    const videoItem = mobileItems.find(item => item.index === currentVideoIndex);
+if (videoItem && videoItem.isVisible) { setTimeout(() => {
         if (currentVideo.paused && currentVideo.play) {
           currentVideo.play().catch((error: any) => {
             console.log('Failed to play current video:', error);
           });
         }
       }, 150);
+
+}
+     
     }
-  }, [visibleItems, currentVideoIndex, isMobile]);
+  }, [visibleItems, currentVideoIndex, isMobile,mobileItems]);
 
   // Synchronize background video with main video for theater mode
   useEffect(() => {
@@ -555,7 +569,7 @@ const MasonryGrid = () => {
                         <MuxPlayer
                           ref={(ref) => setBackgroundVideoRef(item.index, ref)}
                           playbackId={item.muxPlaybackId}
-                          autoPlay={true}
+                          autoPlay={false}   // changing from true to false
                           muted={true}
                           loop={true}
                           playsInline={true}
@@ -584,7 +598,7 @@ const MasonryGrid = () => {
                           <MuxPlayer
                             ref={(ref) => setVideoRef(item.index, ref)}
                             playbackId={item.muxPlaybackId}
-                            autoPlay={true}
+                            autoPlay={false} // change from true to false 
                             muted={isMuted || item.index !== currentVideoIndex}
                             loop={true}
                             playsInline={true}
