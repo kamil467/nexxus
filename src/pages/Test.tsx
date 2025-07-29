@@ -92,7 +92,9 @@ const MasonryGrid = () => {
     // This avoids direct manipulation that can cause sync issues
   }, [isMuted, currentVideoIndex]);
 
-  // Store video ref for mute control with simplified audio management
+  // Store video refs for both main and background videos
+  const backgroundVideoRefs = useRef<Map<number, any>>(new Map());
+
   const setVideoRef = useCallback((index: number, ref: any) => {
     if (ref) {
       videoRefs.current.set(index, ref);
@@ -107,6 +109,14 @@ const MasonryGrid = () => {
       }
     }
   }, [activeAudioVideo]);
+
+  const setBackgroundVideoRef = useCallback((index: number, ref: any) => {
+    if (ref) {
+      backgroundVideoRefs.current.set(index, ref);
+    } else {
+      backgroundVideoRefs.current.delete(index);
+    }
+  }, []);
 
 
 
@@ -369,67 +379,108 @@ const MasonryGrid = () => {
     }
   }, [visibleItems, currentVideoIndex, isMobile]);
 
-  // Intelligent scroll management for mobile
+  // Synchronize background video with main video for theater mode
   useEffect(() => {
     if (!isMobile) return;
 
-    let scrollTimeout: NodeJS.Timeout | null = null;
+    const syncVideos = () => {
+      const mainVideo = videoRefs.current.get(currentVideoIndex);
+      const backgroundVideo = backgroundVideoRefs.current.get(currentVideoIndex);
 
-    const handleScroll = () => {
-
-      // Clear existing timeout
-      if (scrollTimeout) {
-        clearTimeout(scrollTimeout);
-      }
-
-      // Set timeout to detect scroll end
-      scrollTimeout = setTimeout(() => {
-
-        // Get current scroll position
-        const scrollY = window.scrollY;
-        const windowHeight = window.innerHeight;
-
-        // Find video section bounds
-        const videoSection = document.querySelector('.mobile-scroll-view') as HTMLElement;
-        if (!videoSection) return;
-
-        const videoSectionRect = videoSection.getBoundingClientRect();
-        const videoSectionTop = scrollY + videoSectionRect.top;
-        const videoSectionBottom = videoSectionTop + videoSection.offsetHeight;
-
-        // Check if we're within the video section
-        const isInVideoSection = scrollY >= videoSectionTop - windowHeight * 0.3 &&
-                                scrollY <= videoSectionBottom - windowHeight * 0.7;
-
-        if (isInVideoSection) {
-          // Snap to nearest video within the video section
-          const relativeScroll = scrollY - videoSectionTop;
-          const videoIndex = Math.round(relativeScroll / windowHeight);
-          const targetScroll = videoSectionTop + (videoIndex * windowHeight);
-
-          // Only snap if we're not already close to the target
-          if (Math.abs(scrollY - targetScroll) > 50) {
-            window.scrollTo({
-              top: targetScroll,
-              behavior: 'smooth'
-            });
-          }
+      if (mainVideo && backgroundVideo) {
+        // Sync playback state
+        if (mainVideo.paused && !backgroundVideo.paused) {
+          backgroundVideo.pause();
+        } else if (!mainVideo.paused && backgroundVideo.paused) {
+          backgroundVideo.play().catch(() => {});
         }
-        // If outside video section, allow normal scrolling (no snapping)
 
-      }, 150); // Wait for scroll to end
+        // Sync current time (with small tolerance to avoid constant updates)
+        const timeDifference = Math.abs(mainVideo.currentTime - backgroundVideo.currentTime);
+        if (timeDifference > 0.5) { // Only sync if difference is significant
+          backgroundVideo.currentTime = mainVideo.currentTime;
+        }
+      }
     };
 
-    // Add scroll listener
+    // Set up interval to sync videos periodically
+    const syncInterval = setInterval(syncVideos, 1000); // Sync every second
+
+    return () => {
+      clearInterval(syncInterval);
+    };
+  }, [currentVideoIndex, isMobile]);
+
+  // YouTube Shorts-style scroll behavior - only within video section
+  useEffect(() => {
+    if (!isMobile) return;
+
+    let ticking = false;
+    let isSnapping = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const scrollY = window.scrollY;
+          const windowHeight = window.innerHeight;
+
+          // Find video section bounds
+          const videoSection = document.querySelector('.mobile-scroll-view') as HTMLElement;
+          if (!videoSection) return;
+
+          const videoSectionRect = videoSection.getBoundingClientRect();
+          const videoSectionTop = scrollY + videoSectionRect.top;
+          const videoSectionBottom = videoSectionTop + videoSection.offsetHeight;
+
+          // Check if we're within the video section
+          const isInVideoSection = scrollY >= videoSectionTop - windowHeight * 0.1 &&
+                                  scrollY <= videoSectionBottom - windowHeight * 0.9;
+
+          if (isInVideoSection) {
+            // Calculate current video index
+            const relativeScroll = scrollY - videoSectionTop;
+            const newVideoIndex = Math.round(relativeScroll / windowHeight);
+
+            // Update current video index if it changed
+            if (newVideoIndex >= 0 && newVideoIndex < mobileItems.length && newVideoIndex !== currentVideoIndex) {
+              setCurrentVideoIndex(newVideoIndex);
+            }
+
+            // Apply YouTube Shorts-style snapping only within video section
+            if (!isSnapping) {
+              const targetVideoIndex = Math.round(relativeScroll / windowHeight);
+              const targetScroll = videoSectionTop + (targetVideoIndex * windowHeight);
+              const scrollDifference = Math.abs(scrollY - targetScroll);
+
+              // Snap if we're close but not exactly aligned
+              if (scrollDifference > 20 && scrollDifference < windowHeight * 0.3) {
+                isSnapping = true;
+
+                window.scrollTo({
+                  top: targetScroll,
+                  behavior: 'smooth'
+                });
+
+                setTimeout(() => {
+                  isSnapping = false;
+                }, 300);
+              }
+            }
+          }
+
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    // Add scroll listener with passive flag for better performance
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      if (scrollTimeout) {
-        clearTimeout(scrollTimeout);
-      }
     };
-  }, [isMobile, mobileItems.length]);
+  }, [isMobile, mobileItems.length, currentVideoIndex]);
 
   // Performance optimization: Reduce re-renders for mobile
   useEffect(() => {
@@ -498,6 +549,29 @@ const MasonryGrid = () => {
                     data-index={item.index}
                     data-aspect-ratio={item.aspectRatio}
                   >
+                    {/* Blurred Background for Theater Mode (16:9 videos) - Performance Optimized */}
+                    {item.displayMode === 'theater' && item.type === 'mux' && item.shouldLoad && item.isVisible && (
+                      <div className="blurred-video-background">
+                        <MuxPlayer
+                          ref={(ref) => setBackgroundVideoRef(item.index, ref)}
+                          playbackId={item.muxPlaybackId}
+                          autoPlay={true}
+                          muted={true}
+                          loop={true}
+                          playsInline={true}
+                          preload={item.isVisible ? "metadata" : "none"}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            filter: 'blur(25px)',
+                            transform: 'scale(1.2)',
+                            opacity: '0.7'
+                          }}
+                        />
+                      </div>
+                    )}
+
                     <div className={`mobile-video-wrapper ${item.aspectRatio}-wrapper`}>
                       {!loadedItems[item.id] && (
                         <div className="loading-skeleton">

@@ -47,7 +47,7 @@
   }
 
   @media (max-width: 768px) {
-    /* Enhanced smooth scrolling for mobile */
+    /* Smooth scrolling for mobile - no global scroll snap */
     html {
       scroll-behavior: smooth !important;
       -webkit-overflow-scrolling: touch !important;
@@ -646,24 +646,20 @@
     overflow: hidden;
   }
 
-  /* Mobile Instagram-style vertical scroll */
+  /* YouTube Shorts-style scroll snap - isolated to video section only */
   .mobile-scroll-view {
     width: 100vw;
     position: relative;
-    /* Remove fixed height to allow normal page flow */
+    /* Remove scroll snap from container - let individual items handle it */
   }
 
   .mobile-scroll-container {
     width: 100%;
-    /* Enhanced smooth scrolling for better transitions */
     overflow: visible;
-    scroll-snap-type: none; /* Disable container snapping */
     position: relative;
     transform: translateZ(0); /* Hardware acceleration */
     will-change: scroll-position;
     -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-    overscroll-behavior: contain;
   }
 
   .mobile-scroll-container::-webkit-scrollbar {
@@ -680,10 +676,9 @@
     background: #000;
     overflow: hidden;
     flex-shrink: 0; /* Prevent compression */
-    /* Clean transitions without filter effects */
-    transition: transform 0.3s ease-out;
-    transform: translateZ(0); /* Hardware acceleration */
-    will-change: transform, opacity;
+    /* Hardware acceleration for smooth performance */
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   /* Clean transitions without visual effects */
@@ -1513,7 +1508,6 @@
 
   .mobile-scroll-container {
     overflow: visible !important;
-    scroll-snap-type: none !important;
   }
 
   .mobile-scroll-item {
@@ -1790,7 +1784,7 @@
     background: transparent !important;
   }
 
-  /* ===== FACEBOOK-STYLE FULL WIDTH FOR 16:9 VIDEOS ===== */
+  /* ===== IMMERSIVE THEATER MODE WITH BLURRED BACKGROUND ===== */
   .mobile-scroll-item.theater-mode {
     /* Standardized height for consistent scrolling */
     background: #000 !important;
@@ -1800,6 +1794,40 @@
     padding: 0 !important;
     height: 100vh !important;
     height: 100dvh !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  /* Blurred Video Background for Theater Mode - Performance Optimized */
+  .blurred-video-background {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 1 !important;
+    overflow: hidden !important;
+    /* Performance optimizations */
+    will-change: transform !important;
+    transform: translateZ(0) !important; /* Force GPU acceleration */
+    contain: layout style paint !important;
+  }
+
+  .blurred-video-background mux-player {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    width: 120% !important;
+    height: 120% !important;
+    transform: translate(-50%, -50%) scale(1.2) translateZ(0) !important;
+    filter: blur(25px) brightness(0.8) !important;
+    opacity: 0.7 !important;
+    object-fit: cover !important;
+    z-index: 1 !important;
+    /* Performance optimizations */
+    will-change: transform, filter !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
   }
 
   .mobile-scroll-item.theater-mode .mobile-video-wrapper {
@@ -1810,20 +1838,23 @@
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    z-index: 2 !important; /* Above blurred background */
   }
 
   .mobile-scroll-item.theater-mode .mobile-video-wrapper video,
-  .mobile-scroll-item.theater-mode .mobile-video-wrapper .mux-player {
+  .mobile-scroll-item.theater-mode .mobile-video-wrapper mux-player {
     width: 100% !important;
     height: auto !important;
     max-height: 90vh !important;
     max-height: 90dvh !important;
     object-fit: contain !important;
     border-radius: 0 !important;
-    background: #000 !important;
+    background: transparent !important; /* Let blurred background show through */
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
+    position: relative !important;
+    z-index: 3 !important; /* Above everything */
   }
 
   /* Ensure theater mode videos are visible - override any hiding styles */
@@ -2041,9 +2072,9 @@
   }
 
   .mobile-footer-spacer {
-    height: 100vh !important;
-    height: 100dvh !important;
-    scroll-snap-align: start;
+    /* Allow normal height for footer - no forced viewport height */
+    min-height: 200px;
+    padding: 40px 20px;
   }
 
   /* Allow normal scrolling for other sections */
@@ -2051,20 +2082,17 @@
     /* Ensure hero section has proper height */
     min-height: 100vh;
     min-height: 100dvh;
-    scroll-snap-align: none;
   }
 
   .client-section {
     /* Allow natural height for client section */
     min-height: auto;
-    scroll-snap-align: none;
     padding: 80px 20px;
   }
 
   footer {
     /* Allow natural height for footer */
     min-height: auto;
-    scroll-snap-align: none;
     padding: 60px 20px;
   }
 
