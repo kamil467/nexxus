@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, X, Play, Pause, Volume2, VolumeX, Maximize } from 'react-feather';
+import { ArrowLeft, Plus, X, Play, Pause, Volume2, VolumeX, Maximize, SkipBack, SkipForward, Minimize } from 'react-feather';
 import { supabase } from '../api/supabase';
 import { WorkItem } from '../api/supabase';
 import MuxPlayer from '@mux/mux-player-react';
@@ -17,11 +17,68 @@ const WorkDetails = () => {
   const [mutedVideos, setMutedVideos] = useState<Set<string>>(new Set());
   const [videoProgress, setVideoProgress] = useState<{ [key: string]: number }>({});
   const [videoDuration, setVideoDuration] = useState<{ [key: string]: number }>({});
+  const [videoVolume, setVideoVolume] = useState<{ [key: string]: number }>({});
   const [showControls, setShowControls] = useState<{ [key: string]: boolean }>({});
+  const [showVolumeSlider, setShowVolumeSlider] = useState<{ [key: string]: boolean }>({});
+  const [isFullscreen, setIsFullscreen] = useState<{ [key: string]: boolean }>({});
+  const [videoAspectRatio, setVideoAspectRatio] = useState<{ [key: string]: number }>({});
+  const [videoOrientation, setVideoOrientation] = useState<{ [key: string]: 'landscape' | 'portrait' | 'square' }>({});
   const videoRefs = useRef<{ [key: string]: any }>({});
+  const controlTimeouts = useRef<{ [key: string]: NodeJS.Timeout }>({});
 
   const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
+
+  // Fullscreen event listeners
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const isCurrentlyFullscreen = !!document.fullscreenElement;
+
+      if (isCurrentlyFullscreen) {
+        // Find which video is in fullscreen
+        const fullscreenElement = document.fullscreenElement as any;
+        if (fullscreenElement && fullscreenElement.tagName === 'MUX-PLAYER') {
+          // Find the video ID that matches this playback ID
+          Object.keys(videoRefs.current).forEach(videoId => {
+            if (videoRefs.current[videoId] === fullscreenElement) {
+              setIsFullscreen(prev => ({ ...prev, [videoId]: true }));
+              setShowControls(prev => ({ ...prev, [videoId]: true }));
+            }
+          });
+        }
+      } else {
+        // Exited fullscreen
+        unlockOrientation(); // Unlock orientation when exiting fullscreen
+        setIsFullscreen(prev => {
+          const newState = { ...prev };
+          Object.keys(newState).forEach(key => {
+            newState[key] = false;
+          });
+          return newState;
+        });
+        // Show controls when exiting fullscreen
+        setShowControls(prev => {
+          const newState = { ...prev };
+          Object.keys(newState).forEach(key => {
+            newState[key] = true;
+          });
+          return newState;
+        });
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(controlTimeouts.current).forEach(timeout => {
+        if (timeout) clearTimeout(timeout);
+      });
+    };
+  }, []);
 
   // Convert video IDs to Mux playback IDs
   const getMuxPlaybackId = (item: any): string | null => {
@@ -84,6 +141,52 @@ const WorkDetails = () => {
     }
   };
 
+  const setVolume = (videoId: string, volume: number) => {
+    const muxPlayer = videoRefs.current[videoId];
+    if (!muxPlayer) return;
+
+    try {
+      muxPlayer.volume = Math.max(0, Math.min(1, volume));
+      setVideoVolume(prev => ({ ...prev, [videoId]: volume }));
+
+      if (volume === 0) {
+        muxPlayer.muted = true;
+        setMutedVideos(prev => new Set(prev).add(videoId));
+      } else {
+        muxPlayer.muted = false;
+        setMutedVideos(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(videoId);
+          return newSet;
+        });
+      }
+    } catch (error) {
+      console.error('Error setting volume:', error);
+    }
+  };
+
+  const skipBackward = (videoId: string, seconds: number = 10) => {
+    const muxPlayer = videoRefs.current[videoId];
+    if (!muxPlayer) return;
+
+    try {
+      muxPlayer.currentTime = Math.max(0, muxPlayer.currentTime - seconds);
+    } catch (error) {
+      console.error('Error skipping backward:', error);
+    }
+  };
+
+  const skipForward = (videoId: string, seconds: number = 10) => {
+    const muxPlayer = videoRefs.current[videoId];
+    if (!muxPlayer) return;
+
+    try {
+      muxPlayer.currentTime = Math.min(muxPlayer.duration || 0, muxPlayer.currentTime + seconds);
+    } catch (error) {
+      console.error('Error skipping forward:', error);
+    }
+  };
+
   const seekTo = (videoId: string, percentage: number) => {
     const muxPlayer = videoRefs.current[videoId];
     if (!muxPlayer || !videoDuration[videoId]) return;
@@ -96,18 +199,40 @@ const WorkDetails = () => {
     }
   };
 
-  const toggleFullscreen = (videoId: string) => {
+  const toggleFullscreen = async (videoId: string) => {
     const muxPlayer = videoRefs.current[videoId];
     if (!muxPlayer) return;
 
     try {
       if (document.fullscreenElement) {
-        document.exitFullscreen();
+        await document.exitFullscreen();
+        await unlockOrientation();
+        setIsFullscreen(prev => ({ ...prev, [videoId]: false }));
       } else {
-        muxPlayer.requestFullscreen();
+        await muxPlayer.requestFullscreen();
+        await lockOrientation(videoId);
+        setIsFullscreen(prev => ({ ...prev, [videoId]: true }));
       }
     } catch (error) {
       console.error('Error toggling fullscreen:', error);
+    }
+  };
+
+  // Auto-hide controls when video is playing
+  const handleMouseMove = (videoId: string) => {
+    setShowControls(prev => ({ ...prev, [videoId]: true }));
+
+    // Clear existing timeout
+    if (controlTimeouts.current[videoId]) {
+      clearTimeout(controlTimeouts.current[videoId]);
+    }
+
+    // Auto-hide if video is playing (both normal and fullscreen)
+    if (playingVideos.has(videoId)) {
+      const hideDelay = isFullscreen[videoId] ? 3000 : 2000; // Shorter delay for normal view
+      controlTimeouts.current[videoId] = setTimeout(() => {
+        setShowControls(prev => ({ ...prev, [videoId]: false }));
+      }, hideDelay);
     }
   };
 
@@ -115,6 +240,69 @@ const WorkDetails = () => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Detect video aspect ratio and orientation
+  const detectVideoOrientation = (videoId: string, width: number, height: number) => {
+    const aspectRatio = width / height;
+    setVideoAspectRatio(prev => ({ ...prev, [videoId]: aspectRatio }));
+
+    let orientation: 'landscape' | 'portrait' | 'square';
+    if (aspectRatio > 1.2) {
+      orientation = 'landscape'; // 16:9, 21:9, etc.
+    } else if (aspectRatio < 0.8) {
+      orientation = 'portrait'; // 9:16, 4:5, etc.
+    } else {
+      orientation = 'square'; // 1:1 or close to square
+    }
+
+    setVideoOrientation(prev => ({ ...prev, [videoId]: orientation }));
+    console.log(`Video ${videoId}: ${width}x${height}, aspect: ${aspectRatio.toFixed(2)}, orientation: ${orientation}`);
+  };
+
+  // Check if device supports orientation lock
+  const supportsOrientationLock = () => {
+    return 'orientation' in screen && 'lock' in screen.orientation;
+  };
+
+  // Lock screen orientation based on video aspect ratio
+  const lockOrientation = async (videoId: string) => {
+    if (!supportsOrientationLock()) {
+      console.log('Orientation lock not supported on this device');
+      return;
+    }
+
+    const orientation = videoOrientation[videoId];
+
+    try {
+      if (orientation === 'landscape') {
+        // For 16:9 videos, lock to landscape
+        await (screen.orientation as any).lock('landscape');
+        console.log('Locked to landscape for 16:9 video');
+      } else if (orientation === 'portrait') {
+        // For 9:16 videos, lock to portrait
+        await (screen.orientation as any).lock('portrait');
+        console.log('Locked to portrait for 9:16 video');
+      } else {
+        // For square videos, allow natural orientation
+        await (screen.orientation as any).lock('natural');
+        console.log('Locked to natural for square video');
+      }
+    } catch (error) {
+      console.log('Could not lock orientation:', error);
+    }
+  };
+
+  // Unlock orientation when exiting fullscreen
+  const unlockOrientation = async () => {
+    if (!supportsOrientationLock()) return;
+
+    try {
+      (screen.orientation as any).unlock();
+      console.log('Orientation unlocked');
+    } catch (error) {
+      console.log('Could not unlock orientation:', error);
+    }
   };
   
   // Fetch work item data from Supabase
@@ -198,9 +386,18 @@ const WorkDetails = () => {
           ...prev,
           [id]: videoElement.duration || 0
         }));
+
+        // Detect video dimensions and orientation
+        const videoWidth = videoElement.videoWidth || videoElement.clientWidth;
+        const videoHeight = videoElement.videoHeight || videoElement.clientHeight;
+
+        if (videoWidth && videoHeight) {
+          detectVideoOrientation(id, videoWidth, videoHeight);
+        }
       });
 
       videoElement.addEventListener('volumechange', () => {
+        setVideoVolume(prev => ({ ...prev, [id]: videoElement.volume }));
         if (videoElement.muted) {
           setMutedVideos(prev => new Set(prev).add(id));
         } else {
@@ -211,6 +408,20 @@ const WorkDetails = () => {
           });
         }
       });
+
+      // Initialize volume and mute state
+      setVideoVolume(prev => ({ ...prev, [id]: videoElement.volume || 1 }));
+
+      // Initialize mute state based on actual video element
+      if (videoElement.muted) {
+        setMutedVideos(prev => new Set(prev).add(id));
+      } else {
+        setMutedVideos(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(id);
+          return newSet;
+        });
+      }
     }
   };
 
@@ -338,15 +549,27 @@ const WorkDetails = () => {
                     {/* Video Player */}
                     {muxPlaybackId ? (
                       <div
-                        className="relative w-full bg-black rounded-lg overflow-hidden group"
+                        className="work-details-video-container relative w-full bg-black rounded-lg overflow-hidden group"
                         style={{ aspectRatio: '16/9' }}
+                        data-orientation={videoOrientation[videoId] || 'unknown'}
                         onMouseEnter={() => setShowControls(prev => ({ ...prev, [videoId]: true }))}
-                        onMouseLeave={() => setShowControls(prev => ({ ...prev, [videoId]: false }))}
+                        onMouseLeave={() => {
+                          // Clear any existing timeout
+                          if (controlTimeouts.current[videoId]) {
+                            clearTimeout(controlTimeouts.current[videoId]);
+                          }
+
+                          // Hide controls immediately when mouse leaves if video is playing
+                          if (playingVideos.has(videoId)) {
+                            setShowControls(prev => ({ ...prev, [videoId]: false }));
+                          }
+                        }}
+                        onMouseMove={() => handleMouseMove(videoId)}
                       >
                         <MuxPlayer
                           playbackId={muxPlaybackId}
                           autoPlay={false}
-                          muted={true}
+                          muted={false}
                           style={{
                             width: '100%',
                             height: '100%',
@@ -360,7 +583,7 @@ const WorkDetails = () => {
                         {/* Video Controls Overlay */}
                         <div className={`absolute inset-0 transition-opacity duration-300 ${
                           showControls[videoId] || !playingVideos.has(videoId) ? 'opacity-100' : 'opacity-0'
-                        }`}>
+                        }`} style={{ zIndex: isFullscreen[videoId] ? 10000 : 10 }}>
 
                           {/* Center Play/Pause Button */}
                           <div
@@ -368,19 +591,33 @@ const WorkDetails = () => {
                             onClick={() => toggleVideoPlayback(videoId)}
                           >
                             {!playingVideos.has(videoId) && (
-                              <div className="bg-black bg-opacity-50 rounded-full p-4 hover:bg-opacity-70 transition-all backdrop-blur-sm">
+                              <div className="bg-black bg-opacity-50 rounded-full p-6 hover:bg-opacity-70 transition-all backdrop-blur-sm">
                                 <Play size={48} className="text-white ml-1" />
                               </div>
                             )}
                           </div>
 
+
+
                           {/* Top Controls */}
-                          <div className="absolute top-4 right-4 flex space-x-2">
+                          <div className="absolute top-4 right-4 flex items-center space-x-2">
+                            {/* Video Orientation Indicator (for debugging) */}
+                            {videoOrientation[videoId] && (
+                              <div className="bg-black bg-opacity-50 rounded px-2 py-1 text-xs text-white backdrop-blur-sm">
+                                {videoOrientation[videoId]} ({videoAspectRatio[videoId]?.toFixed(2)})
+                              </div>
+                            )}
+
                             <button
                               onClick={() => toggleFullscreen(videoId)}
                               className="bg-black bg-opacity-50 hover:bg-opacity-70 rounded-full p-2 transition-all backdrop-blur-sm"
+                              title={isFullscreen[videoId] ? "Exit fullscreen" : `Enter fullscreen (${videoOrientation[videoId] || 'auto'} mode)`}
                             >
-                              <Maximize size={20} className="text-white" />
+                              {isFullscreen[videoId] ? (
+                                <Minimize size={20} className="text-white" />
+                              ) : (
+                                <Maximize size={20} className="text-white" />
+                              )}
                             </button>
                           </div>
 
@@ -388,9 +625,9 @@ const WorkDetails = () => {
                           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/50 to-transparent p-4">
 
                             {/* Progress Bar */}
-                            <div className="mb-3">
+                            <div className="mb-4">
                               <div
-                                className="w-full h-1 bg-white bg-opacity-30 rounded-full cursor-pointer"
+                                className="w-full h-2 bg-white bg-opacity-30 rounded-full cursor-pointer hover:h-3 transition-all group"
                                 onClick={(e) => {
                                   const rect = e.currentTarget.getBoundingClientRect();
                                   const percentage = ((e.clientX - rect.left) / rect.width) * 100;
@@ -398,39 +635,83 @@ const WorkDetails = () => {
                                 }}
                               >
                                 <div
-                                  className="h-full bg-white rounded-full transition-all"
+                                  className="h-full bg-white rounded-full transition-all relative"
                                   style={{ width: `${videoProgress[videoId] || 0}%` }}
-                                />
+                                >
+                                  <div className="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                                </div>
                               </div>
                             </div>
 
                             {/* Control Buttons */}
                             <div className="flex items-center justify-between">
-                              <div className="flex items-center space-x-3">
+                              <div className="flex items-center space-x-4">
+                                {/* Play/Pause */}
                                 <button
                                   onClick={() => toggleVideoPlayback(videoId)}
                                   className="hover:scale-110 transition-transform"
                                 >
                                   {playingVideos.has(videoId) ? (
-                                    <Pause size={24} className="text-white" />
+                                    <Pause size={28} className="text-white" />
                                   ) : (
-                                    <Play size={24} className="text-white ml-1" />
+                                    <Play size={28} className="text-white ml-1" />
                                   )}
                                 </button>
 
+                                {/* Skip Backward */}
                                 <button
-                                  onClick={() => toggleMute(videoId)}
+                                  onClick={() => skipBackward(videoId, 10)}
                                   className="hover:scale-110 transition-transform"
+                                  title="Skip back 10 seconds"
                                 >
-                                  {mutedVideos.has(videoId) ? (
-                                    <VolumeX size={24} className="text-white" />
-                                  ) : (
-                                    <Volume2 size={24} className="text-white" />
-                                  )}
+                                  <SkipBack size={24} className="text-white" />
                                 </button>
+
+                                {/* Skip Forward */}
+                                <button
+                                  onClick={() => skipForward(videoId, 10)}
+                                  className="hover:scale-110 transition-transform"
+                                  title="Skip forward 10 seconds"
+                                >
+                                  <SkipForward size={24} className="text-white" />
+                                </button>
+
+                                {/* Volume Controls */}
+                                <div
+                                  className="flex items-center space-x-2 group"
+                                  onMouseEnter={() => setShowVolumeSlider(prev => ({ ...prev, [videoId]: true }))}
+                                  onMouseLeave={() => setShowVolumeSlider(prev => ({ ...prev, [videoId]: false }))}
+                                >
+                                  <button
+                                    onClick={() => toggleMute(videoId)}
+                                    className="hover:scale-110 transition-transform"
+                                  >
+                                    {mutedVideos.has(videoId) || (videoVolume[videoId] || 1) === 0 ? (
+                                      <VolumeX size={24} className="text-white" />
+                                    ) : (
+                                      <Volume2 size={24} className="text-white" />
+                                    )}
+                                  </button>
+
+                                  {/* Volume Slider */}
+                                  <div className={`transition-all duration-300 ${
+                                    showVolumeSlider[videoId] ? 'w-20 opacity-100' : 'w-0 opacity-0'
+                                  } overflow-hidden`}>
+                                    <input
+                                      type="range"
+                                      min="0"
+                                      max="1"
+                                      step="0.1"
+                                      value={videoVolume[videoId] || 1}
+                                      onChange={(e) => setVolume(videoId, parseFloat(e.target.value))}
+                                      className="w-full h-1 bg-white bg-opacity-30 rounded-full appearance-none cursor-pointer slider"
+                                    />
+                                  </div>
+                                </div>
                               </div>
 
-                              <div className="text-white text-sm">
+                              {/* Time Display */}
+                              <div className="text-white text-sm font-medium">
                                 {formatTime(videoProgress[videoId] * (videoDuration[videoId] || 0) / 100 || 0)} / {formatTime(videoDuration[videoId] || 0)}
                               </div>
                             </div>
