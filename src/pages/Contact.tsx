@@ -1,5 +1,6 @@
 import React from 'react';
 import { Mail, MapPin, Phone } from 'lucide-react';
+import ClientsSection from '../components/ClientsSection';
 
 const Contact = () => {
   return (
@@ -70,6 +71,8 @@ const Contact = () => {
           </form>
         </div>
       </div>
+      <ClientsSection className="mt-20" />
+    
     </div>
   );
 };

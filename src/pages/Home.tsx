@@ -3,6 +3,7 @@ import { ArrowDown, Users, Building2, Award, Star } from 'lucide-react';
 import Test from './Test';
 import Mobile from './Mobile';
 import { supabase, WorkItem } from '../api/supabase';
+import ClientsSection from '../components/ClientsSection';
 
 const Home = () => {
   const scrollToWork = () => {
@@ -125,7 +126,9 @@ const Home = () => {
             <Mobile videos={workItems}/>
           ) : (
         <Test />)}
+        
       </section>
+       <ClientsSection className="mt-20" />
     </div>
   );
 }

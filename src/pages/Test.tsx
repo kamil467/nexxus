@@ -604,7 +604,7 @@ const MasonryGrid = () => {
         </>
       )}
       {/* Clients Section */}
-      <ClientsSection className="mt-20" />
+    
     </div>
   );
 };
