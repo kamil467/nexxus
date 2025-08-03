@@ -12,7 +12,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid red;
   background: #222;
   position: relative;
   border-radius: 12px;
@@ -41,9 +40,9 @@
   position: relative;
   overflow: hidden;
   border-radius: 12px;
-   border: 1px solid yellow;
   background: black;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+

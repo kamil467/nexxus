@@ -63,7 +63,7 @@ const Mobile: React.FC<Props> = ({ videos }) => {
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative',
-            background: '#000'
+            background: '#fff'
           }}
         >
           <div  tabIndex={-1}
@@ -74,41 +74,18 @@ const Mobile: React.FC<Props> = ({ videos }) => {
             }
             style={{
               width: item.cols === 1 ? 'calc(90vh * 9 / 16)' : '100%',
-              height: item.cols === 1 ? '90vh' : 'auto',
+              height: item.cols === 1 ? '90vh' : '50vh',
               maxHeight: '90vh',
               borderRadius: 12,
               overflow: 'hidden',
               // For landscape: blurred backdrop
-              position: 'relative'
+              position: 'relative',
+              background: 'white',
             }}
           >
-            {/* Optional: blurred background for 16:9 videos 
-            {item.cols === 2 && (
-              <MuxPlayer 
-                playbackId={item.muxPlaybackId}
-                muted
-                loop
-                playsInline
-                preload="none"
-                autoPlay="muted"
-                style={{
-                  pointerEvents: 'none',
-                  width: '120%',
-                  height: '120%',
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%,-50%) scale(1.18)',
-                  filter: 'blur(22px) brightness(0.6)',
-                  opacity: 0.7,
-                  zIndex: 1,
-                  border: 'none',
-                  background: 'transparent'
-                }}
-               
-              />
-            )}
-              */}
+            {/* Optional: blurred background for 16:9 videos */}
+          
+            
             {/* Main video */}
             <MuxPlayer
               playbackId={item.muxPlaybackId}
