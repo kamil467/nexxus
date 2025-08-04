@@ -506,13 +506,21 @@ const WorkDetails = () => {
               <div className="space-y-2">
                 <h3 className="text-lg md:text-xl font-light mb-2 md:mb-3 text-gray-800">Overview</h3>
                 <p className="text-sm leading-relaxed text-gray-600 font-light">
-                  {currentProject?.overview || 'No overview available.'}
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: currentProject?.overview || 'No overview available.'
+                    }}
+                  />
                 </p>
               </div>
               <div className="space-y-2">
                 <h3 className="text-lg md:text-xl font-light mb-2 md:mb-3 text-gray-800">Client Impact</h3>
                 <p className="text-sm leading-relaxed text-gray-600 font-light">
-                  {currentProject?.capability || 'No capability information available.'}
+                   <div
+                    dangerouslySetInnerHTML={{
+                      __html: currentProject?.capability || 'No capability available.'
+                    }}
+                  />
                 </p>
               </div>
               <div className="space-y-2">
@@ -601,13 +609,14 @@ const WorkDetails = () => {
 
                           {/* Top Controls */}
                           <div className="absolute top-4 right-4 flex items-center space-x-2">
-                            {/* Video Orientation Indicator (for debugging) */}
+                            
+                            {/* Video Orientation Indicator (for debugging) 
                             {videoOrientation[videoId] && (
                               <div className="bg-black bg-opacity-50 rounded px-2 py-1 text-xs text-white backdrop-blur-sm">
                                 {videoOrientation[videoId]} ({videoAspectRatio[videoId]?.toFixed(2)})
                               </div>
                             )}
-
+                            */}
                             <button
                               onClick={() => toggleFullscreen(videoId)}
                               className="bg-black bg-opacity-50 hover:bg-opacity-70 rounded-full p-2 transition-all backdrop-blur-sm"
