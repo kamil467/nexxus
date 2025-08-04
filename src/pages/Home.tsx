@@ -1,33 +1,72 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ArrowDown, Users, Building2, Award, Star } from 'lucide-react';
 import Test from './Test';
+import Mobile from './Mobile';
+import { supabase, WorkItem } from '../api/supabase';
 import ClientsSection from '../components/ClientsSection';
-
-// Dummy client logos - Replace with actual client logos
-const clients = [
-  { id: 1, name: 'Client 1', logo: 'https://placehold.co/200x80/A9AC87/white?text=Client+1' },
-  { id: 2, name: 'Client 2', logo: 'https://placehold.co/200x80/A9AC87/white?text=Client+2' },
-  { id: 3, name: 'Client 3', logo: 'https://placehold.co/200x80/A9AC87/white?text=Client+3' },
-  { id: 4, name: 'Client 4', logo: 'https://placehold.co/200x80/A9AC87/white?text=Client+4' },
-  { id: 5, name: 'Client 5', logo: 'https://placehold.co/200x80/A9AC87/white?text=Client+5' },
-  { id: 6, name: 'Client 6', logo: 'https://placehold.co/200x80/A9AC87/white?text=Client+6' },
-  { id: 7, name: 'Client 7', logo: 'https://placehold.co/200x80/A9AC87/white?text=Client+7' },
-  { id: 8, name: 'Client 8', logo: 'https://placehold.co/200x80/A9AC87/white?text=Client+8' },
-];
-
-// Statistics data
-const stats = [
-  { id: 1, title: 'Happy Clients', value: '200+', icon: Users },
-  { id: 2, title: 'Projects Completed', value: '500+', icon: Building2 },
-  { id: 3, title: 'Awards Won', value: '25+', icon: Award },
-  { id: 4, title: 'Years Experience', value: '10+', icon: Star },
-];
 
 const Home = () => {
   const scrollToWork = () => {
     const workSection = document.getElementById('work');
     workSection?.scrollIntoView({ behavior: 'smooth' });
   };
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+    
+  // Optimized mobile detection with debouncing
+    const checkMobile = useCallback(() => {
+      setIsMobile(window.innerWidth < 768);
+    }, []);
+
+
+
+    
+    useEffect(() => {
+  checkMobile(); // Initial check on mount
+
+  // Optional: add resize listener with debounce/throttle for live update
+  let timeoutId: any;
+
+  const handleResize = () => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      checkMobile();
+    }, 150);
+  };
+
+  window.addEventListener('resize', handleResize, { passive: true });
+
+  return () => {
+    window.removeEventListener('resize', handleResize);
+    clearTimeout(timeoutId);
+  };
+}, [checkMobile]);
+
+  const [workItems, setWorkItems] = useState<WorkItem[]>([]);
+    // Fetch work items from Supabase
+    useEffect(() => {
+      const fetchWorkItems = async () => {
+        //setLoading(true);
+        try {
+          const { data, error } = await supabase
+            .from('work_items')
+            .select('*');
+            
+          if (error) {
+            console.error('Error fetching work items:', error);
+          } else {
+            console.log('Fetched work items:', data);
+            setWorkItems(data || []);
+          }
+        } catch (error) {
+          console.error('Error fetching work items:', error);
+        } finally {
+         // setLoading(false);
+        }
+      };
+      
+      fetchWorkItems();
+    }, []);
+  
 
   return (
     <div className="bg-gray-50">
@@ -81,8 +120,15 @@ const Home = () => {
 
       {/* Work Section */}
       <section id="work" className="min-h-screen py-20">
-        <Test />
+
+          {isMobile ? (
+          
+            <Mobile videos={workItems}/>
+          ) : (
+        <Test />)}
+        
       </section>
+       <ClientsSection className="mt-20" />
     </div>
   );
 }

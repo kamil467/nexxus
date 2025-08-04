@@ -1,0 +1,526 @@
+/* WorkDetails Component Styles */
+
+/* Video Player Container */
+.work-details-video-container {
+  position: relative;
+  width: 100%;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* MuxPlayer Optimization for WorkDetails */
+.work-details-video-container mux-player {
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: #000 !important;
+  display: block !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.work-details-video-container mux-player video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  border: none !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove any potential borders from MuxPlayer internal elements */
+.work-details-video-container mux-player *,
+.work-details-video-container mux-player *::before,
+.work-details-video-container mux-player *::after {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Video Player Controls */
+.video-player-container {
+  position: relative;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Video Controls Overlay */
+.video-controls-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.video-controls-overlay * {
+  pointer-events: auto;
+}
+
+/* Progress Bar */
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: height 0.2s ease;
+}
+
+.progress-bar:hover {
+  height: 6px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #fff;
+  border-radius: 2px;
+  transition: width 0.1s ease;
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.progress-bar:hover .progress-fill::after {
+  opacity: 1;
+}
+
+/* Control Buttons */
+.video-control-button {
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 50%;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-control-button:hover {
+  background: rgba(0, 0, 0, 0.7);
+  transform: scale(1.1);
+}
+
+/* Large Play Button */
+.large-play-button {
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 50%;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.large-play-button:hover {
+  background: rgba(0, 0, 0, 0.7);
+  transform: scale(1.1);
+}
+
+/* Time Display */
+.time-display {
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Volume Slider */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.slider::-moz-range-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  border: none;
+}
+
+.slider::-moz-range-thumb {
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Enhanced Progress Bar */
+.progress-bar-enhanced {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.progress-bar-enhanced:hover {
+  transform: scaleY(1.5);
+}
+
+.progress-bar-enhanced .progress-thumb {
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.progress-bar-enhanced:hover .progress-thumb {
+  opacity: 1;
+}
+
+/* Skip Button Animations */
+.skip-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.skip-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.skip-button:active::before {
+  width: 100px;
+  height: 100px;
+}
+
+/* Fullscreen Controls */
+.fullscreen-controls {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 9999 !important;
+  background: #000 !important;
+}
+
+/* Ensure controls are visible in fullscreen */
+mux-player:fullscreen + .video-controls-overlay,
+mux-player:-webkit-full-screen + .video-controls-overlay,
+mux-player:-moz-full-screen + .video-controls-overlay {
+  z-index: 10000 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+}
+
+/* Fullscreen video controls styling */
+.video-controls-overlay[style*="z-index: 10000"] {
+  background: transparent !important;
+}
+
+.video-controls-overlay[style*="z-index: 10000"] .bg-gradient-to-t {
+  background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4), transparent) !important;
+}
+
+/* Enhanced fullscreen button visibility */
+.video-controls-overlay[style*="z-index: 10000"] button {
+  background: rgba(0, 0, 0, 0.7) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.video-controls-overlay[style*="z-index: 10000"] button:hover {
+  background: rgba(0, 0, 0, 0.9) !important;
+}
+
+/* Enhanced Control Buttons */
+.control-button-enhanced {
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 50%;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.control-button-enhanced:hover {
+  background: rgba(0, 0, 0, 0.7);
+  transform: scale(1.1);
+}
+
+.control-button-enhanced:active {
+  transform: scale(0.95);
+}
+
+/* Tooltip */
+.control-button-enhanced[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+}
+
+/* Mobile Orientation Handling */
+@media (max-width: 768px) {
+  /* Landscape videos in fullscreen should use full width */
+  .work-details-video-container[data-orientation="landscape"]:fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+    object-fit: contain !important;
+  }
+
+  /* Portrait videos in fullscreen should maintain aspect ratio */
+  .work-details-video-container[data-orientation="portrait"]:fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+    object-fit: contain !important;
+  }
+
+  /* Square videos in fullscreen */
+  .work-details-video-container[data-orientation="square"]:fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+    object-fit: contain !important;
+  }
+}
+
+/* Orientation-specific fullscreen styles */
+@media screen and (orientation: landscape) {
+  .work-details-video-container:fullscreen[data-orientation="landscape"] mux-player {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+}
+
+@media screen and (orientation: portrait) {
+  .work-details-video-container:fullscreen[data-orientation="portrait"] mux-player {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+}
+
+/* Video Orientation Indicator */
+.video-orientation-indicator {
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Mobile-specific fullscreen controls */
+@media (max-width: 768px) {
+  .video-controls-overlay[style*="z-index: 10000"] {
+    padding: 20px !important;
+  }
+
+  .video-controls-overlay[style*="z-index: 10000"] .bg-gradient-to-t {
+    padding: 20px !important;
+  }
+
+  /* Larger touch targets for mobile */
+  .video-controls-overlay[style*="z-index: 10000"] button {
+    min-width: 48px !important;
+    min-height: 48px !important;
+    padding: 12px !important;
+  }
+
+  /* Hide orientation indicator in fullscreen for cleaner look */
+  .video-controls-overlay[style*="z-index: 10000"] .video-orientation-indicator {
+    display: none;
+  }
+}
+
+/* Loading States */
+.media-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F5F5F0;
+  z-index: 20;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e0e0e0;
+  border-top: 3px solid #A9AC87;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Image Styles */
+.work-details-image {
+  transition: transform 0.3s ease;
+}
+
+.work-details-image:hover {
+  transform: scale(1.02);
+}
+
+/* Error States */
+.media-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.media-error-icon {
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.media-error-text {
+  color: #6c757d;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.media-error-details {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .work-details-video-container {
+    border-radius: 12px;
+  }
+  
+  .play-pause-button {
+    padding: 12px;
+  }
+  
+  .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border-width: 2px;
+  }
+}
+
+/* Performance Optimizations */
+.work-details-video-container {
+  will-change: transform;
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+.work-details-image {
+  will-change: transform;
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .video-overlay,
+  .play-pause-button,
+  .work-details-image {
+    transition: none;
+  }
+  
+  .loading-spinner {
+    animation: none;
+  }
+}
+
+/* Focus States */
+.video-overlay:focus-visible {
+  outline: 2px solid #A9AC87;
+  outline-offset: 2px;
+}
+
+.play-pause-button:focus-visible {
+  outline: 2px solid #A9AC87;
+  outline-offset: 2px;
+}
