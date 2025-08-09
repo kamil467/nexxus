@@ -24,6 +24,17 @@ const MasonryGrid = () => {
   const [videoPaused, setVideoPaused] = useState<Map<number, boolean>>(new Map());
   const [showPlayIcon, setShowPlayIcon] = useState<Map<number, boolean>>(new Map());
 
+  // Video loading states - optimized for faster loading
+  const [videoLoadingStates, setVideoLoadingStates] = useState<{ [key: string]: boolean }>({});
+  const [videoLoadProgress, setVideoLoadProgress] = useState<{ [key: string]: number }>({});
+  const [videoCanPlay, setVideoCanPlay] = useState<{ [key: string]: boolean }>({});
+
+  // Initialize videos as ready faster
+  const handleVideoReady = useCallback((videoKey: string) => {
+    setVideoCanPlay(prev => ({ ...prev, [videoKey]: true }));
+    setVideoLoadingStates(prev => ({ ...prev, [videoKey]: false }));
+  }, []);
+
 
 
 
@@ -551,38 +562,85 @@ const MasonryGrid = () => {
                   </h2>
                 </header>
                 <div className="video-grid landscape-grid">
-                  {landscapeItems.map((item) => (
-                    <div className="video-grid-item" key={`land-${item.id}`}>
-                      <div className="video-aspect-frame aspect-16-9">
-                        <MuxPlayer
-                          playbackId={item.muxPlaybackId}
-                          autoPlay="muted"
-                          muted
-                          loop
-                          playsInline
-                          preload="auto"
-                          style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000' }}
-                          onCanPlay={(e) => {
-                            const el = e.target as any;
-                            if (el && el.play) {
-                              el.play().catch(() => {});
-                            }
-                          }}
-                        />
-                        <div className="grid-overlay">
-                          <div className="grid-overlay-content compact">
-                            <a href={`/work/${item.slug}`} className="card-action icon-only" title="View Project">
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2"/>
-                                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
-                              </svg>
-                            </a>
-                            <h3 className="overlay-title">{item.title}</h3>
+                  {landscapeItems.map((item) => {
+                    const videoKey = `land-${item.id}`;
+                    const isLoading = videoLoadingStates[videoKey] !== false;
+                    const canPlay = videoCanPlay[videoKey] || false;
+
+                    return (
+                      <div className="video-grid-item" key={videoKey}>
+                        <div className="video-aspect-frame aspect-16-9">
+                          {/* Loading overlay with site design */}
+                          {isLoading && (
+                            <div className="video-loading-overlay-site">
+                              <div className="site-loading-spinner">
+                                <div className="spinner-circle"></div>
+                                <div className="spinner-circle"></div>
+                                <div className="spinner-circle"></div>
+                              </div>
+                              <div className="site-loading-text">Loading...</div>
+                              {/* Progress bar */}
+                              <div className="site-progress-bar">
+                                <div
+                                  className="site-progress-fill"
+                                  style={{ width: `${videoLoadProgress[videoKey] || 0}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          )}
+
+                          <MuxPlayer
+                            playbackId={item.muxPlaybackId}
+                            autoPlay="muted"
+                            muted
+                            loop
+                            playsInline
+                            preload="metadata" // Faster loading - only metadata instead of full video
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'contain',
+                              background: '#fff',
+                              opacity: canPlay ? 1 : 0,
+                              transition: 'opacity 0.3s ease' // Faster transition
+                            }}
+                            onLoadStart={() => {
+                              setVideoLoadingStates(prev => ({ ...prev, [videoKey]: true }));
+                            }}
+                            onLoadedMetadata={() => {
+                              // Faster - trigger on metadata instead of full data
+                              handleVideoReady(videoKey);
+                            }}
+                            onCanPlay={(e) => {
+                              const el = e.target as any;
+                              if (el && el.play) {
+                                el.play().catch(() => {});
+                              }
+                            }}
+                            onProgress={(e) => {
+                              const el = e.target as any;
+                              if (el && el.buffered && el.buffered.length > 0) {
+                                const progress = (el.buffered.end(0) / el.duration) * 100;
+                                setVideoLoadProgress(prev => ({ ...prev, [videoKey]: progress }));
+                              }
+                            }}
+                          />
+
+                          <div className="grid-overlay">
+                            <div className="grid-overlay-content compact">
+                              <a href={`/work/${item.slug}`} className="card-action icon-only" title="View Project">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2"/>
+                                  <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+                                </svg>
+                              </a>
+                              <h3 className="overlay-title">{item.title}</h3>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </section>
 
@@ -596,38 +654,85 @@ const MasonryGrid = () => {
                   </h2>
                 </header>
                 <div className="video-grid portrait-grid">
-                  {portraitItems.map((item) => (
-                    <div className="video-grid-item" key={`port-${item.id}`}>
-                      <div className="video-aspect-frame aspect-9-16">
-                        <MuxPlayer
-                          playbackId={item.muxPlaybackId}
-                          autoPlay="muted"
-                          muted
-                          loop
-                          playsInline
-                          preload="auto"
-                          style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000' }}
-                          onCanPlay={(e) => {
-                            const el = e.target as any;
-                            if (el && el.play) {
-                              el.play().catch(() => {});
-                            }
-                          }}
-                        />
-                        <div className="grid-overlay">
-                          <div className="grid-overlay-content compact">
-                            <a href={`/work/${item.slug}`} className="card-action icon-only" title="View Project">
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2"/>
-                                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
-                              </svg>
-                            </a>
-                            <h3 className="overlay-title">{item.title}</h3>
+                  {portraitItems.map((item) => {
+                    const videoKey = `port-${item.id}`;
+                    const isLoading = videoLoadingStates[videoKey] !== false;
+                    const canPlay = videoCanPlay[videoKey] || false;
+
+                    return (
+                      <div className="video-grid-item" key={videoKey}>
+                        <div className="video-aspect-frame aspect-9-16">
+                          {/* Loading overlay with site design */}
+                          {isLoading && (
+                            <div className="video-loading-overlay-site">
+                              <div className="site-loading-spinner">
+                                <div className="spinner-circle"></div>
+                                <div className="spinner-circle"></div>
+                                <div className="spinner-circle"></div>
+                              </div>
+                              <div className="site-loading-text">Loading...</div>
+                              {/* Progress bar */}
+                              <div className="site-progress-bar">
+                                <div
+                                  className="site-progress-fill"
+                                  style={{ width: `${videoLoadProgress[videoKey] || 0}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          )}
+
+                          <MuxPlayer
+                            playbackId={item.muxPlaybackId}
+                            autoPlay="muted"
+                            muted
+                            loop
+                            playsInline
+                            preload="metadata" // Faster loading - only metadata instead of full video
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'contain',
+                              background: '#fff',
+                              opacity: canPlay ? 1 : 0,
+                              transition: 'opacity 0.3s ease' // Faster transition
+                            }}
+                            onLoadStart={() => {
+                              setVideoLoadingStates(prev => ({ ...prev, [videoKey]: true }));
+                            }}
+                            onLoadedMetadata={() => {
+                              // Faster - trigger on metadata instead of full data
+                              handleVideoReady(videoKey);
+                            }}
+                            onCanPlay={(e) => {
+                              const el = e.target as any;
+                              if (el && el.play) {
+                                el.play().catch(() => {});
+                              }
+                            }}
+                            onProgress={(e) => {
+                              const el = e.target as any;
+                              if (el && el.buffered && el.buffered.length > 0) {
+                                const progress = (el.buffered.end(0) / el.duration) * 100;
+                                setVideoLoadProgress(prev => ({ ...prev, [videoKey]: progress }));
+                              }
+                            }}
+                          />
+
+                          <div className="grid-overlay">
+                            <div className="grid-overlay-content compact">
+                              <a href={`/work/${item.slug}`} className="card-action icon-only" title="View Project">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2"/>
+                                  <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+                                </svg>
+                              </a>
+                              <h3 className="overlay-title">{item.title}</h3>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </section>
             </div>
