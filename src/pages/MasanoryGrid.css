@@ -11,7 +11,7 @@
     border: none !important;
     outline: none !important;
   }
-  
+
   /* Loading container styles */
   .loading-container {
     display: flex;
@@ -21,7 +21,7 @@
     height: 300px;
     width: 100%;
   }
-  
+
   .loading-spinner {
     border: 4px solid rgba(0, 0, 0, 0.1);
     border-radius: 50%;
@@ -31,12 +31,12 @@
     animation: spin 1s linear infinite;
     margin-bottom: 16px;
   }
-  
+
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
-  
+
   /* No items container */
   .no-items-container {
     padding: 40px;
@@ -83,11 +83,11 @@
     h3 {
       font-size: 1.2rem;
     }
-  
+
     p {
       font-size: 0.9rem;
     }
-  
+
     .card-media {
       height: auto;
     }
@@ -134,7 +134,7 @@
       object-fit: cover !important;
     }
   }
-  
+
   .masonry-item {
     display: block;
     border-radius: 0;
@@ -146,11 +146,11 @@
     border: none;
     background: transparent;
   }
-  
+
   .masonry-item:hover {
     transform: translateY(-5px);
   }
-  
+
   .card-content {
     width: 100%;
     height: 100%;
@@ -189,7 +189,7 @@
     padding: 0;
     margin: 0;
   }
-  
+
   .video-container iframe,
   .video-container mux-player {
     position: absolute;
@@ -204,7 +204,7 @@
     padding: 0;
     margin: 0;
   }
-  
+
   /* Ensure MuxPlayer fills completely */
   mux-player {
     width: 100% !important;
@@ -221,7 +221,7 @@
     outline: none !important;
     box-shadow: none !important;
   }
-  
+
   mux-player video {
     width: 100% !important;
     height: 100% !important;
@@ -233,7 +233,7 @@
     outline: none !important;
     box-shadow: none !important;
   }
-  
+
   /* Remove any potential borders from MuxPlayer internal elements */
   mux-player *,
   mux-player *::before,
@@ -246,7 +246,7 @@
     border-left: none !important;
     border-right: none !important;
   }
-  
+
   /* Specifically target MuxPlayer controls and bottom elements */
   mux-player [slot="media"],
   mux-player [slot="poster"],
@@ -261,7 +261,7 @@
     outline: none !important;
     box-shadow: none !important;
   }
-  
+
   /* Hide MuxPlayer controls completely to prevent bottom border */
   mux-player::part(controls),
   mux-player::part(control-bar),
@@ -275,7 +275,7 @@
     height: 0 !important;
     border: none !important;
   }
-  
+
   /* Force hide any control elements that might create borders */
   mux-player media-control-bar,
   mux-player .media-control-bar,
@@ -286,7 +286,7 @@
     opacity: 0 !important;
     border: none !important;
   }
-  
+
   /* Ultimate bottom border elimination with sharp edges */
   mux-player,
   mux-player *,
@@ -298,8 +298,8 @@
     outline: 0px solid transparent !important;
     border-radius: 0 !important;
   }
-  
-  /* Video container - seamless and borderless */ 
+
+  /* Video container - seamless and borderless */
   .video-container {
     position: absolute;
     top: 0;
@@ -313,7 +313,7 @@
     outline: none !important;
     background: transparent !important;
   }
-  
+
   .video-container mux-player {
     width: 100% !important;
     height: 100% !important;
@@ -325,7 +325,7 @@
     background: transparent !important;
     box-shadow: none !important;
   }
-  
+
   /* Target MuxPlayer web component specifically - complete border elimination */
   mux-player {
     --controls: none !important;
@@ -358,12 +358,12 @@
     margin: 0 !important;
     padding: 0 !important;
   }
-  
+
   /* Hide any shadow DOM elements that could create borders */
   mux-player[controls] {
     --controls: none !important;
   }
-  
+
   /* Ensure proper grid item sizing based on cols and rows */
   .masonry-item {
     position: relative;
@@ -374,7 +374,7 @@
     outline: none !important;
     background: transparent !important;
   }
-  
+
   .card-content {
     position: relative;
     width: 100%;
@@ -385,34 +385,34 @@
     outline: none !important;
     background: transparent !important;
   }
-  
+
   /* Portrait videos (9:16) - 1 col, 3 rows */
   .masonry-item[data-cols="1"][data-rows="3"] {
     aspect-ratio: 9/16;
   }
-  
+
   /* Landscape videos (16:9) - 2 cols, 3 rows */
   .masonry-item[data-cols="2"][data-rows="3"] {
     aspect-ratio: 16/9;
   }
-  
+
   /* Specific optimization for 16:9 videos (cols: 2, rows: 3) */
   .masonry-item[style*="grid-column-end: span 2"][style*="grid-row-end: span 3"] {
     aspect-ratio: auto;
   }
-  
+
   .masonry-item[style*="grid-column-end: span 2"][style*="grid-row-end: span 3"] mux-player,
   .masonry-item[style*="grid-column-end: span 2"][style*="grid-row-end: span 3"] mux-player video {
     object-fit: cover !important;
     width: 100% !important;
     height: 100% !important;
   }
-  
+
   /* Specific optimization for 9:16 videos (cols: 1, rows: 3) */
   .masonry-item[style*="grid-column-end: span 1"][style*="grid-row-end: span 3"] {
     aspect-ratio: auto;
   }
-  
+
   .masonry-item[style*="grid-column-end: span 1"][style*="grid-row-end: span 3"] mux-player,
   .masonry-item[style*="grid-column-end: span 1"][style*="grid-row-end: span 3"] mux-player video {
     object-fit: cover !important;
@@ -502,6 +502,8 @@
   /* ===== Desktop-only split grids for Landscape and Portrait videos ===== */
   @media (min-width: 1024px) {
     .desktop-video-sections {
+      /* fixed column width so last row can center neatly */
+      --grid-col-width: 320px;
       display: flex;
       flex-direction: column;
       gap: 40px;
@@ -521,36 +523,51 @@
       font-weight: 600;
     }
 
-    /* Grids */
+    /* Base grid setup */
     .video-grid {
-      display: grid;
-      gap: 0; /* no gaps between videos */
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
       padding: 0;
-      /* background removed to prevent black space in empty last-column cells */
       background: transparent;
+      justify-content: center; /* This will center incomplete rows */
     }
 
-    /* Landscape grid: aim for 4 per row on large, 3 on medium */
-    .landscape-grid {
-      grid-template-columns: repeat(4, 1fr);
+    /* Individual video items with fixed sizes */
+    .video-grid-item {
+      flex: 0 0 auto; /* Don't grow or shrink */
     }
 
-    /* Portrait grid: also 4 per row default */
-    .portrait-grid {
-      grid-template-columns: repeat(4, 1fr);
+    /* Landscape videos: fixed width for proper centering */
+    .landscape-grid .video-grid-item {
+      width: 320px;
     }
 
+    /* Portrait videos: fixed width for proper centering */
+    .portrait-grid .video-grid-item {
+      width: 240px;
+    }
+
+    /* Responsive adjustments */
     @media (min-width: 1024px) and (max-width: 1399px) {
-      .landscape-grid, .portrait-grid {
-        grid-template-columns: repeat(3, 1fr);
+      .landscape-grid .video-grid-item {
+        width: 300px;
+      }
+      .portrait-grid .video-grid-item {
+        width: 220px;
       }
     }
 
     @media (min-width: 1400px) {
-      .landscape-grid, .portrait-grid {
-        grid-template-columns: repeat(4, 1fr);
+      .landscape-grid .video-grid-item {
+        width: 320px;
+      }
+      .portrait-grid .video-grid-item {
+        width: 240px;
       }
     }
+
+
 
     /* Consistent item framing with fixed aspect frames so videos don't crop */
     .video-grid-item {
@@ -569,10 +586,31 @@
 
     .video-aspect-frame.aspect-16-9 {
       aspect-ratio: 16/9;
+      height: 180px; /* Fixed height for landscape videos */
     }
 
     .video-aspect-frame.aspect-9-16 {
       aspect-ratio: 9/16;
+      height: 427px; /* Fixed height for portrait videos */
+    }
+
+    /* Responsive height adjustments for aspect frames */
+    @media (min-width: 1024px) and (max-width: 1399px) {
+      .video-aspect-frame.aspect-16-9 {
+        height: 169px; /* For 300px width */
+      }
+      .video-aspect-frame.aspect-9-16 {
+        height: 391px; /* For 220px width */
+      }
+    }
+
+    @media (min-width: 1400px) {
+      .video-aspect-frame.aspect-16-9 {
+        height: 180px; /* For 320px width */
+      }
+      .video-aspect-frame.aspect-9-16 {
+        height: 427px; /* For 240px width */
+      }
     }
 
     .video-aspect-frame mux-player,
@@ -630,7 +668,7 @@
       font-size: 1.2rem;
       margin-bottom: 8px;
     }
-  
+
     .card-overlay p {
       font-size: 0.9rem;
       line-height: 1.4;
@@ -666,7 +704,7 @@
       font-size: 1.3rem;
       margin-bottom: 12px;
     }
-  
+
     .card-overlay p {
       font-size: 1rem;
       line-height: 1.5;
@@ -733,7 +771,7 @@
   }
 
   .loading-progress::after {
-    content: '';  
+    content: '';
     box-sizing: border-box;
     position: absolute;
     left: 50%;
@@ -1218,7 +1256,7 @@
     position: relative;
   }
 
-  
+
 
   @keyframes pulse {
     0%, 100% {
@@ -1282,15 +1320,15 @@
     .mobile-single-view {
       display: none;
     }
-    
+
     .mobile-carousel-container {
       display: none;
     }
-    
+
     .mobile-carousel-indicators {
       display: none;
     }
-    
+
     .mobile-overlay {
       display: none;
     }

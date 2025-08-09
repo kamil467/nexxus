@@ -544,7 +544,11 @@ const MasonryGrid = () => {
               {/* Landscape Section */}
               <section className="video-section landscape">
                 <header className="section-header">
-                  <h2>Landscape Videos</h2>
+                  <h2 aria-label="Landscape" title="Landscape">
+                    <svg width="28" height="18" viewBox="0 0 28 18" fill="none" aria-hidden="true">
+                      <rect x="1" y="1" width="26" height="16" rx="2" stroke="currentColor" strokeWidth="2"/>
+                    </svg>
+                  </h2>
                 </header>
                 <div className="video-grid landscape-grid">
                   {landscapeItems.map((item) => (
@@ -585,7 +589,11 @@ const MasonryGrid = () => {
               {/* Portrait Section */}
               <section className="video-section portrait">
                 <header className="section-header">
-                  <h2>Portrait Videos</h2>
+                  <h2 aria-label="Portrait" title="Portrait">
+                    <svg width="18" height="28" viewBox="0 0 18 28" fill="none" aria-hidden="true">
+                      <rect x="1" y="1" width="16" height="26" rx="2" stroke="currentColor" strokeWidth="2"/>
+                    </svg>
+                  </h2>
                 </header>
                 <div className="video-grid portrait-grid">
                   {portraitItems.map((item) => (
