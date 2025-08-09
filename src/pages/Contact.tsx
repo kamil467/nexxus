@@ -13,21 +13,21 @@ const Contact = () => {
               <Mail className="text-gray-400" size={24} />
               <div>
                 <h3 className="font-medium mb-1">Email</h3>
-                <p className="text-gray-600">hello@studio.com</p>
+                <p className="text-gray-600">nexxusdigitalsolution@gmail.com</p>
               </div>
             </div>
             <div className="flex items-start space-x-4">
               <Phone className="text-gray-400" size={24} />
               <div>
                 <h3 className="font-medium mb-1">Phone</h3>
-                <p className="text-gray-600">+1 (555) 123-4567</p>
+                <p className="text-gray-600">+91 7358203220</p>
               </div>
             </div>
             <div className="flex items-start space-x-4">
               <MapPin className="text-gray-400" size={24} />
               <div>
                 <h3 className="font-medium mb-1">Location</h3>
-                <p className="text-gray-600">123 Design Street<br />San Francisco, CA 94107</p>
+                <p className="text-gray-600"> 23 pal- lucky plaza GH Road <br />Ramanathapuram,TN 623501, India</p>
               </div>
             </div>
           </div>
