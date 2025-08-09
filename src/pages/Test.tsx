@@ -129,6 +129,19 @@ const MasonryGrid = () => {
     }
   }, [isMuted, currentVideoIndex]);
 
+  // Desktop-only: split items into landscape and portrait video groups
+  const landscapeItems = useMemo(() =>
+    workItems.filter((item) =>
+      item.type === 'mux' && ((item.cols === 2 && item.rows === 2) || (item.cols === 2 && item.rows === 3))
+    ),
+  [workItems]);
+
+  const portraitItems = useMemo(() =>
+    workItems.filter((item) =>
+      item.type === 'mux' && (item.cols === 1 && item.rows === 3)
+    ),
+  [workItems]);
+
   // Touch gesture handler for play/pause
   const handleVideoTouch = useCallback((index: number, event: React.TouchEvent) => {
     event.preventDefault();
@@ -525,86 +538,98 @@ const MasonryGrid = () => {
         </div>
       ) : (
         <>
-           (
-            <div className="masonry-grid">
-              {workItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="masonry-item"
-                  data-cols={item.cols}
-                  data-rows={item.rows}
-                  style={{
-                    gridColumnEnd: `span ${item.cols}`,
-                    gridRowEnd: `span ${item.rows}`,
-                  }}
-                >
-                  <div className={`card-content ${loadedItems[item.id] ? 'loaded' : ''}`}>
-                    {!loadedItems[item.id] && (
-                      <>
-                        <div className="loading-skeleton"></div>
-                        <div className="loading-progress"></div>
-                      </>
-                    )}
-                    {item.type === 'mux' ? (
-                      <div className="video-container">
+          {/* Desktop layout: split into Landscape and Portrait sections. Mobile remains untouched elsewhere. */}
+          {!isMobile && (
+            <div className="desktop-video-sections">
+              {/* Landscape Section */}
+              <section className="video-section landscape">
+                <header className="section-header">
+                  <h2>Landscape Videos</h2>
+                </header>
+                <div className="video-grid landscape-grid">
+                  {landscapeItems.map((item) => (
+                    <div className="video-grid-item" key={`land-${item.id}`}>
+                      <div className="video-aspect-frame aspect-16-9">
                         <MuxPlayer
                           playbackId={item.muxPlaybackId}
-                          metadata={{
-                            video_title: 'NXW Scholarship event video',
-                            viewer_user_id: 'Placeholder (optional)',
-                          }}
                           autoPlay="muted"
                           muted
                           loop
                           playsInline
                           preload="auto"
-                          style={{ 
-                            borderRadius: '0',
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                            border: 'none',
-                            outline: 'none',
-                            background: 'transparent'
-                          }}
-                          onLoadStart={() => handleItemLoad(item.id)}
+                          style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000' }}
                           onCanPlay={(e) => {
-                            const video = e.target as any;
-                            if (video && video.play) {
-                              video.play().catch(() => {
-                                // Autoplay blocked, which is normal for some browsers
-                              });
+                            const el = e.target as any;
+                            if (el && el.play) {
+                              el.play().catch(() => {});
                             }
                           }}
                         />
+                        <div className="grid-overlay">
+                          <div className="grid-overlay-content compact">
+                            <a href={`/work/${item.slug}`} className="card-action icon-only" title="View Project">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2"/>
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+                              </svg>
+                            </a>
+                            <h3 className="overlay-title">{item.title}</h3>
+                          </div>
+                        </div>
                       </div>
-                    ) : item.type === 'image' ? (
-                      <img 
-                        src={item.image} 
-                        alt={`Card ${item.id}`} 
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '0' }}
-                        onLoad={() => handleItemLoad(item.id)}
-                      />
-                    ) : null}
-                    <div className="card-overlay">
-                      <h3>{item.title}</h3>
-                      <p>{item.description}</p>
-                      <a href={`/work/${item.slug}`} className="card-action icon-only" title="View Project">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2"/>
-                          <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
-                        </svg>
-                      </a>
                     </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
+              </section>
+
+              {/* Portrait Section */}
+              <section className="video-section portrait">
+                <header className="section-header">
+                  <h2>Portrait Videos</h2>
+                </header>
+                <div className="video-grid portrait-grid">
+                  {portraitItems.map((item) => (
+                    <div className="video-grid-item" key={`port-${item.id}`}>
+                      <div className="video-aspect-frame aspect-9-16">
+                        <MuxPlayer
+                          playbackId={item.muxPlaybackId}
+                          autoPlay="muted"
+                          muted
+                          loop
+                          playsInline
+                          preload="auto"
+                          style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000' }}
+                          onCanPlay={(e) => {
+                            const el = e.target as any;
+                            if (el && el.play) {
+                              el.play().catch(() => {});
+                            }
+                          }}
+                        />
+                        <div className="grid-overlay">
+                          <div className="grid-overlay-content compact">
+                            <a href={`/work/${item.slug}`} className="card-action icon-only" title="View Project">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2"/>
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+                              </svg>
+                            </a>
+                            <h3 className="overlay-title">{item.title}</h3>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
             </div>
-          )
+          )}
+
+          {/* Existing desktop masonry (kept if needed) and mobile rendering handled elsewhere */}
         </>
       )}
       {/* Clients Section */}
-    
+
     </div>
   );
 };
