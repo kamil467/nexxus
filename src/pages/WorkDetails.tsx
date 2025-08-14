@@ -242,22 +242,50 @@ const WorkDetails = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Determine video orientation from project cols and rows
+  const getVideoOrientationFromProject = (cols: number, rows: number): 'landscape' | 'portrait' | 'square' => {
+    if (cols === 1 && rows === 3) {
+      return 'portrait'; // 9:16 aspect ratio
+    } else if (cols === 3 && rows === 3) {
+      return 'square'; // 1:1 aspect ratio (or could be landscape)
+    } else if (cols === 2 && rows === 2) {
+      return 'square'; // 1:1 aspect ratio
+    } else if (cols === 2 &&  rows === 3) {
+      return 'landscape'; // wider than tall
+    } else if (rows > cols) {
+      return 'portrait'; // taller than wide
+    } else {
+      return 'square'; // equal dimensions
+    }
+  };
+
   // Detect video aspect ratio and orientation
   const detectVideoOrientation = (videoId: string, width: number, height: number) => {
     const aspectRatio = width / height;
     setVideoAspectRatio(prev => ({ ...prev, [videoId]: aspectRatio }));
 
-    let orientation: 'landscape' | 'portrait' | 'square';
+    let detectedOrientation: 'landscape' | 'portrait' | 'square';
     if (aspectRatio > 1.2) {
-      orientation = 'landscape'; // 16:9, 21:9, etc.
+      detectedOrientation = 'landscape'; // 16:9, 21:9, etc.
     } else if (aspectRatio < 0.8) {
-      orientation = 'portrait'; // 9:16, 4:5, etc.
+      detectedOrientation = 'portrait'; // 9:16, 4:5, etc.
     } else {
-      orientation = 'square'; // 1:1 or close to square
+      detectedOrientation = 'square'; // 1:1 or close to square
     }
 
-    setVideoOrientation(prev => ({ ...prev, [videoId]: orientation }));
-    console.log(`Video ${videoId}: ${width}x${height}, aspect: ${aspectRatio.toFixed(2)}, orientation: ${orientation}`);
+    // Only update orientation if we don't have a pre-determined one, or if the detected one is significantly different
+    setVideoOrientation(prev => {
+      const currentOrientation = prev[videoId];
+      if (!currentOrientation) {
+        // No pre-determined orientation, use detected
+        console.log(`Video ${videoId}: ${width}x${height}, aspect: ${aspectRatio.toFixed(2)}, detected orientation: ${detectedOrientation}`);
+        return { ...prev, [videoId]: detectedOrientation };
+      } else {
+        // We have a pre-determined orientation, keep it unless detection is very different
+        console.log(`Video ${videoId}: ${width}x${height}, aspect: ${aspectRatio.toFixed(2)}, detected: ${detectedOrientation}, keeping pre-determined: ${currentOrientation}`);
+        return prev;
+      }
+    });
   };
 
   // Check if device supports orientation lock
@@ -333,14 +361,26 @@ const WorkDetails = () => {
 
           // Initialize loading states for all media items
           const initialLoadingStates: { [key: string]: boolean } = {};
+          const initialOrientations: { [key: string]: 'landscape' | 'portrait' | 'square' } = {};
+
           data.relatedItems?.forEach((item: any, index: number) => {
             if (item.type === 'video') {
-              initialLoadingStates[`video-${index}`] = true;
+              const videoId = `video-${index}`;
+              initialLoadingStates[videoId] = true;
+
+              // Pre-determine orientation from project cols and rows
+              if (data.cols && data.rows) {
+                const orientation = getVideoOrientationFromProject(data.cols, data.rows);
+                initialOrientations[videoId] = orientation;
+                console.log(`Pre-determined orientation for ${videoId}: ${orientation} (cols: ${data.cols}, rows: ${data.rows})`);
+              }
             } else if (item.type === 'image') {
               initialLoadingStates[`image-${index}`] = true;
             }
           });
+
           setLoadingStates(initialLoadingStates);
+          setVideoOrientation(initialOrientations);
         }
       } catch (err) {
         console.error('Error in fetch operation:', err);
@@ -360,6 +400,18 @@ const WorkDetails = () => {
   const handleVideoRef = (id: string, videoElement: any) => {
     if (videoElement && !videoRefs.current[id]) {
       videoRefs.current[id] = videoElement;
+
+      // Try to detect orientation immediately if dimensions are available
+      setTimeout(() => {
+        const videoWidth = videoElement.videoWidth || videoElement.clientWidth;
+        const videoHeight = videoElement.videoHeight || videoElement.clientHeight;
+
+        console.log(`Video ${id} immediate check: ${videoWidth}x${videoHeight}`);
+
+        if (videoWidth && videoHeight && !videoOrientation[id]) {
+          detectVideoOrientation(id, videoWidth, videoHeight);
+        }
+      }, 100); // Small delay to allow MuxPlayer to initialize
 
       // Add event listeners for video controls
       videoElement.addEventListener('play', () => {
@@ -391,7 +443,33 @@ const WorkDetails = () => {
         const videoWidth = videoElement.videoWidth || videoElement.clientWidth;
         const videoHeight = videoElement.videoHeight || videoElement.clientHeight;
 
+        console.log(`Video ${id} loadedmetadata: ${videoWidth}x${videoHeight}`);
+
         if (videoWidth && videoHeight) {
+          detectVideoOrientation(id, videoWidth, videoHeight);
+        }
+      });
+
+      // Also try to detect orientation on loadeddata event as backup
+      videoElement.addEventListener('loadeddata', () => {
+        const videoWidth = videoElement.videoWidth || videoElement.clientWidth;
+        const videoHeight = videoElement.videoHeight || videoElement.clientHeight;
+
+        console.log(`Video ${id} loadeddata: ${videoWidth}x${videoHeight}`);
+
+        if (videoWidth && videoHeight && !videoOrientation[id]) {
+          detectVideoOrientation(id, videoWidth, videoHeight);
+        }
+      });
+
+      // Also try to detect on canplay event as another backup
+      videoElement.addEventListener('canplay', () => {
+        const videoWidth = videoElement.videoWidth || videoElement.clientWidth;
+        const videoHeight = videoElement.videoHeight || videoElement.clientHeight;
+
+        console.log(`Video ${id} canplay: ${videoWidth}x${videoHeight}`);
+
+        if (videoWidth && videoHeight && !videoOrientation[id]) {
           detectVideoOrientation(id, videoWidth, videoHeight);
         }
       });
@@ -541,11 +619,15 @@ const WorkDetails = () => {
 
             const isPlaying = playingVideos.has(videoId);
 
+            // Get the current orientation (pre-determined or detected)
+            const currentOrientation = videoOrientation[videoId];
+
             console.log('Video item:', item);
             console.log('Mux Playback ID:', muxPlaybackId);
             console.log('isPlaying', isPlaying);
             console.log('videoId', videoId);
             console.log('loadingStates', loadingStates[videoId]);
+            console.log('currentOrientation', currentOrientation);
 
             return (
               <div key={videoId} className="mb-8">
@@ -558,8 +640,14 @@ const WorkDetails = () => {
                     {muxPlaybackId ? (
                       <div
                         className="work-details-video-container relative w-full bg-black rounded-lg overflow-hidden group"
-                        style={{ aspectRatio: '16/9' }}
-                        data-orientation={videoOrientation[videoId] || 'unknown'}
+                        style={{
+                          aspectRatio: currentOrientation === 'portrait' ? '9/16' :
+                                     currentOrientation === 'square' ? '1/1' :
+                                     currentOrientation === 'landscape' ? '16/9' :
+                                     // Use actual aspect ratio if available, otherwise default to landscape
+                                     videoAspectRatio[videoId] ? `${videoAspectRatio[videoId]}` : '16/9'
+                        }}
+                        data-orientation={currentOrientation || 'unknown'}
                         onMouseEnter={() => setShowControls(prev => ({ ...prev, [videoId]: true }))}
                         onMouseLeave={() => {
                           // Clear any existing timeout

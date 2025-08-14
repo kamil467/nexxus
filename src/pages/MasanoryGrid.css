@@ -11,7 +11,7 @@
     border: none !important;
     outline: none !important;
   }
-  
+
   /* Loading container styles */
   .loading-container {
     display: flex;
@@ -21,7 +21,7 @@
     height: 300px;
     width: 100%;
   }
-  
+
   .loading-spinner {
     border: 4px solid rgba(0, 0, 0, 0.1);
     border-radius: 50%;
@@ -31,12 +31,12 @@
     animation: spin 1s linear infinite;
     margin-bottom: 16px;
   }
-  
+
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
-  
+
   /* No items container */
   .no-items-container {
     padding: 40px;
@@ -83,11 +83,11 @@
     h3 {
       font-size: 1.2rem;
     }
-  
+
     p {
       font-size: 0.9rem;
     }
-  
+
     .card-media {
       height: auto;
     }
@@ -134,7 +134,7 @@
       object-fit: cover !important;
     }
   }
-  
+
   .masonry-item {
     display: block;
     border-radius: 0;
@@ -146,11 +146,11 @@
     border: none;
     background: transparent;
   }
-  
+
   .masonry-item:hover {
     transform: translateY(-5px);
   }
-  
+
   .card-content {
     width: 100%;
     height: 100%;
@@ -189,7 +189,7 @@
     padding: 0;
     margin: 0;
   }
-  
+
   .video-container iframe,
   .video-container mux-player {
     position: absolute;
@@ -204,7 +204,7 @@
     padding: 0;
     margin: 0;
   }
-  
+
   /* Ensure MuxPlayer fills completely */
   mux-player {
     width: 100% !important;
@@ -221,7 +221,7 @@
     outline: none !important;
     box-shadow: none !important;
   }
-  
+
   mux-player video {
     width: 100% !important;
     height: 100% !important;
@@ -233,7 +233,7 @@
     outline: none !important;
     box-shadow: none !important;
   }
-  
+
   /* Remove any potential borders from MuxPlayer internal elements */
   mux-player *,
   mux-player *::before,
@@ -246,7 +246,7 @@
     border-left: none !important;
     border-right: none !important;
   }
-  
+
   /* Specifically target MuxPlayer controls and bottom elements */
   mux-player [slot="media"],
   mux-player [slot="poster"],
@@ -261,7 +261,7 @@
     outline: none !important;
     box-shadow: none !important;
   }
-  
+
   /* Hide MuxPlayer controls completely to prevent bottom border */
   mux-player::part(controls),
   mux-player::part(control-bar),
@@ -275,7 +275,7 @@
     height: 0 !important;
     border: none !important;
   }
-  
+
   /* Force hide any control elements that might create borders */
   mux-player media-control-bar,
   mux-player .media-control-bar,
@@ -286,7 +286,7 @@
     opacity: 0 !important;
     border: none !important;
   }
-  
+
   /* Ultimate bottom border elimination with sharp edges */
   mux-player,
   mux-player *,
@@ -298,8 +298,8 @@
     outline: 0px solid transparent !important;
     border-radius: 0 !important;
   }
-  
-  /* Video container - seamless and borderless */ 
+
+  /* Video container - seamless and borderless */
   .video-container {
     position: absolute;
     top: 0;
@@ -313,7 +313,7 @@
     outline: none !important;
     background: transparent !important;
   }
-  
+
   .video-container mux-player {
     width: 100% !important;
     height: 100% !important;
@@ -325,7 +325,7 @@
     background: transparent !important;
     box-shadow: none !important;
   }
-  
+
   /* Target MuxPlayer web component specifically - complete border elimination */
   mux-player {
     --controls: none !important;
@@ -358,12 +358,12 @@
     margin: 0 !important;
     padding: 0 !important;
   }
-  
+
   /* Hide any shadow DOM elements that could create borders */
   mux-player[controls] {
     --controls: none !important;
   }
-  
+
   /* Ensure proper grid item sizing based on cols and rows */
   .masonry-item {
     position: relative;
@@ -374,7 +374,7 @@
     outline: none !important;
     background: transparent !important;
   }
-  
+
   .card-content {
     position: relative;
     width: 100%;
@@ -385,34 +385,34 @@
     outline: none !important;
     background: transparent !important;
   }
-  
+
   /* Portrait videos (9:16) - 1 col, 3 rows */
   .masonry-item[data-cols="1"][data-rows="3"] {
     aspect-ratio: 9/16;
   }
-  
+
   /* Landscape videos (16:9) - 2 cols, 3 rows */
   .masonry-item[data-cols="2"][data-rows="3"] {
     aspect-ratio: 16/9;
   }
-  
+
   /* Specific optimization for 16:9 videos (cols: 2, rows: 3) */
   .masonry-item[style*="grid-column-end: span 2"][style*="grid-row-end: span 3"] {
     aspect-ratio: auto;
   }
-  
+
   .masonry-item[style*="grid-column-end: span 2"][style*="grid-row-end: span 3"] mux-player,
   .masonry-item[style*="grid-column-end: span 2"][style*="grid-row-end: span 3"] mux-player video {
     object-fit: cover !important;
     width: 100% !important;
     height: 100% !important;
   }
-  
+
   /* Specific optimization for 9:16 videos (cols: 1, rows: 3) */
   .masonry-item[style*="grid-column-end: span 1"][style*="grid-row-end: span 3"] {
     aspect-ratio: auto;
   }
-  
+
   .masonry-item[style*="grid-column-end: span 1"][style*="grid-row-end: span 3"] mux-player,
   .masonry-item[style*="grid-column-end: span 1"][style*="grid-row-end: span 3"] mux-player video {
     object-fit: cover !important;
@@ -499,12 +499,386 @@
     transform: translateY(0);
   }
 
+  /* ===== Desktop-only split grids for Landscape and Portrait videos ===== */
+  @media (min-width: 1024px) {
+    .desktop-video-sections {
+      /* fixed column width so last row can center neatly */
+      --grid-col-width: 420px; /* Updated to match new landscape video width */
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      padding: 20px 20px 40px;
+    }
+
+    .video-section .section-header {
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .video-section .section-header h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    /* Base grid setup */
+    .video-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0; /* Remove spacing between videos */
+      padding: 0;
+      background: transparent;
+      justify-content: center; /* This will center incomplete rows */
+    }
+
+    /* Individual video items with fixed sizes */
+    .video-grid-item {
+      flex: 0 0 auto; /* Don't grow or shrink */
+    }
+
+    /* Landscape videos: larger width for 3 videos per row */
+    .landscape-grid .video-grid-item {
+      width: 420px; /* Increased from 320px for larger videos */
+    }
+
+    /* Portrait videos: increased width for better visibility - 4 videos per row */
+    .portrait-grid .video-grid-item {
+      width: 280px;
+    }
+
+    /* Responsive adjustments */
+    @media (min-width: 1024px) and (max-width: 1399px) {
+      .landscape-grid .video-grid-item {
+        width: 380px; /* Increased from 300px */
+      }
+      .portrait-grid .video-grid-item {
+        width: 260px;
+      }
+    }
+
+    @media (min-width: 1400px) {
+      .landscape-grid .video-grid-item {
+        width: 450px; /* Increased from 320px for even larger videos */
+      }
+      .portrait-grid .video-grid-item {
+        width: 300px;
+      }
+    }
+
+    /* Extra large screens - ensure 3 videos per row for landscape, 4+ for portrait */
+    @media (min-width: 1600px) {
+      .landscape-grid .video-grid-item {
+        width: 500px; /* Even larger for very wide screens */
+      }
+      .portrait-grid .video-grid-item {
+        width: 300px; /* Maintain consistent size for portrait videos */
+      }
+    }
+
+
+
+    /* Consistent item framing with fixed aspect frames so videos don't crop */
+    .video-grid-item {
+      background: #000;
+      border-radius: 0; /* sharp corners, no gaps */
+      overflow: hidden;
+      border: none; /* remove border to eliminate visible gaps */
+      position: relative;
+    }
+
+    .video-aspect-frame {
+      width: 100%;
+      background: #000;
+      position: relative;
+    }
+
+    .video-aspect-frame.aspect-16-9 {
+      aspect-ratio: 16/9;
+      height: 236px; /* Updated height for 420px width (420/16*9) */
+    }
+
+    .video-aspect-frame.aspect-9-16 {
+      aspect-ratio: 9/16;
+      height: 498px; /* Updated height for 280px width (280*16/9) */
+    }
+
+    /* Responsive height adjustments for aspect frames */
+    @media (min-width: 1024px) and (max-width: 1399px) {
+      .video-aspect-frame.aspect-16-9 {
+        height: 214px; /* For 380px width (380/16*9) */
+      }
+      .video-aspect-frame.aspect-9-16 {
+        height: 462px; /* For 260px width (260*16/9) */
+      }
+    }
+
+    @media (min-width: 1400px) {
+      .video-aspect-frame.aspect-16-9 {
+        height: 253px; /* For 450px width (450/16*9) */
+      }
+      .video-aspect-frame.aspect-9-16 {
+        height: 533px; /* For 300px width (300*16/9) */
+      }
+    }
+
+    /* Extra large screens height adjustments */
+    @media (min-width: 1600px) {
+      .video-aspect-frame.aspect-16-9 {
+        height: 281px; /* For 500px width (500/16*9) */
+      }
+      .video-aspect-frame.aspect-9-16 {
+        height: 533px; /* Maintain 300px width for portrait videos */
+      }
+    }
+
+    .video-aspect-frame mux-player,
+    .video-aspect-frame mux-player video {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: contain !important; /* ensure full video visible without cropping */
+      background: #fff !important; /* Clean white background instead of black */
+    }
+
+    /* Site-Branded Video Loading Overlay */
+    .video-loading-overlay-site {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      border-radius: 0; /* Sharp corners to match videos */
+      transition: opacity 0.3s ease;
+      box-shadow: none; /* Remove shadow for cleaner look */
+    }
+
+    /* Site-Branded Loading Spinner */
+    .site-loading-spinner {
+      position: relative;
+      width: 50px;
+      height: 50px;
+      margin-bottom: 20px;
+    }
+
+    .spinner-circle {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 3px solid transparent;
+      border-radius: 50%;
+      animation: site-spin 2s linear infinite;
+    }
+
+    .spinner-circle:nth-child(1) {
+      border-top-color: #A9AC87;
+      border-right-color: #A9AC87;
+      animation-delay: 0s;
+      opacity: 1;
+    }
+
+    .spinner-circle:nth-child(2) {
+      border-bottom-color: rgba(169, 172, 135, 0.6);
+      border-left-color: rgba(169, 172, 135, 0.6);
+      animation-delay: 0.4s;
+      animation-duration: 1.5s;
+    }
+
+    .spinner-circle:nth-child(3) {
+      border-top-color: rgba(169, 172, 135, 0.3);
+      animation-delay: 0.8s;
+      animation-duration: 1s;
+    }
+
+    @keyframes site-spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Site-Branded Loading Text */
+    .site-loading-text {
+      color: #A9AC87;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-family: 'Inter', sans-serif;
+      animation: site-pulse 2s ease-in-out infinite;
+      margin-bottom: 16px;
+    }
+
+    @keyframes site-pulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    /* Site-Branded Progress Bar */
+    .site-progress-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: rgba(169, 172, 135, 0.1);
+      overflow: hidden;
+      border-radius: 0; /* Sharp corners */
+    }
+
+    .site-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #A9AC87, #C5C899);
+      transition: width 0.3s ease;
+      position: relative;
+      border-radius: 0; /* Sharp corners */
+    }
+
+    .site-progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      animation: site-shimmer 2s infinite;
+    }
+
+    @keyframes site-shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* Enhanced Video Container with Loading States */
+    .video-aspect-frame {
+      position: relative;
+      overflow: hidden;
+      border-radius: 0; /* Sharp corners as requested */
+      box-shadow: none; /* Remove shadow for cleaner look */
+      transition: all 0.3s ease;
+      background: #ffffff;
+    }
+
+    .video-aspect-frame:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(169, 172, 135, 0.1);
+    }
+
+    /* Loading State Skeleton */
+    .video-skeleton-site {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, #f8f9fa 25%, #e9ecef 50%, #f8f9fa 75%);
+      background-size: 200% 100%;
+      animation: site-skeleton-loading 1.5s infinite;
+    }
+
+    @keyframes site-skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Responsive Loading Adjustments */
+    @media (max-width: 768px) {
+      .site-loading-spinner {
+        width: 40px;
+        height: 40px;
+      }
+
+      .site-loading-text {
+        font-size: 12px;
+        margin-bottom: 12px;
+      }
+
+      .site-progress-bar {
+        height: 3px;
+      }
+    }
+
+    /* Loading State Improvements */
+    .video-loading-overlay-site::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, rgba(169, 172, 135, 0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: site-pulse-bg 3s ease-in-out infinite;
+    }
+
+    @keyframes site-pulse-bg {
+      0%, 100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.3; }
+      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.1; }
+    }
+
+    /* Ensure loading content is above background pulse */
+    .site-loading-spinner,
+    .site-loading-text {
+      position: relative;
+      z-index: 2;
+    }
+
+    .grid-item-meta { display:none; }
+
+    /* Hover overlay over the video */
+    .grid-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-start;
+      background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.75) 100%);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      padding: 14px;
+      pointer-events: none;
+    }
+
+    .video-grid-item:hover .grid-overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .grid-overlay-content h3 {
+      color: white;
+      margin: 0 0 6px 0;
+      font-size: 1rem;
+      font-weight: 600;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+    }
+
+    .grid-overlay-content p {
+      color: rgba(255,255,255,0.85);
+      margin: 0 0 10px 0;
+      font-size: 0.9rem;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  }
+
   @media (max-width: 768px) {
     .card-overlay h3 {
       font-size: 1.2rem;
       margin-bottom: 8px;
     }
-  
+
     .card-overlay p {
       font-size: 0.9rem;
       line-height: 1.4;
@@ -540,7 +914,7 @@
       font-size: 1.3rem;
       margin-bottom: 12px;
     }
-  
+
     .card-overlay p {
       font-size: 1rem;
       line-height: 1.5;
@@ -607,7 +981,7 @@
   }
 
   .loading-progress::after {
-    content: '';  
+    content: '';
     box-sizing: border-box;
     position: absolute;
     left: 50%;
@@ -1092,7 +1466,7 @@
     position: relative;
   }
 
-  
+
 
   @keyframes pulse {
     0%, 100% {
@@ -1156,15 +1530,15 @@
     .mobile-single-view {
       display: none;
     }
-    
+
     .mobile-carousel-container {
       display: none;
     }
-    
+
     .mobile-carousel-indicators {
       display: none;
     }
-    
+
     .mobile-overlay {
       display: none;
     }

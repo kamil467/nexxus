@@ -184,6 +184,8 @@ const Mobile: React.FC<Props> = ({ videos }) => {
                   </div>
                 )}
 
+
+
                 {/* Mute/Unmute Button - Inside video player */}
                 <button
                   className="mute-button"
@@ -212,7 +214,15 @@ const Mobile: React.FC<Props> = ({ videos }) => {
 
             {/* Project Details - Moved outside video area */}
             <div className="project-info-panel">
-              <h3 className="project-title">{item.title}</h3>
+              <a href={`/work/${item.slug}`} className="project-title-link" title="View Project Details">
+                <h3 className="project-title">
+                  {item.title}
+                  <svg className="project-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M7 17L17 7" stroke="currentColor" strokeWidth="2"/>
+                    <path d="M7 7h10v10" stroke="currentColor" strokeWidth="2"/>
+                  </svg>
+                </h3>
+              </a>
               {item.description && (
                 <p className="project-description">{item.description}</p>
               )}
