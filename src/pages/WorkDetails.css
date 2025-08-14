@@ -7,6 +7,26 @@
   background: #000;
   border-radius: 12px;
   overflow: hidden;
+  max-height: 80vh; /* Prevent videos from being too tall */
+}
+
+/* Landscape Video Container */
+.work-details-video-container[data-orientation="landscape"] {
+  max-height: 70vh; /* Reasonable height for landscape videos */
+}
+
+/* Portrait Video Container */
+.work-details-video-container[data-orientation="portrait"] {
+  max-height: 85vh; /* Allow more height for portrait videos */
+  max-width: 600px; /* Limit width for portrait videos */
+  margin: 0 auto; /* Center portrait videos */
+}
+
+/* Square Video Container */
+.work-details-video-container[data-orientation="square"] {
+  max-height: 75vh; /* Balanced height for square videos */
+  max-width: 800px; /* Reasonable width for square videos */
+  margin: 0 auto; /* Center square videos */
 }
 
 /* MuxPlayer Optimization for WorkDetails */
@@ -19,6 +39,7 @@
   display: block !important;
   outline: none !important;
   box-shadow: none !important;
+  max-height: inherit !important; /* Inherit max-height from container */
 }
 
 .work-details-video-container mux-player video {
@@ -29,6 +50,7 @@
   border-radius: 0 !important;
   outline: none !important;
   box-shadow: none !important;
+  max-height: inherit !important; /* Inherit max-height from container */
 }
 
 /* Remove any potential borders from MuxPlayer internal elements */
@@ -475,12 +497,30 @@ mux-player:-moz-full-screen + .video-controls-overlay {
 @media (max-width: 768px) {
   .work-details-video-container {
     border-radius: 12px;
+    max-height: 60vh; /* Smaller max height on mobile */
   }
-  
+
+  /* Mobile Portrait Video Adjustments */
+  .work-details-video-container[data-orientation="portrait"] {
+    max-height: 70vh; /* Allow more height for portrait on mobile */
+    max-width: 90vw; /* Use more screen width on mobile */
+  }
+
+  /* Mobile Landscape Video Adjustments */
+  .work-details-video-container[data-orientation="landscape"] {
+    max-height: 50vh; /* Prevent landscape videos from being too tall on mobile */
+  }
+
+  /* Mobile Square Video Adjustments */
+  .work-details-video-container[data-orientation="square"] {
+    max-height: 60vh;
+    max-width: 90vw;
+  }
+
   .play-pause-button {
     padding: 12px;
   }
-  
+
   .loading-spinner {
     width: 32px;
     height: 32px;
@@ -493,6 +533,25 @@ mux-player:-moz-full-screen + .video-controls-overlay {
   will-change: transform;
   transform: translateZ(0);
   contain: layout style paint;
+}
+
+/* Prevent video section overflow */
+.work-details-video-section {
+  overflow: hidden;
+  max-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ensure video containers fit within viewport */
+.work-details-video-wrapper {
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 0; /* Allow shrinking */
 }
 
 .work-details-image {

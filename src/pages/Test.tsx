@@ -629,7 +629,7 @@ const MasonryGrid = () => {
                           <div className="grid-overlay">
                             <div className="grid-overlay-content compact">
                               <a href={`/work/${item.slug}`} className="card-action icon-only" title="View Project">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2"/>
                                   <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
                                 </svg>
@@ -721,7 +721,7 @@ const MasonryGrid = () => {
                           <div className="grid-overlay">
                             <div className="grid-overlay-content compact">
                               <a href={`/work/${item.slug}`} className="card-action icon-only" title="View Project">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2"/>
                                   <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
                                 </svg>

@@ -503,7 +503,7 @@
   @media (min-width: 1024px) {
     .desktop-video-sections {
       /* fixed column width so last row can center neatly */
-      --grid-col-width: 320px;
+      --grid-col-width: 420px; /* Updated to match new landscape video width */
       display: flex;
       flex-direction: column;
       gap: 40px;
@@ -527,7 +527,7 @@
     .video-grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 0;
+      gap: 0; /* Remove spacing between videos */
       padding: 0;
       background: transparent;
       justify-content: center; /* This will center incomplete rows */
@@ -538,9 +538,9 @@
       flex: 0 0 auto; /* Don't grow or shrink */
     }
 
-    /* Landscape videos: fixed width for proper centering */
+    /* Landscape videos: larger width for 3 videos per row */
     .landscape-grid .video-grid-item {
-      width: 320px;
+      width: 420px; /* Increased from 320px for larger videos */
     }
 
     /* Portrait videos: fixed width for proper centering */
@@ -551,7 +551,7 @@
     /* Responsive adjustments */
     @media (min-width: 1024px) and (max-width: 1399px) {
       .landscape-grid .video-grid-item {
-        width: 300px;
+        width: 380px; /* Increased from 300px */
       }
       .portrait-grid .video-grid-item {
         width: 220px;
@@ -560,10 +560,17 @@
 
     @media (min-width: 1400px) {
       .landscape-grid .video-grid-item {
-        width: 320px;
+        width: 450px; /* Increased from 320px for even larger videos */
       }
       .portrait-grid .video-grid-item {
         width: 240px;
+      }
+    }
+
+    /* Extra large screens - ensure 3 videos per row */
+    @media (min-width: 1600px) {
+      .landscape-grid .video-grid-item {
+        width: 500px; /* Even larger for very wide screens */
       }
     }
 
@@ -586,7 +593,7 @@
 
     .video-aspect-frame.aspect-16-9 {
       aspect-ratio: 16/9;
-      height: 180px; /* Fixed height for landscape videos */
+      height: 236px; /* Updated height for 420px width (420/16*9) */
     }
 
     .video-aspect-frame.aspect-9-16 {
@@ -597,7 +604,7 @@
     /* Responsive height adjustments for aspect frames */
     @media (min-width: 1024px) and (max-width: 1399px) {
       .video-aspect-frame.aspect-16-9 {
-        height: 169px; /* For 300px width */
+        height: 214px; /* For 380px width (380/16*9) */
       }
       .video-aspect-frame.aspect-9-16 {
         height: 391px; /* For 220px width */
@@ -606,10 +613,17 @@
 
     @media (min-width: 1400px) {
       .video-aspect-frame.aspect-16-9 {
-        height: 180px; /* For 320px width */
+        height: 253px; /* For 450px width (450/16*9) */
       }
       .video-aspect-frame.aspect-9-16 {
         height: 427px; /* For 240px width */
+      }
+    }
+
+    /* Extra large screens height adjustments */
+    @media (min-width: 1600px) {
+      .video-aspect-frame.aspect-16-9 {
+        height: 281px; /* For 500px width (500/16*9) */
       }
     }
 
