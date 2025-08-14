@@ -250,7 +250,7 @@ const WorkDetails = () => {
       return 'square'; // 1:1 aspect ratio (or could be landscape)
     } else if (cols === 2 && rows === 2) {
       return 'square'; // 1:1 aspect ratio
-    } else if (cols > rows) {
+    } else if (cols === 2 &&  rows === 3) {
       return 'landscape'; // wider than tall
     } else if (rows > cols) {
       return 'portrait'; // taller than wide
