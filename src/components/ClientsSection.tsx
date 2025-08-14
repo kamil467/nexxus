@@ -5,44 +5,117 @@ import { Users, Building2, Award, Star, ChevronLeft, ChevronRight } from 'lucide
 const clients = [
   { 
     id: 1, 
-    name: 'Google', 
-    logo: 'https://www.vectorlogo.zone/logos/google/google-ar21.svg'
+    name: 'Lalitha Jewellery', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/Lalithaa%20Logo.png?updatedAt=1755193530742'
   },
   { 
     id: 2, 
-    name: 'Meta', 
-    logo: 'https://www.vectorlogo.zone/logos/facebook/facebook-ar21.svg'
+    name: 'VBJ', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/VBJ%20Logo.png?updatedAt=1755193530161'
   },
-  { 
-    id: 3, 
-    name: 'Microsoft', 
-    logo: 'https://www.vectorlogo.zone/logos/microsoft/microsoft-ar21.svg'
+  {
+    id: 3,
+    name: 'WONDR DIAMONDS',
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/WONDR.jpg?updatedAt=1755193529260'
   },
   { 
     id: 4, 
-    name: 'Apple', 
-    logo: 'https://www.vectorlogo.zone/logos/apple/apple-ar21.svg'
+    name: 'Best Mummy', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/best-mummy-logo.jpg?updatedAt=1755193528053'
   },
   { 
     id: 5, 
-    name: 'Amazon', 
-    logo: 'https://www.vectorlogo.zone/logos/amazon/amazon-ar21.svg'
+    name: 'BFG Studio', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/BFG%20%20watermark.png?updatedAt=1755193528008'
   },
   { 
     id: 6, 
-    name: 'IBM', 
-    logo: 'https://www.vectorlogo.zone/logos/ibm/ibm-ar21.svg'
+    name: 'Zaitoon', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/Zaitoon%20Logo.png?updatedAt=1755193527130'
   },
   { 
     id: 7, 
-    name: 'Intel', 
-    logo: 'https://www.vectorlogo.zone/logos/intel/intel-ar21.svg'
+    name: 'AR Hospital', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/AR%20Hospital.jpg?updatedAt=1755193526824'
   },
   { 
     id: 8, 
-    name: 'Tata', 
-    logo: 'https://www.vectorlogo.zone/logos/tata/tata-ar21.svg'
-  }
+    name: 'HAJIYAR TRADERS', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/Hajiyar%20Logo.jpeg?updatedAt=1755193526807'
+  },
+  { 
+    id: 9, 
+    name: 'HASINA CUPPING', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/hasina%20logo.jpeg?updatedAt=1755193526807'
+  },
+
+  { 
+    id: 10, 
+    name: 'Awinco', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/awinco%20logo-Tamil.png?updatedAt=1755193526698'
+  },
+  { 
+    id: 11, 
+    name: 'GoMBRT', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/GoMBRT_logo.webp?updatedAt=1755193526663'
+  },
+  { 
+    id: 12, 
+    name: 'Hema Printers', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/Hema%20Printers%20Logo.png?updatedAt=1755193526161'
+  },
+
+
+
+   { 
+    id: 13, 
+    name: 'Infinitee', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/Infinitee%20logo%20png.png?updatedAt=1755193524799'
+     },   
+  { 
+    id: 14, 
+    name: 'Anifa Briyani', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/anifa-biriyani%20logo.jpg?updatedAt=1755193524066'
+  },
+  { 
+    id: 15, 
+    name: 'Hyve Inn', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/HYVE%20INN%20LOGO.jpg?updatedAt=1755193523471'
+  },
+
+
+   { 
+    id: 16, 
+    name: 'KRT', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/KRT%20logo.png?updatedAt=1755193523194'
+     },   
+  { 
+    id: 17, 
+    name: 'YES', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/Yes%20Logo.jpeg?updatedAt=1755193523189'
+  },
+  { 
+    id: 18, 
+    name: 'OPAL', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/Opal%20cafe%20logo%202.png?updatedAt=1755193523091'
+  },
+  { 
+    id:19, 
+    name: 'RAMSAI', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/RAMSAI%20LOGO%20(1).png?updatedAt=1755193523076'
+     },   
+  { 
+    id: 20, 
+    name: 'Yuvati', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/Yuvati%20logo%20(1).png?updatedAt=1755193522979'
+  },
+  { 
+    id: 21, 
+    name: 'TNSkills', 
+    logo: 'https://ik.imagekit.io/kamil467/Customers%20Logo%20%20for%20Website/Tnskills%20Logo.png?updatedAt=1755193521873'
+  },
+
+
 ];
 
 // Statistics data
@@ -58,11 +131,11 @@ interface ClientsSectionProps {
 }
 
 const LogoCard = ({ client, className = '' }: { client: typeof clients[0], className?: string }) => (
-  <div className={`bg-gray-50 rounded-lg p-4 flex items-center justify-center hover:shadow-lg transition-all duration-300 ${className}`}>
-    <img 
-      src={client.logo} 
+  <div className={`bg-gray-50 rounded-lg p-6 flex items-center justify-center hover:shadow-lg transition-all duration-300 h-full ${className}`}>
+    <img
+      src={client.logo}
       alt={client.name}
-      className="max-w-full max-h-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+      className="max-w-full max-h-full object-contain transition-all duration-300"
     />
   </div>
 );
@@ -239,14 +312,14 @@ const ClientsSection: React.FC<ClientsSectionProps> = ({ className = '' }) => {
           <div className="flex animate-scroll">
             <div className="flex space-x-8 items-center">
               {clients.map((client) => (
-                <div key={client.id} className="flex-shrink-0 w-[200px] h-20">
+                <div key={client.id} className="flex-shrink-0 w-[200px] h-32">
                   <LogoCard client={client} />
                 </div>
               ))}
             </div>
             <div className="flex space-x-8 items-center">
               {clients.map((client) => (
-                <div key={`${client.id}-duplicate`} className="flex-shrink-0 w-[200px] h-20">
+                <div key={`${client.id}-duplicate`} className="flex-shrink-0 w-[200px] h-32">
                   <LogoCard client={client} />
                 </div>
               ))}
