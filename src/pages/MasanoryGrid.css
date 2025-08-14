@@ -543,9 +543,9 @@
       width: 420px; /* Increased from 320px for larger videos */
     }
 
-    /* Portrait videos: fixed width for proper centering */
+    /* Portrait videos: increased width for better visibility - 4 videos per row */
     .portrait-grid .video-grid-item {
-      width: 240px;
+      width: 280px;
     }
 
     /* Responsive adjustments */
@@ -554,7 +554,7 @@
         width: 380px; /* Increased from 300px */
       }
       .portrait-grid .video-grid-item {
-        width: 220px;
+        width: 260px;
       }
     }
 
@@ -563,14 +563,17 @@
         width: 450px; /* Increased from 320px for even larger videos */
       }
       .portrait-grid .video-grid-item {
-        width: 240px;
+        width: 300px;
       }
     }
 
-    /* Extra large screens - ensure 3 videos per row */
+    /* Extra large screens - ensure 3 videos per row for landscape, 4+ for portrait */
     @media (min-width: 1600px) {
       .landscape-grid .video-grid-item {
         width: 500px; /* Even larger for very wide screens */
+      }
+      .portrait-grid .video-grid-item {
+        width: 300px; /* Maintain consistent size for portrait videos */
       }
     }
 
@@ -598,7 +601,7 @@
 
     .video-aspect-frame.aspect-9-16 {
       aspect-ratio: 9/16;
-      height: 427px; /* Fixed height for portrait videos */
+      height: 498px; /* Updated height for 280px width (280*16/9) */
     }
 
     /* Responsive height adjustments for aspect frames */
@@ -607,7 +610,7 @@
         height: 214px; /* For 380px width (380/16*9) */
       }
       .video-aspect-frame.aspect-9-16 {
-        height: 391px; /* For 220px width */
+        height: 462px; /* For 260px width (260*16/9) */
       }
     }
 
@@ -616,7 +619,7 @@
         height: 253px; /* For 450px width (450/16*9) */
       }
       .video-aspect-frame.aspect-9-16 {
-        height: 427px; /* For 240px width */
+        height: 533px; /* For 300px width (300*16/9) */
       }
     }
 
@@ -624,6 +627,9 @@
     @media (min-width: 1600px) {
       .video-aspect-frame.aspect-16-9 {
         height: 281px; /* For 500px width (500/16*9) */
+      }
+      .video-aspect-frame.aspect-9-16 {
+        height: 533px; /* Maintain 300px width for portrait videos */
       }
     }
 
