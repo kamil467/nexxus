@@ -17,9 +17,10 @@
 
 /* Portrait Video Container */
 .work-details-video-container[data-orientation="portrait"] {
-  max-height: 85vh; /* Allow more height for portrait videos */
-  max-width: 600px; /* Limit width for portrait videos */
+  max-height: 90vh; /* Use more height for portrait videos */
+  max-width: 50vw; /* Limit width to maintain aspect ratio */
   margin: 0 auto; /* Center portrait videos */
+  width: auto; /* Let width adjust based on aspect ratio */
 }
 
 /* Square Video Container */
@@ -27,6 +28,37 @@
   max-height: 75vh; /* Balanced height for square videos */
   max-width: 800px; /* Reasonable width for square videos */
   margin: 0 auto; /* Center square videos */
+}
+
+/* Desktop-specific adjustments */
+@media (min-width: 1024px) {
+  /* Portrait videos on desktop - use full height, adjust width */
+  .work-details-video-container[data-orientation="portrait"] {
+    max-height: 85vh; /* Use most of viewport height */
+    max-width: 48vh; /* Width calculated from 9:16 ratio (85vh * 9/16) */
+    width: auto; /* Let aspect ratio determine width */
+    height: 85vh; /* Fixed height for portrait videos */
+  }
+
+  /* Landscape videos on desktop */
+  .work-details-video-container[data-orientation="landscape"] {
+    max-height: 70vh;
+    max-width: 100%; /* Can use full width */
+  }
+
+  /* Square videos on desktop */
+  .work-details-video-container[data-orientation="square"] {
+    max-height: 80vh;
+    max-width: 80vh; /* Square aspect ratio */
+    width: auto;
+    height: 80vh;
+  }
+
+  /* Unknown orientation fallback - assume landscape */
+  .work-details-video-container[data-orientation="unknown"] {
+    max-height: 70vh;
+    max-width: 100%;
+  }
 }
 
 /* MuxPlayer Optimization for WorkDetails */
@@ -45,12 +77,19 @@
 .work-details-video-container mux-player video {
   width: 100% !important;
   height: 100% !important;
-  object-fit: contain !important;
+  object-fit: contain !important; /* Maintain aspect ratio, no cropping */
   border: none !important;
   border-radius: 0 !important;
   outline: none !important;
   box-shadow: none !important;
   max-height: inherit !important; /* Inherit max-height from container */
+}
+
+/* Ensure portrait videos maintain their aspect ratio */
+.work-details-video-container[data-orientation="portrait"] mux-player,
+.work-details-video-container[data-orientation="portrait"] mux-player video {
+  object-fit: contain !important; /* Critical for portrait videos */
+  object-position: center !important; /* Center the video */
 }
 
 /* Remove any potential borders from MuxPlayer internal elements */
@@ -502,8 +541,10 @@ mux-player:-moz-full-screen + .video-controls-overlay {
 
   /* Mobile Portrait Video Adjustments */
   .work-details-video-container[data-orientation="portrait"] {
-    max-height: 70vh; /* Allow more height for portrait on mobile */
-    max-width: 90vw; /* Use more screen width on mobile */
+    max-height: 75vh; /* Allow more height for portrait on mobile */
+    max-width: 42vh; /* Width based on 9:16 ratio (75vh * 9/16) */
+    width: auto; /* Let aspect ratio determine width */
+    height: 75vh; /* Fixed height for portrait videos on mobile */
   }
 
   /* Mobile Landscape Video Adjustments */
