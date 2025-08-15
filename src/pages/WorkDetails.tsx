@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, X, Play, Pause, Volume2, VolumeX, Maximize, SkipBack, SkipForward, Minimize } from 'react-feather';
-import { supabase } from '../api/supabase';
-import { WorkItem } from '../api/supabase';
+import { strapiAPI, WorkItem, richTextToPlainText } from '../api/strapi';
 import MuxPlayer from '@mux/mux-player-react';
 import ClientsSection from '../components/ClientsSection';
 import './WorkDetails.css';
@@ -80,28 +79,7 @@ const WorkDetails = () => {
     };
   }, []);
 
-  // Convert video IDs to Mux playback IDs
-  const getMuxPlaybackId = (item: any): string | null => {
-    console.log('Getting Mux ID for item:', item);
 
-    // Check all possible video ID fields
-    if (item.muxPlaybackId) {
-      console.log('Found muxPlaybackId:', item.muxPlaybackId);
-      return item.muxPlaybackId;
-    }
-    if (item.hId) {
-      console.log('Found hId:', item.hId);
-      return item.hId;
-    }
-    if (item.videoId) {
-      console.log('Found videoId (might need conversion):', item.videoId);
-      // For now, return null as videoId needs conversion
-      return null;
-    }
-
-    console.log('No valid Mux playback ID found');
-    return null;
-  };
 
   // Video control functions
   const toggleVideoPlayback = (videoId: string) => {
@@ -333,7 +311,7 @@ const WorkDetails = () => {
     }
   };
   
-  // Fetch work item data from Supabase
+  // Fetch work item data from Strapi
   useEffect(() => {
     const fetchWorkItem = async () => {
       if (!slug) {
@@ -344,16 +322,9 @@ const WorkDetails = () => {
 
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('work_items')
-          .select('*')
-          .eq('slug', slug)
-          .single();
+        const data = await strapiAPI.getWorkItemBySlug(slug);
 
-        if (error) {
-          console.error('Error fetching work item:', error);
-          setError('Failed to load project details');
-        } else if (!data) {
+        if (!data) {
           setError('Project not found');
         } else {
           console.log('Fetched work item:', data);
@@ -363,8 +334,8 @@ const WorkDetails = () => {
           const initialLoadingStates: { [key: string]: boolean } = {};
           const initialOrientations: { [key: string]: 'landscape' | 'portrait' | 'square' } = {};
 
-          data.relatedItems?.forEach((item: any, index: number) => {
-            if (item.type === 'video') {
+          data.relatedItems?.forEach((item: WorkItem, index: number) => {
+            if (item.muxPlaybackId) {
               const videoId = `video-${index}`;
               initialLoadingStates[videoId] = true;
 
@@ -374,8 +345,6 @@ const WorkDetails = () => {
                 initialOrientations[videoId] = orientation;
                 console.log(`Pre-determined orientation for ${videoId}: ${orientation} (cols: ${data.cols}, rows: ${data.rows})`);
               }
-            } else if (item.type === 'image') {
-              initialLoadingStates[`image-${index}`] = true;
             }
           });
 
@@ -596,7 +565,7 @@ const WorkDetails = () => {
                 <p className="text-sm leading-relaxed text-gray-600 font-light">
                    <div
                     dangerouslySetInnerHTML={{
-                      __html: currentProject?.capability || 'No capability available.'
+                      __html: richTextToPlainText(currentProject?.overview) || 'No overview available.'
                     }}
                   />
                 </p>
@@ -613,9 +582,9 @@ const WorkDetails = () => {
 
         {/* Media Content Section - Mobile Optimized */}
         <div className="relative">
-          {currentProject?.relatedItems?.filter(item => item.type === 'video')?.map((item, index) => {
+          {currentProject?.relatedItems?.filter(item => item.muxPlaybackId)?.map((item, index) => {
             const videoId = `video-${index}`;
-            const muxPlaybackId = getMuxPlaybackId(item);
+            const muxPlaybackId = item.muxPlaybackId;
 
             const isPlaying = playingVideos.has(videoId);
 
@@ -822,52 +791,8 @@ const WorkDetails = () => {
                         </div>
                         <p className="media-error-text">Video not available</p>
                         <p className="media-error-details">
-                          {item.videoId ? `Video ID: ${item.videoId}` : 'No video ID found'}
+                          {item.muxPlaybackId ? `Mux ID: ${item.muxPlaybackId}` : 'No video ID found'}
                         </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <hr className="my-2 md:my-4 border-t border-gray-200" />
-              </div>
-            );
-          })}
-  
-          {currentProject?.relatedItems?.filter(item => item.type === 'image')?.map((item, index) => {
-            const imageId = `image-${index}`;
-
-            return (
-              <div className="relative mb-8" key={imageId}>
-                <div className="w-full bg-[#F5F5F0] py-4 md:py-8">
-                  <div className="container mx-auto px-4 md:px-8 max-w-7xl relative">
-                    {/* Loading Spinner */}
-                    {loadingStates[imageId] !== false && (
-                      <div className="media-loading">
-                        <div className="loading-spinner"></div>
-                      </div>
-                    )}
-
-                    {/* Image */}
-                    {item.src ? (
-                      <div className="relative group">
-                        <img
-                          src={item.src}
-                          alt={`${currentProject?.title} - Related Image ${index + 1}`}
-                          className="work-details-image w-full h-[50vh] md:h-[70vh] object-cover rounded-lg md:rounded-none"
-                          onLoad={() => handleMediaLoad(imageId)}
-                          onError={() => handleMediaLoad(imageId)}
-                          loading="lazy"
-                        />
-
-                        {/* Image Overlay */}
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 rounded-lg md:rounded-none"></div>
-                      </div>
-                    ) : (
-                      <div className="w-full h-[50vh] md:h-[70vh] media-error">
-                        <div className="media-error-icon">
-                          <X size={48} />
-                        </div>
-                        <p className="media-error-text">Image not available</p>
                       </div>
                     )}
                   </div>

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ArrowDown, Users, Building2, Award, Star } from 'lucide-react';
 import Test from './Test';
 import Mobile from './Mobile';
-import { supabase, WorkItem } from '../api/supabase';
+import { strapiAPI, WorkItem } from '../api/strapi';
 import ClientsSection from '../components/ClientsSection';
 
 const Home = () => {
@@ -42,28 +42,21 @@ const Home = () => {
 }, [checkMobile]);
 
   const [workItems, setWorkItems] = useState<WorkItem[]>([]);
-    // Fetch work items from Supabase
+    // Fetch work items from Strapi
     useEffect(() => {
       const fetchWorkItems = async () => {
         //setLoading(true);
         try {
-          const { data, error } = await supabase
-            .from('work_items')
-            .select('*');
-            
-          if (error) {
-            console.error('Error fetching work items:', error);
-          } else {
-            console.log('Fetched work items:', data);
-            setWorkItems(data || []);
-          }
+          const data = await strapiAPI.getWorkItems();
+          console.log('Fetched work items:', data);
+          setWorkItems(data || []);
         } catch (error) {
           console.error('Error fetching work items:', error);
         } finally {
          // setLoading(false);
         }
       };
-      
+
       fetchWorkItems();
     }, []);
   

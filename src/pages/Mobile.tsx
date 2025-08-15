@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import MuxPlayer from '@mux/mux-player-react';
-import { WorkItem } from '../api/supabase';
+import { WorkItem } from '../api/strapi';
 import './Mobile.css';
 
 interface Props {

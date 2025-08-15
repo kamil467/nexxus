@@ -5,20 +5,33 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+// Updated WorkItem interface based on Strapi API definition
 export interface WorkItem {
     id: number;
+    documentId: string;
     cols: number;
     rows: number;
-    type: string;
-    image?: string;
-    muxPlaybackId?: string;
-    videoId?: string;
-    hId?: string;
+    muxPlaybackId: string;
     title: string;
     slug: string;
     description: string;
-    relatedItems: Array<{ type: string; src?: string; muxPlaybackId?: string; videoId?: string; hId?: string }>;
-    overview?: string;
-    capability?: string;
+    overview?: Array<{
+        type: string;
+        children: Array<{
+            type: string;
+            text: string;
+        }>;
+    }>;
+    clientImpact?: Array<{
+        type: string;
+        children: Array<{
+            type: string;
+            text: string;
+        }>;
+    }>;
     team?: string;
+    createdAt: string;
+    updatedAt: string;
+    publishedAt: string;
+    relatedItems?: WorkItem[];
 }
