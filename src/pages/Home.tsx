@@ -47,14 +47,19 @@ const Home = () => {
       const fetchWorkItems = async () => {
         //setLoading(true);
         try {
+          console.log('Home.tsx: Fetching work items from Works table...');
           const { data, error } = await supabase
-            .from('work_items')
+            .from('Works')
             .select('*');
-            
+
+          console.log('Home.tsx: Supabase response:', { data, error });
+
           if (error) {
-            console.error('Error fetching work items:', error);
+            console.error('Home.tsx: Error fetching work items:', error);
+            console.error('Home.tsx: Error details:', error.message, error.details, error.hint);
           } else {
-            console.log('Fetched work items:', data);
+            console.log('Home.tsx: Fetched work items:', data);
+            console.log('Home.tsx: Number of items:', data?.length || 0);
             setWorkItems(data || []);
           }
         } catch (error) {

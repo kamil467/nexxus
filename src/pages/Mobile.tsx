@@ -113,8 +113,8 @@ const Mobile: React.FC<Props> = ({ videos }) => {
       ref={containerRef}
     >
       {videos.map((item, i) => {
-        const isPortrait = item.cols === 1; // Portrait videos
-        const isLandscape = item.cols === 2; // Landscape videos
+        const isPortrait = item.type === 'portrait'; // Portrait videos
+        const isLandscape = item.type === 'landscape'; // Landscape videos
 
         return (
           <div
@@ -126,7 +126,7 @@ const Mobile: React.FC<Props> = ({ videos }) => {
             <div
               className="video-background"
               style={{
-                backgroundImage: `url(https://image.mux.com/${item.muxPlaybackId}/thumbnail.jpg?width=1200&height=675&fit_mode=smartcrop)`,
+                backgroundImage: `url(https://image.mux.com/${item.videoID}/thumbnail.jpg?width=1200&height=675&fit_mode=smartcrop)`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 filter: 'blur(25px)',
@@ -143,7 +143,7 @@ const Mobile: React.FC<Props> = ({ videos }) => {
                 onClick={() => handleVideoTap(i)}
               >
                 <MuxPlayer
-                  playbackId={item.muxPlaybackId}
+                  playbackId={item.videoID}
                   metadata={{
                     video_title: item.title || '',
                     viewer_user_id: 'mobile-feed'

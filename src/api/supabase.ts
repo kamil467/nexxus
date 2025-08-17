@@ -7,18 +7,13 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export interface WorkItem {
     id: number;
-    cols: number;
-    rows: number;
-    type: string;
-    image?: string;
-    muxPlaybackId?: string;
-    videoId?: string;
-    hId?: string;
+    created_at: string;
+    type: 'portrait' | 'landscape';
+    videoID: string;
     title: string;
     slug: string;
     description: string;
-    relatedItems: Array<{ type: string; src?: string; muxPlaybackId?: string; videoId?: string; hId?: string }>;
     overview?: string;
-    capability?: string;
-    team?: string;
+    client_impact?: string;
+    related_items?: any[]; // Will be updated later
 }
