@@ -1,0 +1,348 @@
+/* About Page Enhanced Styles */
+.about-page {
+  min-height: 100vh;
+  background: #fff;
+  color: #333;
+  overflow-x: hidden;
+}
+
+/* Animations */
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Hero Section */
+.about-hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+/* Story Section */
+.story-section {
+  background: #fff;
+  position: relative;
+}
+
+.story-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.story-image-container {
+  aspect-ratio: 1;
+  border-radius: 32px;
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.story-image-container:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 35px 70px rgba(0, 0, 0, 0.2);
+}
+
+.story-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.story-image-container:hover .story-image {
+  transform: scale(1.05);
+}
+
+.story-image-glow {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background: linear-gradient(135deg, rgba(169, 172, 135, 0.3), rgba(149, 152, 114, 0.3));
+  border-radius: 36px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 1;
+  filter: blur(12px);
+}
+
+.story-image-container:hover + .story-image-glow {
+  opacity: 1;
+}
+
+.story-image-blur-1 {
+  position: absolute;
+  bottom: -24px;
+  right: -24px;
+  width: 192px;
+  height: 192px;
+  background: linear-gradient(135deg, rgba(169, 172, 135, 0.15), rgba(149, 152, 114, 0.15));
+  border-radius: 50%;
+  filter: blur(48px);
+  z-index: 0;
+}
+
+.story-image-blur-2 {
+  position: absolute;
+  top: -24px;
+  left: -24px;
+  width: 128px;
+  height: 128px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+  border-radius: 50%;
+  filter: blur(32px);
+  z-index: 0;
+}
+
+.story-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
+.story-text {
+  space-y: 2rem;
+}
+
+.story-paragraph {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: #6b7280;
+  margin-bottom: 2rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+/* Values Section */
+.values-section {
+  background: #fff;
+  position: relative;
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.value-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  padding: 2.5rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.value-card:hover {
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 25px 50px rgba(169, 172, 135, 0.2);
+  border-color: rgba(169, 172, 135, 0.4);
+}
+
+.value-card:hover .value-card-overlay {
+  opacity: 1;
+}
+
+.value-card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(169, 172, 135, 0.05) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.value-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #A9AC87 0%, #959872 100%);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem;
+  box-shadow: 0 8px 24px rgba(169, 172, 135, 0.3);
+  position: relative;
+  z-index: 2;
+}
+
+.value-icon {
+  color: white;
+}
+
+.value-content {
+  position: relative;
+  z-index: 2;
+}
+
+.value-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.value-description {
+  font-size: 1rem;
+  color: #6b7280;
+  line-height: 1.7;
+  font-weight: 400;
+}
+
+/* Team Section */
+.team-section {
+  background: #f8f9fa;
+  position: relative;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.team-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 28px;
+  padding: 2rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.team-card:hover {
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 25px 50px rgba(169, 172, 135, 0.15);
+  border-color: rgba(169, 172, 135, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .values-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .team-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-hero {
+    min-height: 80vh;
+  }
+  
+  .story-section .container {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+  
+  .story-section .grid {
+    gap: 3rem;
+  }
+  
+  .values-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .value-card {
+    padding: 2rem;
+  }
+  
+  .team-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .team-card {
+    padding: 1.5rem;
+  }
+  
+  .story-paragraph {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .value-card {
+    padding: 1.5rem;
+  }
+  
+  .value-icon-wrapper {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .value-title {
+    font-size: 1.25rem;
+  }
+  
+  .team-card {
+    padding: 1.25rem;
+  }
+  
+  .story-image-blur-1 {
+    width: 120px;
+    height: 120px;
+    bottom: -12px;
+    right: -12px;
+  }
+  
+  .story-image-blur-2 {
+    width: 80px;
+    height: 80px;
+    top: -12px;
+    left: -12px;
+  }
+}
