@@ -42,23 +42,23 @@ const team = [
 const values = [
   {
     icon: Users2,
-    title: 'Collaborative Approach',
-    description: 'We believe in working closely with our clients, fostering open communication and shared success.'
+    title: 'Leadership',
+    description: 'We empower individuals to lead with purpose and influence.By nurturing leaders, we create a ripple effect of growth and inspiration.'
   },
   {
     icon: Lightbulb,
-    title: 'Innovation First',
-    description: 'Pushing boundaries with cutting-edge technology and creative solutions that set new standards.'
+    title: 'Innovation',
+    description: 'We stay ahead by embracing fresh ideas in a fast-changing world.For us, innovation means working smarter—not just faster.'
   },
   {
     icon: Target,
-    title: 'Result Driven',
-    description: 'Focus on delivering measurable impact and achieving meaningful outcomes for our clients.'
+    title: 'Integrity',
+    description: 'We uphold honesty and responsibility in every action.Our commitment ensures trust, transparency, and long-term relationships.'
   },
   {
     icon: Sparkles,
-    title: 'Quality Obsessed',
-    description: 'Committed to excellence in every detail, from concept to final delivery.'
+    title: 'Cultural Roots',
+    description: 'Honoring where we come from empowers us to move ahead with integrity and sustainable vision.'
   }
 ];
 
@@ -71,10 +71,10 @@ const About = () => {
         <div className="container mx-auto px-4 relative">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl lg:text-6xl font-light mb-6 leading-tight">
-              Crafting Digital Excellence
+             Inside Our Vision
             </h1>
             <p className="text-xl text-gray-600 leading-relaxed">
-              We are a creative studio dedicated to crafting meaningful digital experiences that inspire and engage.
+        To be the trusted business growth partner by empowering the creation of world-class brands.
             </p>
           </div>
         </div>
@@ -100,13 +100,13 @@ const About = () => {
             {/* Content Section */}
             <div className="space-y-8">
               <div>
-                <h2 className="text-3xl font-light mb-4">Our Story</h2>
+                <h2 className="text-3xl font-light mb-4">From Vision to Reality </h2>
                 <div className="space-y-6 text-gray-600">
                   <p className="leading-relaxed">
-                    Founded in 2020, we’ve collaborated with brands across various industries, helping them tell their stories and connect with their audiences in innovative ways.
+Nexxus Digital Solutions began its journey in July 2024 with just three passionate minds and a bold vision to transform the digital landscape. What started as a focused digital marketing agency quickly gained momentum, fueled by our dedication to results and creative problem-solving. Within months, we expanded our capabilities and began working with market leaders in our region, earning trust through consistent performance.  
                   </p>
                   <p className="leading-relaxed">
-                    Our approach is rooted in understanding the unique challenges and opportunities each project presents, allowing us to create tailored solutions that drive real impact.
+                    Nexxus is more than just a digital agency — we’re a trusted growth partner. Our services now include business consulting, market research, business surveys, and shared services. Our team has grown to 23 skilled professionals, all driven by the same mission: to empower brands with innovative, data-driven solutions that scale. From local businesses to regional leaders, we help shape strategies that unlock meaningful, long-term growth.
                   </p>
                 </div>
               </div>
@@ -119,9 +119,9 @@ const About = () => {
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-light mb-4">Our Values</h2>
+            <h2 className="text-3xl lg:text-4xl font-light mb-4">Core Values</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              These core principles guide everything we do and help us deliver exceptional results for our clients.
+              We create purpose-driven strategies rooted in innovation to fuel your brand’s growth and success.
             </p>
           </div>
 

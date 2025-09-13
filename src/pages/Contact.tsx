@@ -27,7 +27,7 @@ const Contact = () => {
               <MapPin className="text-gray-400" size={24} />
               <div>
                 <h3 className="font-medium mb-1">Location</h3>
-                <p className="text-gray-600"> 23 pal- lucky plaza GH Road <br />Ramanathapuram,TN 623501, India</p>
+                <p className="text-gray-600"> No21, First floor, Pal lucky plaza, GH road <br />Ramanathapuram,TN 623501, India</p>
               </div>
             </div>
           </div>

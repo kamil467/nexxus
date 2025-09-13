@@ -300,10 +300,9 @@ const ClientsSection: React.FC<ClientsSectionProps> = ({ className = '' }) => {
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-light mb-4">Trusted by Industry Leaders</h2>
+          <h2 className="text-3xl lg:text-4xl font-light mb-4">Trusted by</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            We're proud to work with some of the most innovative companies across various industries,
-            helping them achieve their digital transformation goals.
+          Rooted in trust, driven by results — our relationships with clients go beyond business.
           </p>
         </div>
 

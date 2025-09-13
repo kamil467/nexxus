@@ -103,16 +103,16 @@ const Home = () => {
             <div className="space-y-8 relative order-last lg:order-first">
               <div className="absolute -top-10 -left-10 w-32 h-32 bg-blue-50 rounded-full blur-3xl opacity-60"></div>
               <h1 className="text-4xl lg:text-6xl font-light leading-tight relative z-10">
-                Crafting the future,<br />One pixel at a time
+               Your trusted partner in building world-class brands
               </h1>
               <p className="text-gray-600 max-w-md text-base lg:text-lg">
-                Passionate about creating meaningful digital experiences that inspire and engage. Bringing ideas to life through innovative design and development.
+                At Nexxus, we deliver impactful digital solutions that inspire, engage, and drive growth—combining smart strategy, creative excellence, and innovative design to future-proof your brand.
               </p>
               <button 
                 onClick={scrollToWork}
                 className="flex items-center space-x-3 bg-[#A9AC87] text-white px-6 py-3 rounded-full hover:bg-[#959872] transition-all duration-300 hover:translate-y-1 group hover:shadow-lg hover:shadow-[#A9AC87]/20"
               >
-                <span className="text-base lg:text-lg font-medium">View Our Work</span>
+                <span className="text-base lg:text-lg font-medium">Our Creations</span>
                 <ArrowDown 
                   size={28} 
                   className="animate-bounce group-hover:animate-none group-hover:translate-y-1 transition-all duration-300 group-hover:scale-110" 
