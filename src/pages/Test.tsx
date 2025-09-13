@@ -143,13 +143,13 @@ const MasonryGrid = () => {
   // Desktop-only: split items into landscape and portrait video groups
   const landscapeItems = useMemo(() =>
     workItems.filter((item) =>
-      item.type === 'mux' && ((item.cols === 2 && item.rows === 2) || (item.cols === 2 && item.rows === 3))
+      item.videoID && item.type === 'landscape'
     ),
   [workItems]);
 
   const portraitItems = useMemo(() =>
     workItems.filter((item) =>
-      item.type === 'mux' && (item.cols === 1 && item.rows === 3)
+      item.videoID && item.type === 'portrait'
     ),
   [workItems]);
 
@@ -257,14 +257,19 @@ const MasonryGrid = () => {
     const fetchWorkItems = async () => {
       setLoading(true);
       try {
+        console.log('Attempting to fetch from Works table...');
         const { data, error } = await supabase
-          .from('work_items')
+          .from('Works')
           .select('*');
-          
+
+        console.log('Supabase response:', { data, error });
+
         if (error) {
           console.error('Error fetching work items:', error);
+          console.error('Error details:', error.message, error.details, error.hint);
         } else {
           console.log('Fetched work items:', data);
+          console.log('Number of items:', data?.length || 0);
           setWorkItems(data || []);
         }
       } catch (error) {
@@ -358,17 +363,16 @@ const MasonryGrid = () => {
     if (!isMobile) return [];
 
     return workItems.map((item, index) => {
-      // Determine video aspect ratio based on cols/rows
-      const isPortrait = item.cols === 1 && item.rows === 3; // 9:16 videos
-      const isLandscape = (item.cols === 2 && item.rows === 2) || (item.cols === 2 && item.rows === 3); // 16:9 videos
-      const isSquare = item.cols === item.rows; // Square videos
+      // Use the pre-computed type from Works table
+      const isPortrait = item.type === 'portrait'; // 9:16 videos
+      const isLandscape = item.type === 'landscape'; // 16:9 videos
 
       return {
         ...item,
         index,
         isVisible: visibleItems.has(index),
         shouldLoad: Math.abs(index - currentVideoIndex) <= 1,
-        aspectRatio: isPortrait ? 'portrait' : isLandscape ? 'landscape' : isSquare ? 'square' : 'auto',
+        aspectRatio: item.type,
         displayMode: isPortrait ? 'fullscreen' : 'theater' // Portrait = reels, Landscape = theater mode
       };
     });
@@ -545,7 +549,7 @@ const MasonryGrid = () => {
         </div>
       ) : workItems.length === 0 ? (
         <div className="no-items-container">
-          <p>No work items found. Please check your Supabase connection.</p>
+          <p>No work items found. Please check your database connection.</p>
         </div>
       ) : (
         <>
@@ -590,7 +594,7 @@ const MasonryGrid = () => {
                           )}
 
                           <MuxPlayer
-                            playbackId={item.muxPlaybackId}
+                            playbackId={item.videoID}
                             autoPlay="muted"
                             muted
                             loop
@@ -682,7 +686,7 @@ const MasonryGrid = () => {
                           )}
 
                           <MuxPlayer
-                            playbackId={item.muxPlaybackId}
+                            playbackId={item.videoID}
                             autoPlay="muted"
                             muted
                             loop
